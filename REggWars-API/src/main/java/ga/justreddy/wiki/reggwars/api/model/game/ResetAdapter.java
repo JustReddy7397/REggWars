@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.api.model.game;
 
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 
 /**

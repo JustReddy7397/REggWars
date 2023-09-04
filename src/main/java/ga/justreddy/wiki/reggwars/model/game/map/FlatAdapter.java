@@ -71,4 +71,5 @@ public class FlatAdapter extends ResetAdapter {
     public boolean doesWorldExist(String world) {
         return Bukkit.getWorld(world) != null;
     }
+
 }
