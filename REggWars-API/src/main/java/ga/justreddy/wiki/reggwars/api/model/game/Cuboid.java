@@ -20,6 +20,7 @@ public class Cuboid implements Region {
     private final int x2;
     private final int y2;
     private final int z2;
+    private boolean cleared;
 
     public Cuboid(Location highPoints, Location lowPoints, boolean protect) {
         this.world = highPoints.getWorld();
@@ -32,6 +33,7 @@ public class Cuboid implements Region {
         Location highPoints1 = new Location(this.world, this.x2, this.y2, this.z2);
         Location lowPoints1 = new Location(this.world, this.x1, this.y1, this.z1);
         this.protect = protect;
+        this.cleared = false;
     }
 
 
@@ -46,6 +48,7 @@ public class Cuboid implements Region {
                 }
             }
         }
+        cleared = true;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class Cuboid implements Region {
 
     @Override
     public boolean isProtected() {
+        if (cleared) return false;
         return protect;
     }
 }

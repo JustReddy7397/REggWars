@@ -1,0 +1,26 @@
+spawners:
+  iron:
+    0:
+      drop-time: 0
+      max-dropped: 0
+      spawn-amount: 0
+      upgrade-cost: "40 ; IRON" # From 0 to 1
+    1:
+      drop-time: 2
+      max-dropped: 48
+      spawn-amount: 1
+      upgrade-cost: "30 ; IRON" # from 1 to 2
+    2:
+      drop-time: 1.5
+      max-dropped: 48
+      spawn-amount: 1
+      upgrade-cost: "3 ; GOLD" # from 2 to 3
+    3:
+      drop-time: 1
+      max-dropped: 48
+      spawn-amount: 1
+      upgrade-cost: "6 ; GOLD" # from 3 to 4
+    4:
+      drop-time: 0.5
+      max-dropped: 48
+      spawn-amount: 1

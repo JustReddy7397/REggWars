@@ -1,14 +1,21 @@
 package ga.justreddy.wiki.reggwars.model.game;
 
+import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.*;
+import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
+import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.game.team.ITeamAssigner;
+import ga.justreddy.wiki.reggwars.model.game.generator.Generator;
+import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import ga.justreddy.wiki.reggwars.model.game.team.TeamAssigner;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -30,15 +37,20 @@ public class Game implements IGame {
     private GameMode mode;
     private final List<IGamePlayer> players;
     private final List<IGameTeam> teams;
+    private final List<IGenerator> generators;
+    private final List<Region> regions;
 
     private Cuboid lobbyCuboid;
     private Cuboid gameCuboid;
+
+    private Location lobbyLocation;
+    private Location spectatorLocation;
 
     private int maxPlayers;
     private int minPlayers;
     private int teamSize;
 
-    private ITeamAssigner teamAssigner = new TeamAssigner();
+    private final ITeamAssigner teamAssigner = new TeamAssigner();
 
     public Game(String name, FileConfiguration config) {
         this.name = name;
@@ -46,6 +58,8 @@ public class Game implements IGame {
         this.adapter = REggWars.getInstance().getResetAdapter();
         this.players = new ArrayList<>();
         this.teams = new ArrayList<>();
+        this.generators = new ArrayList<>();
+        this.regions = new ArrayList<>();
     }
 
     @Override
@@ -105,8 +119,23 @@ public class Game implements IGame {
     }
 
     @Override
-    public Region getRegion() {
+    public Region getGameRegion() {
         return gameCuboid;
+    }
+
+    @Override
+    public List<Region> getRegions() {
+        return regions;
+    }
+
+    @Override
+    public void addRegion(Region region) {
+        regions.add(region);
+    }
+
+    @Override
+    public void removeRegion(Region region) {
+        regions.remove(region);
     }
 
     @Override
@@ -137,20 +166,59 @@ public class Game implements IGame {
     @Override
     public void init(World world) {
         this.world = world;
+        players.clear();
+        teams.clear();
+        generators.clear();
+        regions.clear();
         this.displayName = config.getString("settings.displayName", name);
         this.minPlayers = config.getInt("settings.minPlayers");
         this.teamSize = config.getInt("settings.teamSize");
         this.mode = teamSize == 1 ? GameMode.SOLO : GameMode.TEAM;
+        ConfigurationSection teams = config.getConfigurationSection("teams");
+        for (String id : teams.getKeys(false)) {
+            ConfigurationSection section = teams.getConfigurationSection(id);
+            IGameTeam team = new GameTeam(id, section);
+            this.teams.add(team);
+        }
 
+        ConfigurationSection generators = config.getConfigurationSection("generators");
 
+        for (String key : generators.getKeys(false)) {
+            ConfigurationSection section = generators.getConfigurationSection(key);
+            IGenerator generator = new Generator(
+                    key,
+                    section.getInt("startLevel"),
+                    section.getInt("maxLevel"),
+                    Material.matchMaterial(section.getString("material")),
+                    LocationUtils.getLocation(section.getString("location")),
+                    this,
+                    GeneratorType.valueOf(section.getString("type").toUpperCase())
+            );
+            this.generators.add(generator);
+        }
 
         this.maxPlayers = this.teams.size() * this.teamSize;
+        this.lobbyLocation = LocationUtils.getLocation("waiting-lobby");
+        this.spectatorLocation = LocationUtils.getLocation("spectator-location");
+        Location high;
+        Location low;
+        if (lobbyLocation != null) {
+            high = LocationUtils.getLocation("bounds.lobby.high");
+            low = LocationUtils.getLocation("bounds.lobby.low");
+            lobbyCuboid = new Cuboid(high, low, true);
+        }
+
+        high = LocationUtils.getLocation("bounds.game.high");
+        low = LocationUtils.getLocation("bounds.game.low");
+        gameCuboid = new Cuboid(high, low, false);
 
     }
 
     @Override
     public void onCountDown() {
-
+        switch (state) {
+            // TODO
+        }
     }
 
     @Override

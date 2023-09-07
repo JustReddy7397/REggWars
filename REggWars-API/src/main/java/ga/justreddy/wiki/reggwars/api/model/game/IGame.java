@@ -30,7 +30,13 @@ public interface IGame {
 
     List<IGameTeam> getDeadTeams();
 
-    Region getRegion();
+    Region getGameRegion();
+
+    List<Region> getRegions();
+
+    void addRegion(Region region);
+
+    void removeRegion(Region region);
 
     int getTeamSize();
 

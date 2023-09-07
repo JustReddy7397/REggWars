@@ -14,9 +14,9 @@ public enum TeamData {
     v1_15("h", "c", "d", "a", "i", "j", "b"),
     v1_16("h", "c", "d", "a", "i", "j", "b"),
     v1_17("j", "b", "c", "i", "h", "g", "a"),
-    v_18("j", "b", "c", "i", "h", "g", "a"),
-    v_19("j", "b", "c", "i", "h", "g", "a"),
-    v_20("j", "b", "c", "i", "h", "g", "a");
+    v1_18("j", "b", "c", "i", "h", "g", "a"),
+    v1_19("j", "b", "c", "i", "h", "g", "a"),
+    v1_20("j", "b", "c", "i", "h", "g", "a");
 
     private final String members;
     private final String prefix;

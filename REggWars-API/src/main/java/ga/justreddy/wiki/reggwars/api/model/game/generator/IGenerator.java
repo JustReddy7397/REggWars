@@ -43,6 +43,12 @@ public interface IGenerator {
 
     int getMaxAmount();
 
+    int getUpgradeCost();
+
+    void setUpgradeCost(int cost);
+
     void destroy();
+
+    void start();
 
 }
