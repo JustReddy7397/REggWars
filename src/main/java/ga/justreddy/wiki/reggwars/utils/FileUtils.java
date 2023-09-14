@@ -43,7 +43,7 @@ public class FileUtils {
     }
 
     public static void delete(File file) {
-
+        if (file == null) return;
         if (file.isDirectory()) {
             File[] f = file.listFiles();
             if (f == null) return;

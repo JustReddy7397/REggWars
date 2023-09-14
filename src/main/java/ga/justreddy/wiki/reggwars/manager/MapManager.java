@@ -1,9 +1,13 @@
 package ga.justreddy.wiki.reggwars.manager;
 
 import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.api.model.game.ResetAdapter;
+import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
 import lombok.Getter;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author JustReddy
@@ -29,8 +33,8 @@ public class MapManager {
         );
         if (!flatWorldFolder.exists()) flatWorldFolder.mkdirs();
         if (!slimeWorldFolder.exists()) slimeWorldFolder.mkdirs();
-    }
 
+    }
 
 
 }

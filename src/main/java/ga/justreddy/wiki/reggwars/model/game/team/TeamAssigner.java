@@ -1,6 +1,5 @@
 package ga.justreddy.wiki.reggwars.model.game.team;
 
-import com.sun.org.apache.bcel.internal.generic.FieldOrMethod;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;

@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.packets;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -12,6 +13,11 @@ public class FakeTeamManager {
 
     private static final Map<String, FakeTeam> TEAMS = new HashMap<>();
     private static final Map<String, FakeTeam> CACHED_FAKE_TEAMS = new HashMap<>();
+    private static final Map<UUID, List<FakeTeam>> PLAYER_TEAMS = new HashMap<>();
+
+    public static Map<UUID, List<FakeTeam>> getPlayerTeams() {
+        return PLAYER_TEAMS;
+    }
 
     // - API
 

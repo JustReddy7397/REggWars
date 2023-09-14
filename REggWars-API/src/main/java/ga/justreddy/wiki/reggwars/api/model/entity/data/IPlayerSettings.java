@@ -9,6 +9,6 @@ public interface IPlayerSettings {
 
     ILanguage getLanguage();
 
-    ILanguage setLanguage(ILanguage language);
+    void setLanguage(ILanguage language);
 
 }

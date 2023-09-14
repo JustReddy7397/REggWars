@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
 /**
@@ -11,4 +12,7 @@ public class ChatUtil {
         return ChatColor.translateAlternateColorCodes('&', input);
     }
 
+    public static void sendConsole(String s) {
+        Bukkit.getConsoleSender().sendMessage(format(s));
+    }
 }

@@ -86,7 +86,7 @@ public class SlimeAdapter extends ResetAdapter {
                 }catch (UnknownWorldException | IOException | CorruptedWorldException | NewerFormatException |
                         WorldInUseException ex) {
                     onDisable(game);
-                    ex.printStackTrace();
+                    ex.fillInStackTrace();
                 }
             });
 
@@ -108,7 +108,7 @@ public class SlimeAdapter extends ResetAdapter {
                     }
                 }catch (UnknownWorldException | IOException e) {
                     Bukkit.getLogger().log(Level.WARNING, "Uh oh... " + game.getName());
-                    e.printStackTrace();
+                    e.fillInStackTrace();
                 }
                 onEnable(game);
             });
@@ -132,7 +132,7 @@ public class SlimeAdapter extends ResetAdapter {
                     }
                 }catch (UnknownWorldException | IOException e) {
                     Bukkit.getLogger().log(Level.WARNING, "Uh oh... " + game.getName());
-                    e.printStackTrace();
+                    e.fillInStackTrace();
                 }
             });
         });

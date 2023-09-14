@@ -2,6 +2,7 @@ package ga.justreddy.wiki.reggwars.nms;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -37,11 +38,14 @@ public interface Nms {
 
     void setPlayerListName(Player player, Player otherPlayer, String name);
 
+    void setTeamName(IGameTeam team);
+
+    void setTeamName(IGamePlayer player);
+
     void setWaitingLobbyName(IGamePlayer player);
 
     void removeWaitingLobbyName(IGame game);
 
     void removeWaitingLobbyName(IGame game, IGamePlayer player);
-
 
 }

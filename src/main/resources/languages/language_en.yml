@@ -1,0 +1,10 @@
+
+
+
+enums:
+  cosmetics:
+    unlocked: "&aUnlocked"
+    locked: "&cLocked"
+    selected: "&aSelected"
+    not-selected: "&aClick to select"
+    cant-select: "&cCost: &6<cost>"

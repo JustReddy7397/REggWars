@@ -1,10 +1,12 @@
 package ga.justreddy.wiki.reggwars.api.model.entity;
 
+import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerSettings;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -38,9 +40,15 @@ public interface IGamePlayer {
 
     void sendMessage(Message message);
 
+    void sendMessage(Message message, Replaceable... replaceables);
+
     void sendTitle(Message title, Message subTitle);
 
+    void sendTitle(Message title, Message subTitle, Replaceable... replaceables);
+
     void sendActionBar(Message actionBar);
+
+    void sendActionBar(Message actionBar, Replaceable... replaceables);
 
     void sendSound(String name);
 
@@ -51,6 +59,10 @@ public interface IGamePlayer {
     IPlayerSettings getSettings();
 
     void setSettings(IPlayerSettings settings);
+
+    IPlayerCosmetics getCosmetics();
+
+    void setCosmetics(IPlayerCosmetics cosmetics);
 
 
 }

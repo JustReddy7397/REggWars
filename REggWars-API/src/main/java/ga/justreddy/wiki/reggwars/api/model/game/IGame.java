@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.api.model.game;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -42,6 +43,8 @@ public interface IGame {
 
     GameState getGameState();
 
+    boolean isGameState(GameState state);
+
     void setGameState(GameState gameState);
 
     GameMode getGameMode();
@@ -64,8 +67,10 @@ public interface IGame {
 
     void onGamePlayerJoinSpectator(IGamePlayer gamePlayer);
 
-    void onGamePlayerDeath(IGamePlayer killer, IGamePlayer victim);
+    void onGamePlayerDeath(IGamePlayer killer, IGamePlayer victim, String path, boolean isFinal);
 
     IGameTeam getTeamByEggLocation(Location location);
+
+    IGenerator getGeneratorByLocation(Location location);
 
 }

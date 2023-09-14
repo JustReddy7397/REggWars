@@ -1,3 +1,5 @@
 name: REggWars
 version: '${project.version}'
 main: ga.justreddy.wiki.reggwars.REggWars
+commands:
+  eggwars:

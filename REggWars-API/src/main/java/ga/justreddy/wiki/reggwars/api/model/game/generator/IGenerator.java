@@ -3,6 +3,7 @@ package ga.justreddy.wiki.reggwars.api.model.game.generator;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -30,6 +31,9 @@ public interface IGenerator {
 
     GeneratorType getType();
 
+    Material getUpgradeMaterial();
+
+    void setUpgradeMaterial(Material material);
 
     void setDelay(int delay);
 
@@ -47,8 +51,15 @@ public interface IGenerator {
 
     void setUpgradeCost(int cost);
 
+    ConfigurationSection getSection();
+
+    int getLevel();
+
+    void setLevel(int level);
+
     void destroy();
 
     void start();
 
+    boolean isMaxLevel();
 }

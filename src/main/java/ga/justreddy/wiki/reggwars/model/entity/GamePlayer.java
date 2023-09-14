@@ -1,13 +1,17 @@
 package ga.justreddy.wiki.reggwars.model.entity;
 
+import com.cryptomorin.xseries.XSound;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerSettings;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -88,18 +92,38 @@ public class GamePlayer implements IGamePlayer {
     }
 
     @Override
-    public void sendTitle(Message title, Message subTitle) {
+    public void sendMessage(Message message, Replaceable... replaceables) {
+        ILanguage language = getSettings().getLanguage();
+        language.sendMessage(this, message, replaceables);
+    }
 
+    @Override
+    public void sendTitle(Message title, Message subTitle) {
+        ILanguage language = getSettings().getLanguage();
+        language.sendTitle(this, title, subTitle);
+    }
+
+    @Override
+    public void sendTitle(Message title, Message subTitle, Replaceable... replaceables) {
+        ILanguage language = getSettings().getLanguage();
+        language.sendTitle(this, title, subTitle, replaceables);
     }
 
     @Override
     public void sendActionBar(Message actionBar) {
+        ILanguage language = getSettings().getLanguage();
+        language.sendActionBar(this, actionBar);
+    }
 
+    @Override
+    public void sendActionBar(Message actionBar, Replaceable... replaceables) {
+        ILanguage language = getSettings().getLanguage();
+        language.sendActionBar(this, actionBar, replaceables);
     }
 
     @Override
     public void sendSound(String name) {
-
+        player.playSound(getLocation(), XSound.matchXSound(name).orElse(XSound.ENTITY_VILLAGER_NO).parseSound(), 1, 1);
     }
 
     @Override
@@ -109,7 +133,7 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public Location getLocation() {
-        return null;
+        return player.getLocation();
     }
 
     @Override
@@ -119,6 +143,16 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public void setSettings(IPlayerSettings settings) {
+
+    }
+
+    @Override
+    public IPlayerCosmetics getCosmetics() {
+        return null;
+    }
+
+    @Override
+    public void setCosmetics(IPlayerCosmetics cosmetics) {
 
     }
 }

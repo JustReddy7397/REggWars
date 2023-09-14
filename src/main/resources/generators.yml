@@ -11,16 +11,61 @@ spawners:
       spawn-amount: 1
       upgrade-cost: "30 ; IRON" # from 1 to 2
     2:
-      drop-time: 1.5
+      drop-time: 1
       max-dropped: 48
       spawn-amount: 1
       upgrade-cost: "3 ; GOLD" # from 2 to 3
     3:
-      drop-time: 1
+      drop-time: 0.5
       max-dropped: 48
       spawn-amount: 1
       upgrade-cost: "6 ; GOLD" # from 3 to 4
     4:
-      drop-time: 0.5
+      drop-time: 0.25
       max-dropped: 48
+      spawn-amount: 1
+  gold:
+    0:
+      drop-time: 0
+      max-dropped: 0
+      spawn-amount: 0
+      upgrade-cost: "30 ; IRON" # From 0 to 1
+    1:
+      drop-time: 4
+      max-dropped: 16
+      spawn-amount: 1
+      upgrade-cost: "6 ; GOLD" # from 1 to 2
+    2:
+      drop-time: 3
+      max-dropped: 16
+      spawn-amount: 1
+      upgrade-cost: "12 ; GOLD" # from 2 to 3
+    3:
+      drop-time: 2
+      max-dropped: 16
+      spawn-amount: 1
+      upgrade-cost: "4 ; DIAMOND" # from 3 to 4
+    4:
+      drop-time: 1
+      max-dropped: 16
+      spawn-amount: 1
+  diamond:
+    0:
+      drop-time: 0
+      max-dropped: 0
+      spawn-amount: 0
+      upgrade-cost: "40 ; GOLD" # From 0 to 1
+    1:
+      drop-time: 4
+      max-dropped: 8
+      spawn-amount: 1
+      upgrade-cost: "15 ; DIAMOND" # from 1 to 2
+    2:
+      drop-time: 3
+      max-dropped: 8
+      spawn-amount: 1
+      upgrade-cost: "25 ; DIAMOND" # from 2 to 3
+    3:
+      drop-time: 2
+      max-dropped: 8
       spawn-amount: 1

@@ -3,6 +3,7 @@ package ga.justreddy.wiki.reggwars.listener;
 import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
@@ -30,14 +31,14 @@ public class GameListener implements Listener {
         if (game == null) return;
         IGameTeam team = gamePlayer.getTeam();
         if (team == null) return;
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         Block clickedBlock = event.getClickedBlock();
         if (event.getClickedBlock().getType() != XMaterial.DRAGON_EGG.parseMaterial()) return;
         event.setCancelled(true);
         Location location = clickedBlock.getLocation();
         Location ownEggLocation = team.getEggLocation();
         if (LocationUtils.equalsBlock(location, ownEggLocation) && !team.isEggGone()) {
-            // TODO send message :)
+            gamePlayer.sendLegacyMessage("&cYou can't break your own egg silly"); // TODO
             return;
         }
 
@@ -48,6 +49,23 @@ public class GameListener implements Listener {
         teamEgg.setEggGone(true);
         clickedBlock.setType(Material.AIR);
 
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onGeneratorInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        Player player = event.getPlayer();
+        IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(player.getUniqueId());
+        IGame game = gamePlayer.getGame();
+        if (game == null) return;
+        Location location = event.getClickedBlock().getLocation();
+        IGenerator generator = game.getGeneratorByLocation(location);
+        if (generator == null) return;
+        if (player.isSneaking() && !generator.isMaxLevel()) {
+            // TODO upgrade generator if able
+            return;
+        }
+        // TODO open GUI
     }
 
 }

@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.api.model.game.team;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.Region;
 import org.bukkit.Location;
 
@@ -32,5 +33,9 @@ public interface IGameTeam {
     boolean isEggGone();
 
     void setEggGone(boolean eggGone);
+
+    Team getTeam();
+
+    IGame getGame();
 
 }

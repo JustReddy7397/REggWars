@@ -1,7 +1,9 @@
 package ga.justreddy.wiki.reggwars.model.game.team;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
+import ga.justreddy.wiki.reggwars.api.model.game.team.Team;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
@@ -17,16 +19,29 @@ import java.util.stream.Stream;
 public class GameTeam implements IGameTeam {
 
     private final String id;
+    private final IGame game;
     private final List<IGamePlayer> players;
     private final Location spawnLocation;
     private final Location eggLocation;
+    private final Team team;
     private boolean eggGone = false;
 
-    public GameTeam(String id, ConfigurationSection section) {
+    public GameTeam(String id, IGame game, ConfigurationSection section) {
         this.id = id;
+        this.game = game;
         this.players = new ArrayList<>();
         this.spawnLocation = LocationUtils.getLocation(section.getString("spawn"));
         this.eggLocation = LocationUtils.getLocation(section.getString("egg"));
+        this.team = Team.getByIdentifier(id);
+    }
+
+    public GameTeam(String id) {
+        this.id = id;
+        this.game = null;
+        this.players = new ArrayList<>();
+        this.spawnLocation = null;
+        this.eggLocation = null;
+        this.team = Team.getByIdentifier(id);
     }
 
 
@@ -89,5 +104,15 @@ public class GameTeam implements IGameTeam {
     @Override
     public void setEggGone(boolean eggGone) {
         this.eggGone = eggGone;
+    }
+
+    @Override
+    public Team getTeam() {
+        return team;
+    }
+
+    @Override
+    public IGame getGame() {
+        return game;
     }
 }
