@@ -3,10 +3,13 @@ package ga.justreddy.wiki.reggwars.api.model.game;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
+import ga.justreddy.wiki.reggwars.api.model.language.Message;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author JustReddy
@@ -69,8 +72,37 @@ public interface IGame {
 
     void onGamePlayerDeath(IGamePlayer killer, IGamePlayer victim, String path, boolean isFinal);
 
+
+    List<Map.Entry<IGamePlayer, Integer>> getTopKillers();
+
+    int getKills(IGamePlayer player);
+
+    void addKill(IGamePlayer player);
+
+    List<IGameTeam> getTeamsOrdered();
+
     IGameTeam getTeamByEggLocation(Location location);
 
     IGenerator getGeneratorByLocation(Location location);
+
+    void sendMessage(Message message);
+
+    void sendLegacyMessage(String message);
+
+    void sendMessage(Message message, Replaceable... replaceable);
+
+    void sendListMessage(Message message);
+
+    void sendListMessage(Message message, Replaceable... replaceable);
+
+    void sendTitle(Message title, Message subTitle);
+
+    void sendTitle(Message title, Message subTitle, Replaceable... replaceable);
+
+    void sendActionBar(Message message);
+
+    void sendActionBar(Message message, Replaceable... replaceable);
+
+    void sendSound(String sound);
 
 }

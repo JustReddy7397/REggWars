@@ -2,6 +2,7 @@ package ga.justreddy.wiki.reggwars.api.model.language;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;
 
@@ -31,5 +32,7 @@ public interface ILanguage {
     List<String> getStringList(Message message);
 
     String getId();
+
+    FileConfiguration getConfig();
 
 }

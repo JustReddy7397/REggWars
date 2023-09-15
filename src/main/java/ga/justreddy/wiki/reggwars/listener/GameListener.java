@@ -48,7 +48,7 @@ public class GameListener implements Listener {
         // TODO send message :)
         teamEgg.setEggGone(true);
         clickedBlock.setType(Material.AIR);
-
+        game.sendLegacyMessage("haha " + teamEgg.getTeam().getDisplayName() + " their egg has been broken, what a nerd!");
     }
 
     @EventHandler(ignoreCancelled = true)

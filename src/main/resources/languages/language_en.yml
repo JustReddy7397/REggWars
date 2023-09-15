@@ -1,6 +1,18 @@
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#
 
 
-
+scoreboard:
+  date-format: "dd/MM/yyyy"
+  you: "&7YOU"
+  dead: "&c&l✗"
+  alive: "&a&l✔"
+  game-board:
+    title: "&dEggWars"
+    waiting:
+      - "hi"
+      - "bye"
+    playing: []
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#
 enums:
   cosmetics:
     unlocked: "&aUnlocked"
@@ -8,3 +20,4 @@ enums:
     selected: "&aSelected"
     not-selected: "&aClick to select"
     cant-select: "&cCost: &6<cost>"
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#
