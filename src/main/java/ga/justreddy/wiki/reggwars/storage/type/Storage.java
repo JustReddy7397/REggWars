@@ -11,6 +11,8 @@ import java.util.UUID;
  */
 public interface Storage {
 
+    void createData();
+
     void createPlayer(IGamePlayer player);
 
     boolean doesPlayerExist(IGamePlayer player);

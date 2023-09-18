@@ -4,6 +4,7 @@ import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillEffect;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.VictoryDance;
+import ga.justreddy.wiki.reggwars.model.cosmetics.messages.DefaultMessage;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.ClassUtil;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class KillMessageManager {
     }
 
     public void start() {
+        register(new DefaultMessage());
         File[] files = messagesFile.listFiles();
         if (files == null) return;
         for (File file : files) {

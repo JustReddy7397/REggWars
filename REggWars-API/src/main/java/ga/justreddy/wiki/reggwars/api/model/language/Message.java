@@ -16,8 +16,8 @@ public enum Message {
     SCOREBOARD_YOU_TEXT("scoreboard.you"),
     SCOREBOARD_DEAD_TEXT("scoreboard.dead"),
     SCOREBOARD_ALIVE_TEXT("scoreboard.alive"),
-    SCOREBOARD_PLAYING_LINES("scoreboard.game-board.playing.lines"),
-    SCOREBOARD_WAITING_LINES("scoreboard.game-board.waiting.lines");
+    SCOREBOARD_PLAYING_LINES("scoreboard.game-board.playing"),
+    SCOREBOARD_WAITING_LINES("scoreboard.game-board.waiting");
     ;
     ;
 

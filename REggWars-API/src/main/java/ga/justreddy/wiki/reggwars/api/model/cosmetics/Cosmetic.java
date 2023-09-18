@@ -11,7 +11,7 @@ public abstract class Cosmetic {
     private final String permission;
     private final CosmeticRarity rarity;
 
-    protected Cosmetic(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
+    public Cosmetic(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
         this.id = id;
         this.subname = subname;
         this.cost = cost;

@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.model.game;
 
+import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.events.EggWarsGameJoinEvent;
 import ga.justreddy.wiki.reggwars.api.events.EggWarsGameKillEvent;
@@ -8,6 +9,7 @@ import ga.justreddy.wiki.reggwars.api.events.EggWarsGameStartEvent;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.*;
+import ga.justreddy.wiki.reggwars.api.model.game.GameMode;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
@@ -15,6 +17,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.team.ITeamAssigner;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
+import ga.justreddy.wiki.reggwars.board.EggWarsBoard;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.generator.Generator;
 import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
@@ -26,10 +29,8 @@ import ga.justreddy.wiki.reggwars.model.game.timer.Timer;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -58,6 +59,7 @@ public class Game implements IGame {
     private final List<IGameTeam> teams;
     private final List<IGenerator> generators;
     private final List<Region> regions;
+    private final List<Location> placedBlocks;
 
     private final Map<UUID, Integer> kills;
 
@@ -87,6 +89,7 @@ public class Game implements IGame {
         this.regions = new ArrayList<>();
         this.kills = new HashMap<>();
         this.spectators = new ArrayList<>();
+        this.placedBlocks = new ArrayList<>();
     }
 
     @Override
@@ -204,9 +207,10 @@ public class Game implements IGame {
         regions.clear();
         kills.clear();
         spectators.clear();
+        setGameState(GameState.WAITING);
         this.displayName = config.getString("settings.displayName", name);
         this.minPlayers = config.getInt("settings.minPlayers");
-        this.teamSize = config.getInt("settings.teamSize");
+        this.teamSize = config.getInt("settings.team-size");
         this.mode = teamSize == 1 ? GameMode.SOLO : GameMode.TEAM;
         ConfigurationSection teams = config.getConfigurationSection("teams");
         for (String id : teams.getKeys(false)) {
@@ -232,18 +236,19 @@ public class Game implements IGame {
         }
 
         this.maxPlayers = this.teams.size() * this.teamSize;
-        this.lobbyLocation = LocationUtils.getLocation("waiting-lobby");
-        this.spectatorLocation = LocationUtils.getLocation("spectator-location");
+
+        this.lobbyLocation = LocationUtils.getLocation(config.getString("waiting-lobby"));
+        this.spectatorLocation = LocationUtils.getLocation(config.getString("spectator-location"));
         Location high;
         Location low;
         if (lobbyLocation != null) {
-            high = LocationUtils.getLocation("bounds.lobby.high");
-            low = LocationUtils.getLocation("bounds.lobby.low");
+            high = LocationUtils.getLocation(config.getString("bounds.lobby.high"));
+            low = LocationUtils.getLocation(config.getString("bounds.lobby.low"));
             lobbyCuboid = new Cuboid(high, low, true);
         }
 
-        high = LocationUtils.getLocation("bounds.game.high");
-        low = LocationUtils.getLocation("bounds.game.low");
+        high = LocationUtils.getLocation(config.getString("bounds.game.high"));
+        low = LocationUtils.getLocation(config.getString("bounds.game.low"));
         gameCuboid = new Cuboid(high, low, false);
         this.gameTimer = new GameTimer(0, REggWars.getInstance(), this);
         this.startTimer = new GameStartTimer(10, REggWars.getInstance());
@@ -267,15 +272,21 @@ public class Game implements IGame {
                     startTimer.stop();
                     return;
                 }
-            break;
+                break;
             case PLAYING:
-                if (getAliveTeams().size() == 1) {
+/*                if (getAliveTeams().size() == 1) {
                     onGameEnd(getAliveTeams().get(0));
                 } else if (getAliveTeams().isEmpty()) {
                     onGameEnd(null);
-                }
+                }*/
+
+                generators.forEach(generator -> {
+                    generator.getGameSign().update();
+                });
 
 
+                break;
+            case ENDING:
                 break;
         }
     }
@@ -283,12 +294,17 @@ public class Game implements IGame {
     @Override
     public void onGameStart() {
         setGameState(GameState.PLAYING);
+        if (!gameTimer.isStarted()) gameTimer.start();
         teamAssigner.assignTeam(this);
         Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> {
             EggWarsGameStartEvent event = new EggWarsGameStartEvent(this);
             event.call();
             generators.forEach(IGenerator::start);
-            teams.forEach(this::toSpawn);
+            teams.forEach(team -> {
+                toSpawn(team);
+                team.getEggLocation().getBlock().setType(Material.DRAGON_EGG);
+                REggWars.getInstance().getNms().setTeamName(team);
+            });
             if (lobbyLocation != null && lobbyCuboid != null) {
                 lobbyCuboid.clear();
             }
@@ -297,9 +313,8 @@ public class Game implements IGame {
                 Player player = gamePlayer.getPlayer();
                 player.setGameMode(org.bukkit.GameMode.SURVIVAL);
                 PlayerUtil.clearInventory(player);
+
             }
-
-
 
 
         }, 5);
@@ -317,7 +332,7 @@ public class Game implements IGame {
     public void onGameRestart() {
         if (world != null) {
             world.getPlayers().forEach(player -> {
-                /* player.teleport();*/ // TODO
+                player.teleport(Bukkit.getWorld("world").getSpawnLocation());
             });
         }
         adapter.onRestart(this);
@@ -375,6 +390,7 @@ public class Game implements IGame {
                 player.getPlayer().showPlayer(player1);
             }*/
             // TODO create scoreboard
+            EggWarsBoard.getManager().setGameBoard(gamePlayer);
         }, 10L);
 
 
@@ -509,6 +525,11 @@ public class Game implements IGame {
     }
 
     @Override
+    public Set<IGameTeam> getTeamsSet() {
+        return new HashSet<>(teams);
+    }
+
+    @Override
     public List<Map.Entry<IGamePlayer, Integer>> getTopKillers() {
         return new ArrayList<>();
     }
@@ -531,8 +552,13 @@ public class Game implements IGame {
 
     @Override
     public IGameTeam getTeamByEggLocation(Location location) {
-        try (Stream<IGameTeam> stream = getAliveTeams().stream()) {
-            return stream.filter(team -> LocationUtils.equalsBlock(team.getEggLocation(), location))
+        try (Stream<IGameTeam> stream = getTeams().stream()) {
+            return stream.filter(team ->
+                    team.getEggLocation() != null &&
+                            team.getEggLocation().getBlock().getType() == XMaterial.DRAGON_EGG.parseMaterial()
+                            &&
+                        LocationUtils.equalsBlock(team.getEggLocation(), location)
+                    )
                     .findFirst()
                     .orElse(null);
         }
@@ -547,6 +573,11 @@ public class Game implements IGame {
                     .findFirst()
                     .orElse(null);
         }
+    }
+
+    @Override
+    public int getMaxPlayers() {
+        return maxPlayers;
     }
 
     @Override
@@ -632,6 +663,27 @@ public class Game implements IGame {
     @Override
     public void sendSound(String sound) {
         players.forEach(player -> player.sendSound(sound));
+    }
+
+    @Override
+    public void addBlock(Location location) {
+        if (placedBlocks.contains(location)) return;
+        placedBlocks.add(location);
+    }
+
+    @Override
+    public boolean isPlacedBlock(Location location) {
+        return placedBlocks.contains(location);
+    }
+
+    @Override
+    public void removeBlock(Location location) {
+        placedBlocks.add(location);
+    }
+
+    @Override
+    public World getWorld() {
+        return world;
     }
 
     private void toSpawn(IGameTeam team) {

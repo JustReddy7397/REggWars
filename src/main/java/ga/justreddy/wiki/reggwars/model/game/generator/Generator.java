@@ -3,15 +3,22 @@ package ga.justreddy.wiki.reggwars.model.game.generator;
 import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.IGameSign;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
+import ga.justreddy.wiki.reggwars.model.game.signs.GeneratorSign;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.util.Vector;
 
 /**
  * @author JustReddy
@@ -33,6 +40,9 @@ public class Generator implements IGenerator {
     private int upgradeCost;
     private BukkitTask task;
     private ConfigurationSection section;
+    private final IGameSign sign;
+    private final World world;
+    private boolean shouldDrop = true;
 
     public Generator(String id,
                      int startLevel,
@@ -70,6 +80,11 @@ public class Generator implements IGenerator {
             setUpgradeCost(Integer.MAX_VALUE);
             setUpgradeMaterial(null);
         }
+        this.sign = new GeneratorSign(id, location, game, this);
+        this.delay = section.getInt(level + ".drop-time");
+        this.spawnAmount = section.getInt(level + ".spawn-amount");
+        this.maxSpawnAmount = section.getInt(level + ".max-dropped");
+        this.world = game.getWorld();
     }
 
     @Override
@@ -94,7 +109,7 @@ public class Generator implements IGenerator {
 
     @Override
     public Location getLocation() {
-        return location;
+        return sign.getRelative().getLocation();
     }
 
     @Override
@@ -118,12 +133,29 @@ public class Generator implements IGenerator {
             setUpgradeMaterial(null);
         }
 
-        task = Bukkit.getScheduler().runTaskTimer(REggWars.getInstance(), this::dropItem, 0, this.delay);
+        task = Bukkit.getScheduler().runTaskTimer(REggWars.getInstance(), this::dropItem, 0, this.delay * 20L);
     }
 
     @Override
     public void dropItem() {
-        location.getWorld().dropItemNaturally(location, new ItemStack(material, spawnAmount));
+        int count = 0;
+        for (Entity entity : world.getNearbyEntities(getLocation(), 2, 2, 2)) {
+            if (!(entity instanceof Item)) continue;
+            Item item = (Item) entity;
+            if (item.getItemStack().getType() != getMaterial()) continue;
+            count+=1;
+        }
+        if (count >= maxSpawnAmount) {
+            shouldDrop = false;
+        }
+        if (!shouldDrop) {
+            shouldDrop = true;
+            return;
+        }
+        Vector vector = new Vector();
+        Item item = location.getWorld().dropItemNaturally(getLocation().add(0.5, 1.0D, 0.5), new ItemStack(material));
+        item.setVelocity(new Vector());
+        shouldDrop = true;
     }
 
     @Override
@@ -210,7 +242,7 @@ public class Generator implements IGenerator {
     @Override
     public void start() {
         if (level == 0) return;
-        task = Bukkit.getScheduler().runTaskTimer(REggWars.getInstance(), this::dropItem, 0, delay);
+        task = Bukkit.getScheduler().runTaskTimer(REggWars.getInstance(), this::dropItem, 0, delay * 20L);
     }
 
     private Material getMaterial(String input) {
@@ -230,6 +262,11 @@ public class Generator implements IGenerator {
     @Override
     public boolean isMaxLevel() {
         return level >= maxLevel;
+    }
+
+    @Override
+    public IGameSign getGameSign() {
+        return sign;
     }
 }
 

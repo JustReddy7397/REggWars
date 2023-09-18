@@ -2,13 +2,14 @@ package ga.justreddy.wiki.reggwars.api.model.cosmetics;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 
 /**
  * @author JustReddy
  */
 public abstract class KillMessage extends Cosmetic {
 
-    protected KillMessage(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
+    public KillMessage(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
         super(id, subname, cost, permission, rarity);
     }
 
@@ -20,7 +21,7 @@ public abstract class KillMessage extends Cosmetic {
 
     public abstract void sendFallMessage(IGame game, IGamePlayer killer, IGamePlayer victim, boolean isFinal);
 
-    public abstract void sendEggBreakMessage(IGame game, IGamePlayer killer, IGamePlayer victim);
+    public abstract void sendEggBreakMessage(IGame game, IGamePlayer breaker, IGameTeam team);
 
 
 }

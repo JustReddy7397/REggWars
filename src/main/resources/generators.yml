@@ -1,3 +1,6 @@
+# As for now, you cannot add your own generator types
+# you can only edit the current ones
+# I'm working on making it so you can create your own!
 spawners:
   iron:
     0:

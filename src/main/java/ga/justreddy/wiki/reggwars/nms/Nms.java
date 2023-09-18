@@ -5,6 +5,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
@@ -47,5 +48,7 @@ public interface Nms {
     void removeWaitingLobbyName(IGame game);
 
     void removeWaitingLobbyName(IGame game, IGamePlayer player);
+
+    Block getRelative(Location location);
 
 }

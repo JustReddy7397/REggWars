@@ -8,7 +8,9 @@ import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 
@@ -27,6 +29,10 @@ public class TestCommand extends Command {
 
     @Override
     public void onCommand(IGamePlayer g, String[] args) {
+        g.getLocation().getWorld().dropItemNaturally(
+                g.getLocation().add(0.5, 0, 0.5), new ItemStack(Material.IRON_INGOT)
+        );
+/*
         IGameTeam red = new GameTeam("white");
         IGameTeam blue = new GameTeam("gray");
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -40,5 +46,6 @@ public class TestCommand extends Command {
         }
         REggWars.getInstance().getNms().setTeamName(red);
         REggWars.getInstance().getNms().setTeamName(blue);
+*/
     }
 }

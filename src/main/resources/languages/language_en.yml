@@ -9,9 +9,15 @@ scoreboard:
   game-board:
     title: "&dEggWars"
     waiting:
-      - "hi"
-      - "bye"
-    playing: []
+      - ""
+      - "Waiting..."
+      - ""
+      - "&ejustreddy.tech"
+    playing:
+      - ""
+      - "<teams>"
+      - ""
+      - "&ejustreddy.tech"
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#
 enums:
   cosmetics:

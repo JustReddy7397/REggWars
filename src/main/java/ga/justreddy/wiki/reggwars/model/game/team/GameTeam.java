@@ -30,8 +30,8 @@ public class GameTeam implements IGameTeam {
         this.id = id;
         this.game = game;
         this.players = new ArrayList<>();
-        this.spawnLocation = LocationUtils.getLocation(section.getString("spawn"));
-        this.eggLocation = LocationUtils.getLocation(section.getString("egg"));
+        this.spawnLocation = LocationUtils.getBlockLocation(section.getString("spawn"));
+        this.eggLocation = LocationUtils.getBlockLocation(section.getString("egg"));
         this.team = Team.getByIdentifier(id);
     }
 
@@ -67,6 +67,11 @@ public class GameTeam implements IGameTeam {
         try (Stream<IGamePlayer> stream = players.stream()) {
             return stream.filter(IGamePlayer::isDead).collect(Collectors.toList());
         }
+    }
+
+    @Override
+    public int getSize() {
+        return players.size();
     }
 
     @Override

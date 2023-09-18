@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.utils;
 
 
+import com.sun.corba.se.pept.transport.ReaderThread;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -11,6 +12,15 @@ public class LocationUtils {
 
     public static String toLocation(Location location) {
         return location.getWorld().getName() + " : " + location.getX() + " : " + location.getY() + " : " + location.getZ() + " : " + location.getYaw() + " : " + location.getPitch();
+    }
+
+    public static Location getBlockLocation(String path) {
+        String[] split = path.split(" : ");
+        return new Location(Bukkit.getWorld(split[0]),
+                Math.round(Double.parseDouble(split[1])),
+                Math.round(Double.parseDouble(split[2])),
+                Math.round(Double.parseDouble(split[3]))
+                );
     }
 
     public static Location getLocation(String path) {

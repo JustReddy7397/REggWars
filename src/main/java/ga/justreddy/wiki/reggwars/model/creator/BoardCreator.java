@@ -3,6 +3,7 @@ package ga.justreddy.wiki.reggwars.model.creator;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.board.lib.FastBoard;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * @author JustReddy
  */
+@Getter
 public abstract class BoardCreator {
 
     private final FastBoard fastBoard;
@@ -18,7 +20,6 @@ public abstract class BoardCreator {
     public BoardCreator(IGamePlayer gamePlayer) {
         fastBoard = new FastBoard(gamePlayer.getPlayer());;
     }
-
 
     public void setTitle(String title) {
         title = ChatColor.translateAlternateColorCodes('&', title);

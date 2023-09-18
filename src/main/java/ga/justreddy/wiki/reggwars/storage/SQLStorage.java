@@ -25,6 +25,11 @@ public class SQLStorage implements Storage {
     }
 
     @Override
+    public void createData() {
+
+    }
+
+    @Override
     public void createPlayer(IGamePlayer player) {
 
     }

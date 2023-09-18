@@ -15,9 +15,9 @@ public abstract class Timer implements Runnable {
 
     private final int seconds;
     protected int ticksExceed = 0;
-    private int task;
+    protected int task;
     private final REggWars plugin;
-    private boolean started;
+    protected boolean started;
 
 
     /**

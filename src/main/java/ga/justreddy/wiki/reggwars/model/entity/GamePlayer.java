@@ -9,6 +9,8 @@ import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
+import ga.justreddy.wiki.reggwars.model.entity.data.PlayerSettings;
+import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -29,10 +31,13 @@ public class GamePlayer implements IGamePlayer {
     private IGameTeam team;
     private boolean dead;
 
+    private IPlayerSettings settings;
+
     public GamePlayer(UUID uniqueId, String name) {
         this.uniqueId = uniqueId;
         this.name = name;
         this.player = Bukkit.getPlayer(uniqueId);
+        this.settings = new PlayerSettings();
     }
 
     @Override
@@ -82,7 +87,7 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public void sendLegacyMessage(String message) {
-        player.sendMessage(message);
+        player.sendMessage(ChatUtil.format(message));
     }
 
     @Override
@@ -128,7 +133,7 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public void teleport(Location location) {
-
+        player.teleport(location);
     }
 
     @Override
@@ -138,12 +143,12 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public IPlayerSettings getSettings() {
-        return null;
+        return settings;
     }
 
     @Override
     public void setSettings(IPlayerSettings settings) {
-
+        this.settings = settings;
     }
 
     @Override

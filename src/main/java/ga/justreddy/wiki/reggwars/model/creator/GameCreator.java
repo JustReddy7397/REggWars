@@ -1,32 +1,43 @@
 package ga.justreddy.wiki.reggwars.model.creator;
 
-import com.avaje.ebeaninternal.server.type.EnumToDbStringMap;
 import com.grinderwolf.swm.api.exceptions.InvalidWorldException;
 import com.grinderwolf.swm.api.exceptions.WorldAlreadyExistsException;
 import com.grinderwolf.swm.api.exceptions.WorldLoadedException;
 import com.grinderwolf.swm.api.exceptions.WorldTooBigException;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
+import ga.justreddy.wiki.reggwars.api.model.game.team.Team;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.WorldManager;
+import ga.justreddy.wiki.reggwars.utils.LocationUtils;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * @author JustReddy
  */
+@Getter
 public class GameCreator implements Listener {
 
     private static GameCreator creator;
@@ -36,14 +47,12 @@ public class GameCreator implements Listener {
     }
 
     private final Map<UUID, String> stringMap;
-
-    public Map<UUID, String> getStringMap() {
-        return stringMap;
-    }
+    private final Map<UUID, FileConfiguration> generatorSetup;
 
     private GameCreator() {
         Bukkit.getPluginManager().registerEvents(this, REggWars.getInstance());
         this.stringMap = new HashMap<>();
+        this.generatorSetup = new HashMap<>();
     }
 
     @SneakyThrows
@@ -55,18 +64,18 @@ public class GameCreator implements Listener {
             return; // TODO
         }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
-        game.set("options.team-size", 1);
-        game.set("options.minimum", 8);
-        game.set("options.enabled", false);
+        game.set("settings.team-size", 1);
+        game.set("settings.minPlayers", 8);
+        game.set("settings.enabled", false);
         game.save(file);
 
         World world = WorldManager.getManager().createNewWorld(name);
         world.getSpawnLocation().getBlock().setType(Material.STONE);
         player.teleport(world.getSpawnLocation().add(0.0, 1, 0.0));
         stringMap.put(uuid, world.getName());
+        System.out.println("teleport");
         // TODO add items
     }
-
 
     @SneakyThrows
     public void save(IGamePlayer player) {
@@ -77,11 +86,13 @@ public class GameCreator implements Listener {
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         if (!isSetupComplete(game)) {
             // TODO send message
+            player.sendLegacyMessage("setup not complete");
             return;
         }
         World world = Bukkit.getServer().getWorld(stringMap.get(uuid));
         for (Player p : world.getPlayers()) {
-            // TODO send to lobby
+            p.teleport(Bukkit.getWorld("world").getSpawnLocation());
+            // TODO
         }
 
         world.save();
@@ -119,17 +130,227 @@ public class GameCreator implements Listener {
         }
     }
 
-    public void check(IGamePlayer gamePlayer) {
+    @SneakyThrows
+    public void addTeam(IGamePlayer gamePlayer, Team team) {
+        UUID uuid = gamePlayer.getUniqueId();
+        if (!stringMap.containsKey(uuid)) return; // TODO
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) return; // TODO
+        FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+        if (doesTeamExist(game, team)) return; // TODO
+        game.set("teams." + team.getIdentifier() + ".egg", "");
+        game.set("teams." + team.getIdentifier() + ".spawn", "");
+        game.save(file);
+        // TODO send proper message
+        gamePlayer.sendLegacyMessage("Added team: " + team.getIdentifier());
+    }
 
+    @SneakyThrows
+    public void setEgg(IGamePlayer gamePlayer, Team team) {
+        UUID uuid = gamePlayer.getUniqueId();
+        if (!stringMap.containsKey(uuid)) return; // TODO
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) return; // TODO
+        FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+        if (!doesTeamExist(game, team)) return; // TODO
+        game.set("teams." + team.getIdentifier() + ".egg", LocationUtils.toLocation(gamePlayer.getLocation().getBlock().getLocation()));
+        game.save(file);
+        // TODO send proper message
+        gamePlayer.sendLegacyMessage("Set egg for team: " + team.getIdentifier());
+    }
+
+    @SneakyThrows
+    public void setSpawn(IGamePlayer gamePlayer, Team team) {
+        UUID uuid = gamePlayer.getUniqueId();
+        if (!stringMap.containsKey(uuid)) return; // TODO
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) return; // TODO
+        FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+        if (!doesTeamExist(game, team)) return; // TODO
+        game.set("teams." + team.getIdentifier() + ".spawn", LocationUtils.toLocation(gamePlayer.getLocation().getBlock().getLocation()));
+        game.save(file);
+        // TODO send proper message
+        gamePlayer.sendLegacyMessage("Set spawn for team: " + team.getIdentifier());
+    }
+
+    @SneakyThrows
+    public void setWaitingLobby(IGamePlayer player) {
+        UUID uuid = player.getUniqueId();
+        if (!stringMap.containsKey(uuid)) return; // TODO
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) return; // TODO
+        FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+        game.set("waiting-lobby", LocationUtils.toLocation(player.getLocation()));
+        game.save(file);
+        // TODO send proper message
+        player.sendLegacyMessage("Set waiting-lobby");
+    }
+
+    @SneakyThrows
+    public void setSpectatorSpawn(IGamePlayer player) {
+        UUID uuid = player.getUniqueId();
+        if (!stringMap.containsKey(uuid)) return; // TODO
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) return; // TODO
+        FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+        game.set("spectator-location", LocationUtils.toLocation(player.getLocation()));
+        game.save(file);
+        // TODO send proper message
+        player.sendLegacyMessage("Set spectator-location");
+    }
+
+    public void check(IGamePlayer gamePlayer) {
+    }
+
+    public boolean isTeamSetup(FileConfiguration config, Team team) {
+        return config.isSet("teams." + team.getIdentifier() + ".spawn") &&
+                !config.getString("teams." + team.getIdentifier() + ".spawn", "")
+                        .equalsIgnoreCase("")
+                && config.isSet("teams." + team.getIdentifier() + ".egg")
+                && !config.getString("teams." + team.getIdentifier() + ".egg", "")
+                .equalsIgnoreCase("")
+                ;
+    }
+
+    @SneakyThrows
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        ItemStack itemStack = event.getItem();
+        if (itemStack == null || itemStack.getType() == Material.AIR) return;
+        UUID uuid = player.getUniqueId();
+        if (!stringMap.containsKey(player.getUniqueId())) return;
+        Block block = event.getClickedBlock();
+        if (block == null ) return;
+        String name = stringMap.get(uuid);
+        File file = getFile(name);
+        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        String location;
+        if (itemStack.getType() == Material.STICK) {
+            location = LocationUtils.toLocation(event.getClickedBlock().getLocation());
+            switch (event.getAction()) {
+                case LEFT_CLICK_BLOCK:
+                    config.set("bounds.lobby.high", location);
+                    config.save(file);
+                    player.sendMessage("high bound lobby set");
+                    event.setCancelled(true);
+                    break;
+                case RIGHT_CLICK_BLOCK:
+                    config.set("bounds.lobby.low", location);
+                    config.save(file);
+                    player.sendMessage("low bound lobby set");
+                    event.setCancelled(true);
+                    break;
+                    // TODO
+            }
+        } else if (itemStack.getType() == Material.BLAZE_ROD) {
+            location = LocationUtils.toLocation(event.getClickedBlock().getLocation());
+            switch (event.getAction()) {
+                case LEFT_CLICK_BLOCK:
+                    config.set("bounds.game.high", location);
+                    config.save(file);
+                    player.sendMessage("high bound game set");
+                    event.setCancelled(true);
+                    break;
+                case RIGHT_CLICK_BLOCK:
+                    config.set("bounds.game.low", location);
+                    config.save(file);
+                    player.sendMessage("low bound game set");
+                    event.setCancelled(true);
+                    break;
+                    // TODO
+            }
+
+        }
+    }
+
+    @SneakyThrows
+    @EventHandler
+    public void onSignChange(SignChangeEvent event) {
+        Player player = event.getPlayer();
+        if (!stringMap.containsKey(player.getUniqueId())) return;
+        if (event.getLines().length < 4) return;
+        String first = event.getLine(0);
+        String second = event.getLine(1);
+        String third = event.getLine(2);
+        String fourth = event.getLine(3);
+        if (first.equalsIgnoreCase("[GENERATOR]")) {
+            FileConfiguration config = REggWars.getInstance().getGeneratorsConfig().getConfig();
+            GeneratorType type = GeneratorType.getType(second.toUpperCase());
+            if (type == null) {
+                event.getBlock().setType(Material.AIR);
+                player.sendMessage("Invalid generator type!"); // TODO
+                return;
+            }
+
+            int startlevel;
+
+            try {
+                startlevel = Integer.parseInt(third);
+            }catch (NumberFormatException e) {
+                event.getBlock().setType(Material.AIR);
+                player.sendMessage("The generator start level must be between 0-"
+                + (config.getConfigurationSection("spawners." + type.name().toLowerCase())
+                                .getKeys(false).size() - 1)
+                ); // TODO
+                return;
+            }
+
+            File file = getFile(stringMap.get(player.getUniqueId()));
+            FileConfiguration c = YamlConfiguration.loadConfiguration(file);
+            int current = getGenerators(c);
+            c.set("generators." + current + ".startLevel", startlevel);
+            c.set("generators." + current + ".maxLevel",
+                    (config.getConfigurationSection("spawners." + type.name()
+                            .toLowerCase()).getKeys(false).size() - 1));
+            c.set("generators." + current + ".material", getMaterial(type.name()).name());
+            c.set("generators." + current + ".location", LocationUtils.toLocation(event.getBlock().getLocation()));
+            c.set("generators." + current + ".type", type.name());
+            c.save(file);
+            player.sendMessage("generator added!"); // TODO
+        }
+
+    }
+
+    @SneakyThrows
+    public void setMinPlayers(IGamePlayer player, int players) {
+        UUID uuid = player.getUniqueId();
+        if (!stringMap.containsKey(uuid)) return; // TODO
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) return; // TODO
+        FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+        game.set("settings.minPlayers", players);
+        game.save(file);
+        // TODO send proper message
+        player.sendLegacyMessage("Set waiting-lobby");
+    }
+
+    private int getGenerators(FileConfiguration config) {
+        if (!config.isSet("generators.")) {
+            return 1;
+        }
+
+        int count = 1;
+
+        Set<String> generators = config.getConfigurationSection("generators").getKeys(false);
+        for (String key : generators) {
+            ConfigurationSection section = config.getConfigurationSection("generators." + key);
+            if (section.isSet("startLevel") && section.isSet("maxLevel")
+            && section.isSet("material") && section.isSet("location")
+            && section.isSet("type")) {
+                ++count;
+            }
+        }
+        return count;
     }
 
     @SneakyThrows
     public boolean isSetupComplete(FileConfiguration config) {
         return config.isSet("settings.displayName")
                 && config.isSet("settings.minPlayers")
-                && config.isSet("settings.teamSize")
-                && config.isSet("teams")
-                && config.isSet("generators")
+                && config.isSet("settings.team-size")
+                && config.isSet("teams.")
+                && config.isSet("generators.")
                 && config.isSet("waiting-lobby")
                 && config.isSet("spectator-location")
                 && config.isSet("bounds.lobby.high")
@@ -138,8 +359,48 @@ public class GameCreator implements Listener {
                 && config.isSet("bounds.game.low");
     }
 
+    public boolean doesTeamExist(FileConfiguration config, Team team) {
+        return config.isSet("teams." + team.getIdentifier());
+    }
+
+    public boolean hasMoreThatOneTeam(FileConfiguration config) {
+        return config.getConfigurationSection("teams").getKeys(false).size() > 1;
+    }
+
+    @SneakyThrows
+    public boolean areTeamsComplete(FileConfiguration configuration) {
+        ConfigurationSection section = configuration.getConfigurationSection("teams");
+        for (String key : section.getKeys(false)) {
+            ConfigurationSection team = section.getConfigurationSection(key);
+            if (!team.isSet("egg")
+                    && team.getString("egg", "")
+                    .equalsIgnoreCase("")
+                    && !team.isSet("spawn")
+                    && team.getString("spawn", "")
+                    .equalsIgnoreCase("")
+            ) return false;
+        }
+
+        return true;
+    }
 
     public File getFile(String name) {
         return new File(REggWars.getInstance().getDataFolder().getAbsolutePath() + "/data/games/" + name + ".yml");
     }
+
+    private Material getMaterial(String input) {
+        switch (input) {
+            case "IRON":
+                return Material.IRON_INGOT;
+            case "GOLD":
+                return Material.GOLD_INGOT;
+            case "DIAMOND":
+                return Material.DIAMOND;
+            case "EMERALD":
+                return Material.EMERALD;
+        }
+        return null;
+    }
+
+
 }

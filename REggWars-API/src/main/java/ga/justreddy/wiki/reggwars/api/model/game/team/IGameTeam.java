@@ -20,6 +20,8 @@ public interface IGameTeam {
 
     List<IGamePlayer> getSpectatorPlayers();
 
+    int getSize();
+
     void addPlayer(IGamePlayer player);
 
     boolean hasPlayer(IGamePlayer player);

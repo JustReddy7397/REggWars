@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.nms.v1_8_R3;
 
+import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
@@ -10,9 +11,10 @@ import ga.justreddy.wiki.reggwars.packets.FakeTeam;
 import ga.justreddy.wiki.reggwars.packets.FakeTeamManager;
 import ga.justreddy.wiki.reggwars.utils.NumberUtil;
 import net.minecraft.server.v1_8_R3.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
@@ -215,5 +217,21 @@ public final class v1_8_R3 implements Nms {
     @Override
     public void removeWaitingLobbyName(IGame game, IGamePlayer player) {
 
+    }
+
+    @Override
+    public Block getRelative(Location location) {
+        if (location.getBlock().getType() == XMaterial.OAK_WALL_SIGN.parseMaterial())
+            switch (location.getBlock().getData()) {
+                case 2:
+                    return location.getBlock().getRelative(BlockFace.SOUTH);
+                case 3:
+                    return location.getBlock().getRelative(BlockFace.NORTH);
+                case 4:
+                    return location.getBlock().getRelative(BlockFace.EAST);
+                case 5:
+                    return location.getBlock().getRelative(BlockFace.WEST);
+            }
+        return null;
     }
 }

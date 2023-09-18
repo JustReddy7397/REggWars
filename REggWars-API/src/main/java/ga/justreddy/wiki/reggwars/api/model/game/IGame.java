@@ -7,9 +7,11 @@ import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author JustReddy
@@ -72,6 +74,7 @@ public interface IGame {
 
     void onGamePlayerDeath(IGamePlayer killer, IGamePlayer victim, String path, boolean isFinal);
 
+    Set<IGameTeam> getTeamsSet();
 
     List<Map.Entry<IGamePlayer, Integer>> getTopKillers();
 
@@ -84,6 +87,8 @@ public interface IGame {
     IGameTeam getTeamByEggLocation(Location location);
 
     IGenerator getGeneratorByLocation(Location location);
+
+    int getMaxPlayers();
 
     void sendMessage(Message message);
 
@@ -104,5 +109,13 @@ public interface IGame {
     void sendActionBar(Message message, Replaceable... replaceable);
 
     void sendSound(String sound);
+
+    void addBlock(Location location);
+
+    boolean isPlacedBlock(Location location);
+
+    void removeBlock(Location location);
+
+    World getWorld();
 
 }

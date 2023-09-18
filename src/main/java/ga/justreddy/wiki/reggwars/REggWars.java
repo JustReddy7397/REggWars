@@ -8,12 +8,20 @@ import ga.justreddy.wiki.reggwars.config.Config;
 import ga.justreddy.wiki.reggwars.exceptions.DependencyNotInstalledException;
 import ga.justreddy.wiki.reggwars.listener.GameListener;
 import ga.justreddy.wiki.reggwars.listener.MainListener;
+import ga.justreddy.wiki.reggwars.manager.GameManager;
+import ga.justreddy.wiki.reggwars.manager.LanguageManager;
+import ga.justreddy.wiki.reggwars.manager.MapManager;
+import ga.justreddy.wiki.reggwars.manager.MenuManager;
+import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
+import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.map.FlatAdapter;
 import ga.justreddy.wiki.reggwars.model.game.map.SlimeAdapter;
 import ga.justreddy.wiki.reggwars.model.replays.ReplayAdapter;
 import ga.justreddy.wiki.reggwars.model.replays.advancedreplay.AdvancedReplayAdapter;
 import ga.justreddy.wiki.reggwars.nms.Nms;
+import ga.justreddy.wiki.reggwars.schematic.ISchematic;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
+import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
@@ -37,7 +45,9 @@ public final class REggWars extends JavaPlugin {
     private ResetAdapter resetAdapter;
     private ReplayAdapter replayAdapter;
 
+    // Version specific stuff
     private Nms nms;
+    private ISchematic schematic;
 
     private Config generatorsConfig;
     private Config settingsConfig;
@@ -62,6 +72,21 @@ public final class REggWars extends JavaPlugin {
             return;
         }
 
+        ChatUtil.sendConsole("&7[&dREggWars&7] &aFinding Schematic version...");
+        try {
+            schematic = (ISchematic)
+                    Class.forName("ga.justreddy.wiki.reggwars.nms."
+                            + VERSION + "."
+                            + "Schematic").newInstance();
+            ChatUtil.sendConsole("&7[&dREggWars&7] &aSchematic version found: " + VERSION);
+        }catch (Exception e) {
+            ChatUtil.sendConsole("&7[&dREggWars&7] &cSchematic version: " + VERSION + " not supported! Shutting down...");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+
+
 
         isSlimeEnabled = settingsConfig.getConfig().getBoolean("modules.slimeworldmanager");
         if (isSlimeEnabled) {
@@ -72,6 +97,7 @@ public final class REggWars extends JavaPlugin {
             }
             loader = slime.getLoader("file");
             resetAdapter = new SlimeAdapter();
+            System.out.println("boom");
         } else {
             resetAdapter = new FlatAdapter();
         }
@@ -88,7 +114,7 @@ public final class REggWars extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new GameListener(), this);
         Bukkit.getPluginManager().registerEvents(new MainListener(), this);
 
-
+        registerManagers();
 
     }
 
@@ -100,11 +126,17 @@ public final class REggWars extends JavaPlugin {
     @SneakyThrows
     private boolean loadConfig() {
         settingsConfig = new Config("settings.yml");
+        generatorsConfig = new Config("generators.yml");
         return true;
     }
 
     private void registerManagers() {
-
+        MapManager.getManager();
+        LanguageManager.getManager().start();
+        MenuManager.getManager().start();
+        GameManager.getManager().start();
+        DanceManager.getManager().start();
+        KillMessageManager.getManager().start();
     }
 
     private static String getVersion(Server server) {

@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.api.model.game.generator;
 
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.IGameSign;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -62,4 +63,7 @@ public interface IGenerator {
     void start();
 
     boolean isMaxLevel();
+
+    IGameSign getGameSign();
+
 }

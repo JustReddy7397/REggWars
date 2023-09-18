@@ -28,9 +28,11 @@ public class EggWarsBoard {
     }
 
     private final Map<UUID, Integer> data;
+    private final Map<UUID, BoardCreator> boards;
 
     private EggWarsBoard() {
         this.data = new HashMap<>();
+        this.boards = new HashMap<>();
     }
 
     public void setLobbyBoard(IGamePlayer player) {
@@ -52,8 +54,8 @@ public class EggWarsBoard {
         BoardCreator creator = new BoardCreator(player) {
             @Override
             public String placeholder(String text) {
-
-
+                text = text.replaceAll("<kills>", String.valueOf(game.getKills(player))
+                        .replaceAll("<mode>", game.getGameMode().name()));
                 return text;
             }
         };
@@ -98,6 +100,7 @@ public class EggWarsBoard {
             }
         }, 0L, 20L).getTaskId();
         data.put(player.getUniqueId(), id);
+        boards.put(player.getUniqueId(), creator);
 
 
     }
@@ -109,6 +112,7 @@ public class EggWarsBoard {
         player.getPlayer().setScoreboard(Bukkit.getServer().getScoreboardManager().getNewScoreboard());
         Bukkit.getServer().getScheduler().cancelTask(data.get(uuid));
         data.remove(uuid);
+        boards.remove(player.getUniqueId());
     }
 
     public void shutdown() {
@@ -116,10 +120,14 @@ public class EggWarsBoard {
             Bukkit.getScheduler().cancelTask(integer);
         }
         data.clear();
+        boards.clear();
     }
 
     public Map<UUID, Integer> getData() {
         return data;
     }
 
+    public Map<UUID, BoardCreator> getBoards() {
+        return boards;
+    }
 }

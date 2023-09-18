@@ -8,6 +8,8 @@ import ga.justreddy.wiki.reggwars.api.model.game.team.ITeamAssigner;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author JustReddy
@@ -39,16 +41,19 @@ public class TeamAssigner implements ITeamAssigner {
             }
         }
 
+
+
         for (IGamePlayer remaining : game.getPlayers()) {
             if (skip.contains(remaining)) continue;
-            for (IGameTeam team : game.getTeams()) {
+            for (IGameTeam team : game.getTeamsSet()) {
                 if (team.getPlayers().size() < game.getTeamSize()) {
                     remaining.getPlayer().closeInventory();
                     team.addPlayer(remaining);
+                    remaining.setTeam(team);
                     break;
                 }
             }
         }
-
     }
+
 }
