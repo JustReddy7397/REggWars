@@ -43,6 +43,8 @@ public class GeneratorSign implements IGameSign {
 
     @Override
     public void update() {
+        if (location == null) return;
+        if (!(location.getBlock().getState() instanceof Sign)) return;
         Sign sign = (Sign) location.getBlock().getState();
         if (!sign.getChunk().isLoaded()) {
             sign.getChunk().load(true);

@@ -9,6 +9,7 @@ import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 public class NumberUtil {
 
     public static int getPriority(IGameTeam team) {
+        if (team == null) return 0;
         switch (team.getTeam()) {
             case RED:
                 return 1;

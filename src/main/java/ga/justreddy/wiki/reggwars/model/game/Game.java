@@ -302,6 +302,10 @@ public class Game implements IGame {
             generators.forEach(IGenerator::start);
             teams.forEach(team -> {
                 toSpawn(team);
+                if (team.getSize() == 0) {
+                    team.setEggGone(true);
+                    return;
+                }
                 team.getEggLocation().getBlock().setType(Material.DRAGON_EGG);
                 REggWars.getInstance().getNms().setTeamName(team);
             });
@@ -378,17 +382,16 @@ public class Game implements IGame {
 
         PlayerUtil.refresh(gamePlayer.getPlayer());
 
-        // TODO set possible their rank
+        // TODO set possibly their rank
 
         REggWars.getInstance().getServer().getScheduler().runTaskLater(REggWars.getInstance(), () -> {
-/*            EggWarsBoard.getScoreboard().removeScoreboard(player);
-            PlayerUtil.clearInventory(player.getPlayer(), getClass());
-            SkyWarsBoard.getScoreboard().setGameBoard(player);
-            HotBarManager.getManager().giveItems(player.getPlayer(), HotBarType.GAME);
-            for (Player player1 : gameMap.getWorld().getPlayers()) {
-                player1.showPlayer(player.getPlayer());
-                player.getPlayer().showPlayer(player1);
-            }*/
+            EggWarsBoard.getManager().removeScoreboard(gamePlayer);
+            PlayerUtil.clearInventory(gamePlayer.getPlayer());
+            //HotBarManager.getManager().giveItems(player.getPlayer(), HotBarType.GAME);
+            for (Player player1 : world.getPlayers()) {
+                player1.showPlayer(gamePlayer.getPlayer());
+                gamePlayer.getPlayer().showPlayer(player1);
+            }
             // TODO create scoreboard
             EggWarsBoard.getManager().setGameBoard(gamePlayer);
         }, 10L);
@@ -417,6 +420,7 @@ public class Game implements IGame {
         gamePlayer.setTeam(null);
 
         // TODO remove scoreboard
+        EggWarsBoard.getManager().removeScoreboard(gamePlayer);
         // TODO teleport to lobby
         PlayerUtil.refresh(gamePlayer.getPlayer());
         EggWarsGameLeaveEvent event = new EggWarsGameLeaveEvent(this, gamePlayer);
@@ -447,18 +451,16 @@ public class Game implements IGame {
 
         victim.setDead(true);
         Player player = victim.getPlayer();
-        Bukkit.getServer().getScheduler().runTaskLater(REggWars.getInstance(), () -> {
-            if (player == null) return;
+        PlayerUtil.refresh(player);
+        Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> {
+            player.teleport(spectatorLocation);
+            System.out.println("teleported");
             player.setGameMode(org.bukkit.GameMode.ADVENTURE);
             player.setAllowFlight(true);
             player.setFlying(true);
             player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 4));
-            player.teleport(spectatorLocation);
-            if (isFinal) {
-                //HotBarManager.getManager().giveItems(player, HotBarType.SPECTATOR);
-            }
 
-        }, 5L);
+        }, 3L);
         for (IGamePlayer players : players) {
             players.getPlayer().hidePlayer(player);
         }
@@ -469,8 +471,8 @@ public class Game implements IGame {
 
         if (killer != null) {
             KillMessage messages = KillMessageManager
-                    .getManager().getById(killer.getCosmetics().getSelectedKillMessage());
-            if (path != null || !path.isEmpty()) {
+                    .getManager().getById(0);
+            if (path != null && !path.isEmpty()) {
                 switch (path) {
                     case "void":
                         messages.sendVoidMessage(this, killer, victim, isFinal);
@@ -495,9 +497,7 @@ public class Game implements IGame {
             }
         }
 
-        if (isFinal) {
-
-        } else {
+        if (!isFinal) {
             // TODO send respawn stuff
             new BukkitRunnable() {
                 int i = 5;
@@ -508,8 +508,17 @@ public class Game implements IGame {
                         cancel();
                         return;
                     }
-                    if (i <= 5) {
+                    if (i <= 0) {
+                        victim.setDead(false);
                         IGameTeam team = victim.getTeam();
+                        PlayerUtil.refresh(player);
+                        for (IGamePlayer players : players) {
+                            players.getPlayer().showPlayer(player);
+                        }
+
+                        for (IGamePlayer players : getDeadPlayers()) {
+                            players.getPlayer().showPlayer(player);
+                        }
                         victim.teleport(team.getSpawnLocation());
                         // TODO send respawned title and message
                         cancel();
@@ -573,6 +582,17 @@ public class Game implements IGame {
                     .findFirst()
                     .orElse(null);
         }
+    }
+
+    @Override
+    public IGameSign getGeneratorSignByLocation(Location location) {
+        IGenerator generator = generators.stream().filter(
+                gen -> LocationUtils.equalsBlock(gen.getGameSign()
+                        .getLocation().getBlock().getLocation(),
+                        location.getBlock().getLocation())
+        ).findFirst().orElse(null);
+        if (generator == null) return null;
+        return generator.getGameSign();
     }
 
     @Override

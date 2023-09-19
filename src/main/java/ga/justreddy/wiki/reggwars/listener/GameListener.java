@@ -1,10 +1,13 @@
 package ga.justreddy.wiki.reggwars.listener;
 
 import com.cryptomorin.xseries.XMaterial;
+import com.cryptomorin.xseries.XSound;
+import ga.justreddy.wiki.reggwars.api.events.EggWarsEvent;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.IGameSign;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
@@ -15,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,7 +26,13 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.ArrayList;
 
 /**
  * @author JustReddy
@@ -90,6 +100,7 @@ public class GameListener implements Listener {
         Location location = event.getBlock().getLocation();
         if (game.getGeneratorByLocation(location.clone().subtract(0, 1,0)) != null) {
             player.sendLegacyMessage("&cYou can't place blocks on a generator"); // TODO
+            event.setCancelled(true);
             return;
         }
 
@@ -97,16 +108,20 @@ public class GameListener implements Listener {
 
     }
 
-    @EventHandler
-    public void onBlockExplode(BlockExplodeEvent event) {
-        for (Block block : event.blockList()) {
-            World w = block.getWorld();
-            IGame game = GameManager.getManager().getGameByWorld(w);
-            if (game == null) continue;
-            if (game.getGeneratorByLocation(block.getLocation()) != null) {
 
-            }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplode(EntityExplodeEvent event) {
+        for (Block block : new ArrayList<>(event.blockList())) {
+            World world = block.getWorld();
+            IGame game = GameManager.getManager().getGameByWorld(world);
+            if (game == null) continue;
+            if (game.isPlacedBlock(block.getLocation())) continue;
+            event.blockList().remove(block);
         }
+
+
+
     }
 
     @EventHandler
@@ -120,13 +135,87 @@ public class GameListener implements Listener {
         }
 
         if (!game.isPlacedBlock(event.getBlock().getLocation())) {
-            player.sendLegacyMessage("&cYou can only place blocks placed by players!"); // TODO
+            player.sendLegacyMessage("&cYou can only break blocks placed by players!"); // TODO
             event.setCancelled(true);
             return;
         }
 
         game.removeBlock(event.getBlock().getLocation());
 
+
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        event.setDroppedExp(0);
+        event.setDeathMessage(null);
+        Player death = event.getEntity();
+        if (death == null) return;
+        IGamePlayer deathPlayer = PlayerManager.getManager().getGamePlayer(death.getUniqueId());
+        if (deathPlayer == null) return;
+        IGame game = deathPlayer.getGame();
+        if (game == null) return;
+        Player killer = death.getKiller();
+        IGamePlayer killerPlayer = null;
+        if (killer != null) {
+            killerPlayer = PlayerManager.getManager().getGamePlayer(killer.getUniqueId());
+        } else {
+            // TODO make combat log
+        }
+        EntityDamageEvent.DamageCause damageCause = death.getPlayer().getLastDamageCause().getCause();
+        String path = null;
+        switch (damageCause) {
+            case VOID:
+                path = "void";
+                break;
+            case FALL:
+                path = "fall";
+                if (deathPlayer.getPlayer().getLocation().getBlockY() <= game.getGameRegion().getLowY()) {
+                    path = "void";
+                }
+                break;
+            case FIRE_TICK:
+                path = "burned";
+                break;
+            case ENTITY_ATTACK:
+                path = "melee";
+                break;
+            case LAVA:
+                path = "lava";
+                break;
+            case BLOCK_EXPLOSION:
+                path = "explosion";
+                break;
+            case DROWNING:
+                path = "drowning";
+                break;
+            case SUFFOCATION:
+                path = "suffocation";
+                break;
+            case PROJECTILE:
+                path = "projectile";
+                if (deathPlayer.getPlayer().getLocation().getBlockY() <= game.getGameRegion().getLowY()) {
+                    path = "void";
+                }
+                break;
+            default:
+                path = "unknown";
+                break;
+        }
+        if (killerPlayer == null) {
+            game.onGamePlayerDeath(null, deathPlayer, path,
+                    deathPlayer.getTeam() != null && deathPlayer.getTeam().isEggGone()
+                    );
+            // TODO send death message
+        } else {
+            game.addKill(killerPlayer);
+            killerPlayer.sendSound(
+                    XSound.ENTITY_EXPERIENCE_ORB_PICKUP.name()
+            );
+            // TODO add stats
+            game.onGamePlayerDeath(killerPlayer, deathPlayer, path, deathPlayer.getTeam().isEggGone());
+            // TODO add kill effect
+        }
 
     }
 

@@ -202,6 +202,14 @@ public final class v1_8_R3 implements Nms {
         TEAMS.put(player.getUniqueId(), teams);
         TEAMS.get(player.getUniqueId()).get(0).addMember(player.getName());
         // TODO this
+        for (IGamePlayer p : team.getGame().getPlayers()) {
+            for (IGamePlayer players : team.getPlayers()) {
+                List<FakeTeam> t = TEAMS.getOrDefault(players.getUniqueId(), new ArrayList<>());
+                FakeTeamManager.sendTeam(players.getPlayer(), t.get(0));
+                if (players == p) continue;
+                FakeTeamManager.sendTeam(p.getPlayer(), t.get(0));
+            }
+        }
     }
 
     @Override

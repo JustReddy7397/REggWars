@@ -88,6 +88,8 @@ public interface IGame {
 
     IGenerator getGeneratorByLocation(Location location);
 
+    IGameSign getGeneratorSignByLocation(Location location);
+
     int getMaxPlayers();
 
     void sendMessage(Message message);

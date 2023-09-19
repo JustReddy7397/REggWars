@@ -12,4 +12,6 @@ public interface Region {
 
     boolean isProtected();
 
+    double getLowY();
+
 }

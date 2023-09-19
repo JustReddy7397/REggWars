@@ -138,6 +138,7 @@ public class Generator implements IGenerator {
 
     @Override
     public void dropItem() {
+        if (location == null) return;
         int count = 0;
         for (Entity entity : world.getNearbyEntities(getLocation(), 2, 2, 2)) {
             if (!(entity instanceof Item)) continue;
