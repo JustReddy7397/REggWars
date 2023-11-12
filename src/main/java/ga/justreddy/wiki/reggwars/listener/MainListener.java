@@ -1,13 +1,21 @@
 package ga.justreddy.wiki.reggwars.listener;
 
 import com.avaje.ebeaninternal.server.query.LimitOffsetList;
+import com.avaje.ebeaninternal.server.query.RawSqlSelectClauseBuilder;
+import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopGui;
+import ga.justreddy.wiki.reggwars.bungee.Core;
+import ga.justreddy.wiki.reggwars.bungee.ServerMode;
+import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.MapManager;
 import ga.justreddy.wiki.reggwars.manager.MenuManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.model.gui.custom.Gui;
 import ga.justreddy.wiki.reggwars.model.gui.editable.InventoryMenu;
 import ga.justreddy.wiki.reggwars.packets.FakeTeamManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,8 +34,17 @@ public class MainListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        PlayerManager.getManager().
+        IGamePlayer gamePlayer = PlayerManager.getManager().
                 addGamePlayer(player.getUniqueId(), player.getName());
+        event.setJoinMessage(null);
+        if (Core.MODE == ServerMode.BUNGEE) {
+            if (!GameManager.getManager().getGames().isEmpty()) {
+                GameManager.getManager().getGames().values().stream().findFirst()
+                        .get().onGamePlayerJoin(gamePlayer);
+            }
+            return;
+        }
+
     }
 
     @EventHandler
@@ -44,6 +61,9 @@ public class MainListener implements Listener {
         } else if (holder instanceof InventoryMenu) {
             InventoryMenu menu = (InventoryMenu) holder;
             menu.inventoryClick(event);
+        } else if (holder instanceof IShopGui) {
+            IShopGui shopGui = (IShopGui) holder;
+            shopGui.onClick(gamePlayer, event.getRawSlot());
         }
     }
 
@@ -66,8 +86,15 @@ public class MainListener implements Listener {
             menu.onClose();
             MenuManager.getManager().getOpenMenus().remove(gamePlayer);
         }
-        FakeTeamManager.getPlayerTeams().remove(gamePlayer.getUniqueId());
-        PlayerManager.getManager().removeGamePlayer(gamePlayer.getUniqueId());
+        if (gamePlayer.getGame() != null) {
+            IGame game = gamePlayer.getGame();
+            game.onGamePlayerQuit(gamePlayer, true); // TODO
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(REggWars.getInstance(), () -> {
+            REggWars.getInstance().getStorage().savePlayer(gamePlayer);
+            FakeTeamManager.getPlayerTeams().remove(gamePlayer.getUniqueId());
+            PlayerManager.getManager().removeGamePlayer(gamePlayer.getUniqueId());
+        });
     }
 
 }

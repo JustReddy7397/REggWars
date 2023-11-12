@@ -12,14 +12,18 @@ import ga.justreddy.wiki.reggwars.api.model.game.*;
 import ga.justreddy.wiki.reggwars.api.model.game.GameMode;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.IShop;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.ShopType;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.game.team.ITeamAssigner;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.board.EggWarsBoard;
+import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.generator.Generator;
+import ga.justreddy.wiki.reggwars.model.game.shop.Shop;
 import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import ga.justreddy.wiki.reggwars.model.game.team.TeamAssigner;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameEndTimer;
@@ -60,8 +64,9 @@ public class Game implements IGame {
     private final List<IGenerator> generators;
     private final List<Region> regions;
     private final List<Location> placedBlocks;
-
+    private final List<IGamePlayer> protections;
     private final Map<UUID, Integer> kills;
+    private final Map<Location, IShop> shops;
 
     private Cuboid lobbyCuboid;
     private Cuboid gameCuboid;
@@ -90,6 +95,8 @@ public class Game implements IGame {
         this.kills = new HashMap<>();
         this.spectators = new ArrayList<>();
         this.placedBlocks = new ArrayList<>();
+        this.protections = new ArrayList<>();
+        this.shops = new HashMap<>();
     }
 
     @Override
@@ -143,7 +150,7 @@ public class Game implements IGame {
     @Override
     public List<IGameTeam> getDeadTeams() {
         try (Stream<IGameTeam> stream = teams.stream()) {
-            return stream.filter(team -> team.getAlivePlayers().size() == 0)
+            return stream.filter(team -> team.getAlivePlayers().isEmpty())
                     .collect(Collectors.toList());
         }
     }
@@ -207,7 +214,8 @@ public class Game implements IGame {
         regions.clear();
         kills.clear();
         spectators.clear();
-        setGameState(GameState.WAITING);
+        protections.clear();
+        shops.clear();
         this.displayName = config.getString("settings.displayName", name);
         this.minPlayers = config.getInt("settings.minPlayers");
         this.teamSize = config.getInt("settings.team-size");
@@ -235,6 +243,14 @@ public class Game implements IGame {
             this.generators.add(generator);
         }
 
+        ConfigurationSection shops = config.getConfigurationSection("shops");
+        for (String key : shops.getKeys(false)) {
+            String type = shops.getString(key + ".type");
+            IShop shop = ShopManager.getManager().getShopByType(ShopType.valueOf(type));
+            if (shop == null) continue;
+            this.shops.put(LocationUtils.getLocation(shops.getString(key + ".location")), shop);
+        }
+
         this.maxPlayers = this.teams.size() * this.teamSize;
 
         this.lobbyLocation = LocationUtils.getLocation(config.getString("waiting-lobby"));
@@ -253,6 +269,7 @@ public class Game implements IGame {
         this.gameTimer = new GameTimer(0, REggWars.getInstance(), this);
         this.startTimer = new GameStartTimer(10, REggWars.getInstance());
         endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
+        setGameState(GameState.WAITING); // TODO make it so if disabled, it wont enable again
     }
 
     @Override
@@ -419,7 +436,6 @@ public class Game implements IGame {
 
         gamePlayer.setTeam(null);
 
-        // TODO remove scoreboard
         EggWarsBoard.getManager().removeScoreboard(gamePlayer);
         // TODO teleport to lobby
         PlayerUtil.refresh(gamePlayer.getPlayer());
@@ -449,12 +465,16 @@ public class Game implements IGame {
         EggWarsGameKillEvent event = new EggWarsGameKillEvent(this, killer, victim, isFinal);
         event.call();
 
-        victim.setDead(true);
+        if (victim.getTeam().isEggGone()) {
+            victim.setDead(true);
+        } else {
+            victim.setFakeDead(true);
+        }
+
         Player player = victim.getPlayer();
         PlayerUtil.refresh(player);
         Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> {
             player.teleport(spectatorLocation);
-            System.out.println("teleported");
             player.setGameMode(org.bukkit.GameMode.ADVENTURE);
             player.setAllowFlight(true);
             player.setFlying(true);
@@ -498,7 +518,6 @@ public class Game implements IGame {
         }
 
         if (!isFinal) {
-            // TODO send respawn stuff
             new BukkitRunnable() {
                 int i = 5;
 
@@ -510,6 +529,7 @@ public class Game implements IGame {
                     }
                     if (i <= 0) {
                         victim.setDead(false);
+                        victim.setFakeDead(false);
                         IGameTeam team = victim.getTeam();
                         PlayerUtil.refresh(player);
                         for (IGamePlayer players : players) {
@@ -520,16 +540,27 @@ public class Game implements IGame {
                             players.getPlayer().showPlayer(player);
                         }
                         victim.teleport(team.getSpawnLocation());
+                        addRespawnProtection(victim);
+                        Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> removeRespawnProtection(victim),
+                                REggWars.getInstance().getSettingsConfig()
+                                        .getConfig().getInt("game.respawn-protection") * 20L
+                                );
                         // TODO send respawned title and message
                         cancel();
                         return;
                     }
 
-                    // TODO send respawn title and message
+                    victim.sendTitle(Message.TITLES_RESPAWNING_TITLE, Message.TITLES_RESPAWNING_SUBTITLE,
+                            new Replaceable("<time>", String.valueOf(i))
+                            );
+                    victim.sendMessage(Message.MESSAGES_GAME_RESPAWN, new Replaceable("<time>", String.valueOf(i)));
 
                     --i;
                 }
             }.runTaskTimer(REggWars.getInstance(), 7L, 20L);
+        } else {
+            victim.sendTitle(Message.TITLES_DIED_TITLE, Message.TITLES_DIED_SUBTITLE
+            );
         }
     }
 
@@ -593,6 +624,16 @@ public class Game implements IGame {
         ).findFirst().orElse(null);
         if (generator == null) return null;
         return generator.getGameSign();
+    }
+
+    @Override
+    public IShop getShopByLocation(Location location) {
+        for (Map.Entry<Location, IShop> entry : shops.entrySet()) {
+            if (LocationUtils.equals(entry.getKey(), location)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -699,6 +740,21 @@ public class Game implements IGame {
     @Override
     public void removeBlock(Location location) {
         placedBlocks.add(location);
+    }
+
+    @Override
+    public void addRespawnProtection(IGamePlayer gamePlayer) {
+        protections.add(gamePlayer);
+    }
+
+    @Override
+    public boolean hasRespawnProtection(IGamePlayer gamePlayer) {
+        return protections.contains(gamePlayer);
+    }
+
+    @Override
+    public void removeRespawnProtection(IGamePlayer gamePlayer) {
+        protections.remove(gamePlayer);
     }
 
     @Override

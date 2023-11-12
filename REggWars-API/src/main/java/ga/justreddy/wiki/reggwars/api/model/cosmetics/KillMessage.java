@@ -23,5 +23,4 @@ public abstract class KillMessage extends Cosmetic {
 
     public abstract void sendEggBreakMessage(IGame game, IGamePlayer breaker, IGameTeam team);
 
-
 }

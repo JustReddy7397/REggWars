@@ -114,6 +114,10 @@
             <version>1.5.21</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>1.16-R0.4</version>
+        </dependency>
     </dependencies>
 </project>

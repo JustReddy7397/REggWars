@@ -2,6 +2,7 @@ package ga.justreddy.wiki.reggwars.api.model.game;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.IShop;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
@@ -90,6 +91,8 @@ public interface IGame {
 
     IGameSign getGeneratorSignByLocation(Location location);
 
+    IShop getShopByLocation(Location location);
+
     int getMaxPlayers();
 
     void sendMessage(Message message);
@@ -117,6 +120,12 @@ public interface IGame {
     boolean isPlacedBlock(Location location);
 
     void removeBlock(Location location);
+
+    void addRespawnProtection(IGamePlayer gamePlayer);
+
+    boolean hasRespawnProtection(IGamePlayer gamePlayer);
+
+    void removeRespawnProtection(IGamePlayer gamePlayer);
 
     World getWorld();
 

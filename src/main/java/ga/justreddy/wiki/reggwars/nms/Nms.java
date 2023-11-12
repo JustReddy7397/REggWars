@@ -3,6 +3,8 @@ package ga.justreddy.wiki.reggwars.nms;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
+import ga.justreddy.wiki.reggwars.api.model.hologram.IArmorStand;
+import ga.justreddy.wiki.reggwars.api.model.hologram.IHologramLine;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -50,5 +52,9 @@ public interface Nms {
     void removeWaitingLobbyName(IGame game, IGamePlayer player);
 
     Block getRelative(Location location);
+
+    void spawnVillager(Location location);
+
+    IArmorStand spawnArmorStand(Location location, IGamePlayer player, String line, IHologramLine hologramLine);
 
 }

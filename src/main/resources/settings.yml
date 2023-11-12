@@ -1,3 +1,7 @@
 modules:
   slimeworldmanager: false
   advancedreplay: false
+  mode: MULTI_ARENA # MULTI_ARENA, BUNGEE, LOBBY
+
+game:
+  respawn-protection: 5 # In seconds

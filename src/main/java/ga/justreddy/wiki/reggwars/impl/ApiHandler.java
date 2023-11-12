@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.VictoryDance;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
 
@@ -22,7 +23,7 @@ public class ApiHandler implements EggWarsAPI {
 
     @Override
     public IGame getGame(String name) {
-        return null; // TODO
+        return GameManager.getManager().getGameByName(name); // TODO
     }
 
     @Override

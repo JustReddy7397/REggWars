@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.manager;
 
+import com.google.common.collect.ImmutableList;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 
@@ -38,6 +39,10 @@ public class PlayerManager {
 
     public void removeGamePlayer(UUID uuid) {
         players.remove(uuid);
+    }
+
+    public ImmutableList<IGamePlayer> getPlayers() {
+        return ImmutableList.copyOf(players.values());
     }
 
 }

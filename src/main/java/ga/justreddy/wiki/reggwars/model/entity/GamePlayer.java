@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.model.entity;
 
 import com.cryptomorin.xseries.XSound;
+import ga.justreddy.wiki.reggwars.api.model.entity.ICombatLog;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerSettings;
@@ -30,14 +31,18 @@ public class GamePlayer implements IGamePlayer {
     private IGame game;
     private IGameTeam team;
     private boolean dead;
+    private boolean fakeDead;
 
     private IPlayerSettings settings;
+
+    private ICombatLog combatLog;
 
     public GamePlayer(UUID uniqueId, String name) {
         this.uniqueId = uniqueId;
         this.name = name;
         this.player = Bukkit.getPlayer(uniqueId);
         this.settings = new PlayerSettings();
+        this.combatLog = new CombatLog(this);
     }
 
     @Override
@@ -86,6 +91,16 @@ public class GamePlayer implements IGamePlayer {
     }
 
     @Override
+    public boolean isFakeDead() {
+        return fakeDead;
+    }
+
+    @Override
+    public void setFakeDead(boolean dead) {
+        this.fakeDead = dead;
+    }
+
+    @Override
     public void sendLegacyMessage(String message) {
         player.sendMessage(ChatUtil.format(message));
     }
@@ -105,6 +120,7 @@ public class GamePlayer implements IGamePlayer {
     @Override
     public void sendTitle(Message title, Message subTitle) {
         ILanguage language = getSettings().getLanguage();
+        System.out.println(title.getPath() + " - " + subTitle.getPath());
         language.sendTitle(this, title, subTitle);
     }
 
@@ -159,5 +175,15 @@ public class GamePlayer implements IGamePlayer {
     @Override
     public void setCosmetics(IPlayerCosmetics cosmetics) {
 
+    }
+
+    @Override
+    public ICombatLog getCombatLog() {
+        return combatLog;
+    }
+
+    @Override
+    public void setCombatLog(ICombatLog combatLog) {
+        this.combatLog = combatLog;
     }
 }

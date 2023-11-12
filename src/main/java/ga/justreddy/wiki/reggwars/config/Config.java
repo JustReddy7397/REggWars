@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.config;
 
 import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.manager.ConfigManager;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -58,6 +59,7 @@ public class Config {
         this.file = configFile;
         this.config = YamlConfiguration.loadConfiguration(file);
         reload();
+        ConfigManager.getManager().register(this);
     }
 
     /**

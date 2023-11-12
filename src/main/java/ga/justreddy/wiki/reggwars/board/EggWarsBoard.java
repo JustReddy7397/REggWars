@@ -101,8 +101,6 @@ public class EggWarsBoard {
         }, 0L, 20L).getTaskId();
         data.put(player.getUniqueId(), id);
         boards.put(player.getUniqueId(), creator);
-
-
     }
 
 

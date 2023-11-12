@@ -79,7 +79,7 @@ public class Language implements ILanguage {
             stringTitle = stringTitle.replaceAll(ra.getKey(), ra.getValue());
         }
 
-        String stringSubTitle = getString(title);
+        String stringSubTitle = getString(subTitle);
         for (Replaceable ra : replaceables) {
             if (ra.getKey().isEmpty() && ra.getValue().isEmpty()) continue;
             stringSubTitle = stringSubTitle.replaceAll(ra.getKey(), ra.getValue());

@@ -36,6 +36,10 @@ public interface IGamePlayer {
 
     void setDead(boolean dead);
 
+    boolean isFakeDead();
+
+    void setFakeDead(boolean dead);
+
     void sendLegacyMessage(String message);
 
     void sendMessage(Message message);
@@ -63,6 +67,10 @@ public interface IGamePlayer {
     IPlayerCosmetics getCosmetics();
 
     void setCosmetics(IPlayerCosmetics cosmetics);
+
+    ICombatLog getCombatLog();
+
+    void setCombatLog(ICombatLog combatLog);
 
 
 }

@@ -33,6 +33,17 @@ public interface Storage {
 
     GameReplayCache getGameReplayCache(String id);
 
+    boolean doesBungeeFilesExist();
 
+    boolean doesBungeeFileExist(String name);
+
+
+    void createBungeeFiles(String name, String whatToCreate);
+
+    void updateBungeeFiles(String name, String file);
+
+    void loadBungeeFiles(String name);
+
+    void saveBungeeFiles(String name, String toSave);
 
 }

@@ -7,6 +7,7 @@ scoreboard:
   dead: "&c&l✗"
   alive: "&a&l✔"
   game-board:
+    enabled: true
     title: "&dEggWars"
     waiting:
       - ""
@@ -27,3 +28,14 @@ enums:
     not-selected: "&aClick to select"
     cant-select: "&cCost: &6<cost>"
 #-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#
+titles:
+  respawn:
+    title: "&cYOU DIED!"
+    subtitle: "&eYou will respawn in &c<time> &eseconds"
+  died:
+    title: "&cYOU DIED!"
+    subtitle: "&eBetter luck next time!"
+#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#
+messages:
+  game:
+    respawn: "&eYou will respawn in &c<time> &eseconds"

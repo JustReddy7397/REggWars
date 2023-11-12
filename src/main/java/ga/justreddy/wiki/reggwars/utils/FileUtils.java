@@ -11,6 +11,16 @@ import java.util.List;
  */
 public class FileUtils {
 
+    public static void copy(InputStream source, File destination) throws IOException {
+        OutputStream out = Files.newOutputStream(destination.toPath());
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = source.read(buffer)) > 0)
+            out.write(buffer, 0, length);
+        source.close();
+        out.close();
+    }
+
     public static void copy(File source, File destination) throws IOException {
         try {
             List<String> ignore = new ArrayList<>(Arrays.asList("uid.dat", "session.lock"));
