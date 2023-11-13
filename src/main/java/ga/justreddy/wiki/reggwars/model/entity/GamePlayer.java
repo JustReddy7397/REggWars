@@ -120,7 +120,6 @@ public class GamePlayer implements IGamePlayer {
     @Override
     public void sendTitle(Message title, Message subTitle) {
         ILanguage language = getSettings().getLanguage();
-        System.out.println(title.getPath() + " - " + subTitle.getPath());
         language.sendTitle(this, title, subTitle);
     }
 

@@ -14,7 +14,7 @@ public interface IHologramLine {
 
     void setLocation(Location location);
 
-    void setLine(String line);
+    void setLine(IGamePlayer player, String line);
 
     Location getLocation();
 

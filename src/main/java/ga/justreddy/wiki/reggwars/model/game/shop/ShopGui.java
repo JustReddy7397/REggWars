@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopItem;
 import ga.justreddy.wiki.reggwars.model.gui.editable.InventoryMenu;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -50,13 +51,21 @@ public class ShopGui implements IShopGui, InventoryHolder {
         final Player p = player.getPlayer();
         if (p == null) return;
         p.openInventory(inventory);
+
     }
 
     private void loadItems() {
-        for (String key : config.getConfigurationSection("items").getKeys(false)) {
+        ConfigurationSection section = config.getConfigurationSection("items");
+        if (section == null) return;
+        for (String key : section.getKeys(false)) {
             IShopItem item = new ShopItem(config.getConfigurationSection("items." + key));
-            items.put(item.getSlot(), item);
-            inventory.setItem(item.getSlot(), item.getItem());
+            for (int slot : item.getSlots()) {
+                items.put(slot, item);
+            }
+
+            for (int slot : items.keySet()) {
+                inventory.setItem(slot, items.get(slot).getItem());
+            }
         }
     }
 

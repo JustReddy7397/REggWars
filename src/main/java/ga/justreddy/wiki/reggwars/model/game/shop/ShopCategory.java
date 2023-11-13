@@ -3,6 +3,7 @@ package ga.justreddy.wiki.reggwars.model.game.shop;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopCategory;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopGui;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopItem;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.ArrayList;
@@ -17,10 +18,11 @@ public class ShopCategory implements IShopCategory {
     private final List<IShopItem> items;
     private final IShopGui gui;
 
+
     public ShopCategory(FileConfiguration configuration) {
         this.category = configuration.getString("category");
         this.items = new ArrayList<>();
-        loadItems();
+        loadItems(configuration);
         this.gui = new ShopGui(configuration);
     }
 
@@ -31,11 +33,20 @@ public class ShopCategory implements IShopCategory {
 
     @Override
     public List<IShopItem> getItems() {
-        return items
+        return items;
     }
 
     @Override
     public IShopGui getGui() {
-        return null;
+        return gui;
     }
+
+    private void loadItems(FileConfiguration configuration) {
+        ConfigurationSection items = configuration.getConfigurationSection("items");
+        for (String key : items.getKeys(false)) {
+            IShopItem item = new ShopItem(items.getConfigurationSection(key));
+            this.items.add(item);
+        }
+    }
+
 }

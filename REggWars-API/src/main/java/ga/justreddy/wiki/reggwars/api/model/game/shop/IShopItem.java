@@ -17,6 +17,8 @@ public interface IShopItem {
 
     int getSlot();
 
+    int[] getSlots();
+
     boolean shouldColor();
 
     boolean isBuyable();

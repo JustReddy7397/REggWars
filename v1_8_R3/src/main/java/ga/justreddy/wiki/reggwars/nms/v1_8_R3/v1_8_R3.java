@@ -24,6 +24,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.*;
@@ -251,9 +252,9 @@ public final class v1_8_R3 implements Nms {
     @Override
     public void spawnVillager(Location location) {
         // TODO add hologram
-        VillagerShop shop = new VillagerShop(location);
-        removeEntityAI(shop.getBukkitEntity());
-        ((CraftLivingEntity) shop.getBukkitEntity()).setRemoveWhenFarAway(false);
+        Villager villager = VillagerShop.spawn(location);
+        removeEntityAI(villager);
+        villager.setRemoveWhenFarAway(false);
     }
 
     @Override

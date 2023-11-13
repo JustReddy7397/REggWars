@@ -246,7 +246,7 @@ public class Game implements IGame {
         ConfigurationSection shops = config.getConfigurationSection("shops");
         for (String key : shops.getKeys(false)) {
             String type = shops.getString(key + ".type");
-            IShop shop = ShopManager.getManager().getShopByType(ShopType.valueOf(type));
+            IShop shop = ShopManager.getManager().getShopByType(ShopType.getById(type));
             if (shop == null) continue;
             this.shops.put(LocationUtils.getLocation(shops.getString(key + ".location")), shop);
         }
@@ -317,6 +317,7 @@ public class Game implements IGame {
             EggWarsGameStartEvent event = new EggWarsGameStartEvent(this);
             event.call();
             generators.forEach(IGenerator::start);
+            shops.forEach((location, shop) -> shop.spawn(location));
             teams.forEach(team -> {
                 toSpawn(team);
                 if (team.getSize() == 0) {

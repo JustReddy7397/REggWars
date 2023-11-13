@@ -26,7 +26,7 @@ public class Hologram implements IHologram {
         this.lines = new HashMap<>();
         for (String line : lines) {
             this.lines.put(++current,
-                    new HologramLine(this, location.clone().add(0, 0.33 * this.lines.size() + 1, 0), line));
+                    new HologramLine(this, location.clone().add(0, -0.33 * this.lines.size() + 1, 0), line));
         }
     }
 
@@ -65,13 +65,13 @@ public class Hologram implements IHologram {
     }
 
     @Override
-    public IHologram updateLine(int id, String line) {
+    public IHologram updateLine(IGamePlayer player, int id, String line) {
         if (!lines.containsKey(id)) {
             return this;
         }
 
         HologramLine hl = lines.get(id);
-        hl.setLine(ChatUtil.format(line));
+        hl.setLine(player, ChatUtil.format(line));
         return this;
     }
 

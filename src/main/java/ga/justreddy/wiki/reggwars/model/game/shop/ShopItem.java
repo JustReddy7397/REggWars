@@ -8,8 +8,10 @@ import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopCategory;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopGui;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopItem;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopPrice;
+import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -27,24 +29,39 @@ public class ShopItem implements IShopItem {
     private final ItemStack item;
     private final IShopPrice price;
     private final int amount;
-    private final int slot;
+    private int[] slots;
     private final boolean shouldColor;
     private final boolean isBuyable;
     private final List<String> actions;
 
     public ShopItem(ConfigurationSection section) {
-        Optional<XMaterial> item = XMaterial.matchXMaterial(section.getString("item.material"));
-        if (!item.isPresent()) throw new NullPointerException("The material " + section.getString("item.material") + " is not a valid material!");
-        ItemBuilder builder = new ItemBuilder(item.get().parseItem());
+        ItemBuilder builder;
+        if (section.getString("item.material").equals("FILLER")) {
+            builder = new ItemBuilder(ShopManager.getManager().getMaterial().parseItem());
+        } else {
+            Optional<XMaterial> item = XMaterial.matchXMaterial(section.getString("item.material"));
+            if (!item.isPresent())
+                throw new NullPointerException("The material " + section.getString("item.material") + " is not a valid material!");
+            builder = new ItemBuilder(item.get().parseItem());
+        }
         if (section.contains("item.name")) builder.withName(section.getString("item.name"));
         if (section.contains("item.lore")) builder.withLore(section.getStringList("item.lore"));
         this.item = builder.build();
         Optional<XMaterial> priceMaterial = XMaterial.matchXMaterial(section.getString("price.material"));
-        if (!priceMaterial.isPresent()) throw new NullPointerException("The material " + section.getString("price.material") + " is not a valid material!");
+        if (!priceMaterial.isPresent())
+            throw new NullPointerException("The material " + section.getString("price.material") + " is not a valid material!");
         int price = section.getInt("price.amount");
         this.price = new ShopPrice(priceMaterial.get().parseMaterial(), price);
         this.amount = section.getInt("amount");
-        this.slot = section.getInt("slot");
+        if (section.contains("slots")) {
+            String[] slots = section.getString("slots").split(", ");
+            this.slots = new int[slots.length];
+            for (int i = 0; i < slots.length; i++) {
+                this.slots[i] = Integer.parseInt(slots[i]);
+            }
+        } else if (section.contains("slot")) {
+            this.slots = new int[]{section.getInt("slot")};
+        }
         this.shouldColor = section.getBoolean("color");
         this.isBuyable = section.getBoolean("buyable");
         this.actions = section.getStringList("actions");
@@ -69,7 +86,12 @@ public class ShopItem implements IShopItem {
 
     @Override
     public int getSlot() {
-        return slot;
+        return slots[0];
+    }
+
+    @Override
+    public int[] getSlots() {
+        return slots;
     }
 
     @Override
@@ -110,6 +132,11 @@ public class ShopItem implements IShopItem {
                 final PlayerInventory inventory = p.getInventory();
                 if (shouldColor) {
                     // TODO
+                    IGameTeam team = player.getTeam();
+                    Color color = team.getTeam().getColor();
+                    ItemBuilder builder = new ItemBuilder(item);
+                    builder.withColor(color);
+                    return;
                 }
                 inventory.addItem(item);
 

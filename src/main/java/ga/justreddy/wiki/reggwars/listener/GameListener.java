@@ -2,6 +2,7 @@ package ga.justreddy.wiki.reggwars.listener;
 
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
+import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.events.EggWarsEvent;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
@@ -15,6 +16,7 @@ import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -33,6 +35,7 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 
 /**
@@ -78,6 +81,7 @@ public class GameListener implements Listener {
         if (gamePlayer == null) return;
         IGame game = gamePlayer.getGame();
         if (game == null) return;
+        event.setCancelled(true);
         if (gamePlayer.isDead() || gamePlayer.isFakeDead()) return;
         IGameTeam team = gamePlayer.getTeam();
         if (team == null) return;
@@ -85,8 +89,7 @@ public class GameListener implements Listener {
         if (event.getRightClicked().getType() != EntityType.VILLAGER) return;
         IShop shop = game.getShopByLocation(event.getRightClicked().getLocation());
         if (shop == null) return;
-        event.setCancelled(true);
-        shop.open(gamePlayer);
+        Bukkit.getScheduler().runTask(REggWars.getInstance(), () -> shop.open(gamePlayer));
     }
 
     @EventHandler(ignoreCancelled = true)

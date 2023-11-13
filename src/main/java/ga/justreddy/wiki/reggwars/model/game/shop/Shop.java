@@ -7,6 +7,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.shop.IShop;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopCategory;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopGui;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.ShopType;
+import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,17 +25,18 @@ public class Shop implements IShop {
     private final List<IShopCategory> categories;
     private final ShopType type;
     private final IShopGui main;
+    private final FileConfiguration config;
 
     public Shop(FileConfiguration config) {
+        this.config = config;
         this.categories = new ArrayList<>();
-        loadCategories();
         this.type = ShopType.valueOf(config.getString("type"));
         this.main = new ShopGui(config);
     }
 
     @Override
     public ShopType getShopType() {
-        return null;
+        return type;
     }
 
     @Override
@@ -49,13 +51,16 @@ public class Shop implements IShop {
 
     @Override
     public void spawn(Location location) {
-        // TODO
+        REggWars.getInstance().getNms().spawnVillager(location);
     }
 
-    private void loadCategories() {
+    public void loadCategories() {
         // TODO load categories
-
-
+        for (String category : config.getStringList("categories")) {
+            IShopCategory shopCategory = ShopManager.getManager().getCategoryById(category);
+            if (shopCategory == null) continue;
+            categories.add(shopCategory);
+        }
 
     }
 

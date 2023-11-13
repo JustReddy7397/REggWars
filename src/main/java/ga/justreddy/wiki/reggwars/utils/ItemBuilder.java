@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.utils;
 
 import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -9,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
@@ -16,6 +18,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.material.Dye;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Wool;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
@@ -31,24 +36,16 @@ import java.util.UUID;
 public class ItemBuilder {
 
     private final ItemStack stack;
-    private static boolean hasUsername;
-    private static boolean hasTexture;
-    private static String texture;
+    @Getter
+    private boolean hasUsername;
+    @Getter
+    private boolean hasTexture;
+    @Getter
+    private String texture;
+
 
     public ItemBuilder(ItemStack itemStack) {
         stack = itemStack;
-    }
-
-    public boolean isHasUsername() {
-        return hasUsername;
-    }
-
-    public boolean isHasTexture() {
-        return hasTexture;
-    }
-
-    public String getTexture() {
-        return texture;
     }
 
     public static ItemBuilder getItemStack(ConfigurationSection section, Player player) {
@@ -60,13 +57,11 @@ public class ItemBuilder {
 
         if (section.contains("username") && player != null) {
             builder.setSkullOwner(section.getString("username").replace("<player>", player.getName()));
-             hasUsername = true;
         }
 
         if (section.contains("texture")) {
             builder.setTexture(section.getString("texture"));
-            hasTexture = true;
-            texture = section.getString("texture");
+
         }
 
         if (section.contains("displayname")) {
@@ -134,6 +129,7 @@ public class ItemBuilder {
             SkullMeta im = (SkullMeta) stack.getItemMeta();
             im.setOwner(owner);
             stack.setItemMeta(im);
+            hasUsername = true;
         } catch (ClassCastException expected) {
         }
         return this;
@@ -203,6 +199,8 @@ public class ItemBuilder {
         Field profileField = skullMeta.getClass().getDeclaredField("profile");
         profileField.setAccessible(true);
         profileField.set(skullMeta, profile);
+        hasTexture = true;
+        this.texture = texture;
         return this;
     }
 
@@ -250,8 +248,21 @@ public class ItemBuilder {
             meta.setColor(color);
             stack.setItemMeta(meta);
             return this;
+        } else if (type == Material.WOOL) {
+            MaterialData data = stack.getData();
+            Wool wool = (Wool) data;
+            wool.setColor(DyeColor.getByColor(color));
+            stack.setData(wool);
+            return this;
+        } else if (type == Material.STAINED_GLASS_PANE || type == Material.STAINED_GLASS) {
+            MaterialData data = stack.getData();
+            Dye dye = (Dye) data;
+            dye.setColor(DyeColor.getByColor(color));
+            stack.setData(dye);
+            return this;
         } else {
-            throw new IllegalArgumentException("withColor is only applicable for leather armor!");
+            throw new IllegalArgumentException("withColor is only applicable for leather armor, wool or glass (panes)!!");
+
         }
     }
 
@@ -348,9 +359,8 @@ public class ItemBuilder {
     @Override
     public ItemBuilder clone() {
         try {
-            ItemBuilder clone = (ItemBuilder) super.clone();
             // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
+            return (ItemBuilder) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

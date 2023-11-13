@@ -73,7 +73,6 @@ public class GameCreator implements Listener {
         world.getSpawnLocation().getBlock().setType(Material.STONE);
         player.teleport(world.getSpawnLocation().add(0.0, 1, 0.0));
         stringMap.put(uuid, world.getName());
-        System.out.println("teleport");
         // TODO add items
     }
 

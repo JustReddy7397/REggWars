@@ -16,7 +16,7 @@ public interface IHologram {
 
     IHologram withLine(String line);
 
-    IHologram updateLine(int id, String line);
+    IHologram updateLine(IGamePlayer player, int id, String line);
 
     boolean isSpawned();
 

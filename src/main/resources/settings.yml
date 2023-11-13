@@ -1,3 +1,5 @@
+# Everything here requires a restart when edited
+
 modules:
   slimeworldmanager: false
   advancedreplay: false
@@ -5,3 +7,8 @@ modules:
 
 game:
   respawn-protection: 5 # In seconds
+
+gui:
+  # Used for filling empty slots in GUIs
+  # To set this in GUIs, set "material" to "FILLER"
+  filler: GRAY_STAINED_GLASS_PANE

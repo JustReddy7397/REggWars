@@ -1,0 +1,7 @@
+title: "&bMain Shop"
+rows: 6 # 1 = 9, 2 = 18 etc etc
+
+items:
+  filler:
+    item:
+      material: FILLER

@@ -81,7 +81,6 @@ public class GameManager {
             if (g.isGameState(GameState.DISABLED)) continue;
             if (g.isGameState(GameState.WAITING) || g.isGameState(GameState.STARTING)) {
                 if (g.getPlayerCount() >= g.getMaxPlayers()) {
-                    System.out.println("Skipping...");
                     continue;
                 }
                 list.add(g);

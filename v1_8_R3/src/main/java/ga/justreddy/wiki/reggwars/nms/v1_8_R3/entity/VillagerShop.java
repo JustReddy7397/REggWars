@@ -4,6 +4,7 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Field;
@@ -27,8 +28,15 @@ public class VillagerShop extends EntityVillager {
         }
         this.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         this.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
-        (((CraftWorld) loc.getWorld()).getHandle()).addEntity(this, CreatureSpawnEvent.SpawnReason.CUSTOM);
         persistent = true;
+    }
+
+    public static Villager spawn(Location location) {
+        World mcWorld = ((CraftWorld) location.getWorld()).getHandle();
+        VillagerShop shop = new VillagerShop(location);
+        shop.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        EntityTypes.spawnEntity(shop, location);
+        return (Villager) shop.getBukkitEntity();
     }
 
     public void move(double d0, double d1, double d2) {
