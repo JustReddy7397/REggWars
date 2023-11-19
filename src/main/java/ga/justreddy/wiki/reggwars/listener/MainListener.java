@@ -12,6 +12,8 @@ import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.MapManager;
 import ga.justreddy.wiki.reggwars.manager.MenuManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
+import ga.justreddy.wiki.reggwars.model.entity.data.PlayerSettings;
+import ga.justreddy.wiki.reggwars.model.game.shop.ShopGui;
 import ga.justreddy.wiki.reggwars.model.gui.custom.Gui;
 import ga.justreddy.wiki.reggwars.model.gui.editable.InventoryMenu;
 import ga.justreddy.wiki.reggwars.packets.FakeTeamManager;
@@ -47,23 +49,26 @@ public class MainListener implements Listener {
 
     }
 
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getInventory() == null) return;
         IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(event.getWhoClicked().getUniqueId());
-        // TODO check if player is building
         InventoryHolder holder = event.getInventory().getHolder();
         if (holder == null) return;
         if (event.getCurrentItem() == null) return;
         if (holder instanceof Gui) {
             Gui gui = (Gui) holder;
+            event.setCancelled(true);
             gui.inventoryClick(event);
         } else if (holder instanceof InventoryMenu) {
             InventoryMenu menu = (InventoryMenu) holder;
+            event.setCancelled(true);
             menu.inventoryClick(event);
-        } else if (holder instanceof IShopGui) {
-            IShopGui shopGui = (IShopGui) holder;
-            shopGui.onClick(gamePlayer, event.getRawSlot());
+        } else if (holder instanceof ShopGui) {
+            event.setCancelled(true);
+            ShopGui shopGui = (ShopGui) holder;
+            shopGui.onClick(gamePlayer, event.getRawSlot(), event.isShiftClick());
         }
     }
 

@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
  */
 public interface IShopItem {
 
+    String getId();
+
     ItemStack getItem();
 
     IShopPrice getPrice();
@@ -21,8 +23,10 @@ public interface IShopItem {
 
     boolean shouldColor();
 
-    boolean isBuyable();
+    boolean isDummy();
 
-    void give(IGamePlayer player);
+    boolean canQuickBuy();
+
+    void give(IGamePlayer player, boolean shift);
 
 }

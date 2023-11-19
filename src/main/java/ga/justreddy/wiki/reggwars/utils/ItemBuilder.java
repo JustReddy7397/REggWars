@@ -28,6 +28,7 @@ import org.bukkit.potion.PotionType;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -46,6 +47,10 @@ public class ItemBuilder {
 
     public ItemBuilder(ItemStack itemStack) {
         stack = itemStack;
+    }
+
+    public ItemBuilder(XMaterial material) {
+        this(material.parseItem());
     }
 
     public static ItemBuilder getItemStack(ConfigurationSection section, Player player) {
@@ -251,14 +256,16 @@ public class ItemBuilder {
         } else if (type == Material.WOOL) {
             MaterialData data = stack.getData();
             Wool wool = (Wool) data;
-            wool.setColor(DyeColor.getByColor(color));
+            wool.setColor(getByColor(color));
             stack.setData(wool);
+            stack.setDurability(getByColor(color).getWoolData());
             return this;
         } else if (type == Material.STAINED_GLASS_PANE || type == Material.STAINED_GLASS) {
             MaterialData data = stack.getData();
             Dye dye = (Dye) data;
-            dye.setColor(DyeColor.getByColor(color));
+            dye.setColor(getByColor(color));
             stack.setData(dye);
+            stack.setDurability(getByColor(color).getWoolData());
             return this;
         } else {
             throw new IllegalArgumentException("withColor is only applicable for leather armor, wool or glass (panes)!!");
@@ -368,5 +375,47 @@ public class ItemBuilder {
 
     public Material getType() {
         return stack.getType();
+    }
+
+    private DyeColor getByColor(Color color) {
+        if (color.equals(Color.RED)) {
+            return DyeColor.RED;
+        } else if (color.equals(Color.BLUE)) {
+            return DyeColor.BLUE;
+        } else if (color.equals(Color.GREEN)) {
+            return DyeColor.GREEN;
+        } else if (color.equals(Color.YELLOW)) {
+            return DyeColor.YELLOW;
+        } else if (color.equals(Color.PURPLE)) {
+            return DyeColor.PURPLE;
+        } else if (color.equals(Color.BLACK)) {
+            return DyeColor.BLACK;
+        } else if (color.equals(Color.ORANGE)) {
+            return DyeColor.ORANGE;
+        } else if (color.equals(Color.GRAY)) {
+            return DyeColor.GRAY;
+        } else if (color.equals(Color.FUCHSIA)) {
+            return DyeColor.PINK;
+        } else if (color.equals(Color.LIME)) {
+            return DyeColor.LIME;
+        } else if (color.equals(Color.AQUA)) {
+            return DyeColor.LIGHT_BLUE;
+        } else if (color.equals(Color.MAROON)) {
+            return DyeColor.MAGENTA;
+        } else if (color.equals(Color.NAVY)) {
+            return DyeColor.CYAN;
+        } else if (color.equals(Color.TEAL)) {
+            return DyeColor.BROWN;
+        } else if (color.equals(Color.SILVER)) {
+            return DyeColor.SILVER;
+        }
+        return DyeColor.WHITE;
+    }
+
+    public ItemBuilder withEnchantments(Map<Enchantment, Integer> enchants) {
+        for (Map.Entry<Enchantment, Integer> entry : enchants.entrySet()) {
+            withEnchantment(entry.getKey(), entry.getValue());
+        }
+        return this;
     }
 }

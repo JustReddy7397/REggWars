@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * @author JustReddy
  */
-public interface IShopGui {
+public interface IShopGui extends Cloneable {
 
     List<IShopItem> getItems();
 
-    void onClick(IGamePlayer player, int slot);
+    void onClick(IGamePlayer player, int slot, boolean shift);
 
     void open(IGamePlayer player);
 

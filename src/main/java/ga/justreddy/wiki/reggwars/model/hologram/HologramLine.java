@@ -36,7 +36,7 @@ public class HologramLine implements IHologramLine {
     @Override
     public void despawn(IGamePlayer player) {
         if (armor != null) {
-            this.armor.killEntity();
+            this.armor.killEntity(player);
             this.armor = null;
         }
     }

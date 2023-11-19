@@ -100,7 +100,7 @@ public class OtherMenu extends InventoryMenu {
                         case "inventory":
                             MenuManager.getManager().getByName(actions[1]).open(gamePlayer);
                             break;
-                        case "playewr":
+                        case "player":
                             player.performCommand(actions[1]);
                             break;
                         case "close":

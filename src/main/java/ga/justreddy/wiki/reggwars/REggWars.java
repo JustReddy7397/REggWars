@@ -178,6 +178,7 @@ public final class REggWars extends JavaPlugin {
     }
 
     private void registerManagers() {
+        new ShopManager();
         ShopManager.getManager().start();
         LanguageManager.getManager().start();
         MenuManager.getManager().start();

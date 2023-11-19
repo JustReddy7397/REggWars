@@ -10,7 +10,9 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.util.EulerAngle;
 
 import java.lang.reflect.Field;
@@ -69,8 +71,12 @@ public class HologramStand extends EntityArmorStand implements IArmorStand {
     }
 
     @Override
-    public void killEntity() {
+    public void killEntity(IGamePlayer player) {
         super.die();
+        PacketPlayOutEntityDestroy destroy = new PacketPlayOutEntityDestroy(getId());
+        Player bukkitPlayer = player.getPlayer();
+        EntityPlayer entityPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
+        entityPlayer.playerConnection.sendPacket(destroy);
     }
 
     @Override
@@ -157,8 +163,8 @@ public class HologramStand extends EntityArmorStand implements IArmorStand {
         }
 
         @Override
-        public void killEntity() {
-            ((HologramStand) entity).killEntity();
+        public void killEntity(IGamePlayer player) {
+            ((HologramStand) entity).killEntity(player);
         }
 
         @Override

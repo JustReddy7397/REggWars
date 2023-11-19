@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.api.model.entity;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
+import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerQuickBuy;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerSettings;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
@@ -71,6 +72,10 @@ public interface IGamePlayer {
     ICombatLog getCombatLog();
 
     void setCombatLog(ICombatLog combatLog);
+
+    IPlayerQuickBuy getQuickBuy();
+
+    void setQuickBuy(IPlayerQuickBuy quickBuy);
 
 
 }

@@ -114,7 +114,7 @@ public class EggWarsBoard {
     }
 
     public void shutdown() {
-        for (Integer integer : data.values()) {
+        for (int integer : data.values()) {
             Bukkit.getScheduler().cancelTask(integer);
         }
         data.clear();

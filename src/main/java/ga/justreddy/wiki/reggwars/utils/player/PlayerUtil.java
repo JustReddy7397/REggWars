@@ -30,6 +30,7 @@ public class PlayerUtil {
         if (player == null) return;
         IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(player.getUniqueId());
         if (gamePlayer == null) return;
+        player.setMaxHealth(20.0D);
         player.setHealth(20.0D);
         player.setHealthScale(20.0D);
         player.setNoDamageTicks(0);

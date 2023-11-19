@@ -12,6 +12,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
@@ -151,8 +152,13 @@ public class EntityHologram extends EntityArmorStand implements IArmorStand {
     }
 
     @Override
-    public void killEntity() {
-        die();
+    public void killEntity(IGamePlayer player) {
+        super.die();
+        PacketPlayOutEntityDestroy destroy = new PacketPlayOutEntityDestroy(getId());
+        Player bukkitPlayer = player.getPlayer();
+        EntityPlayer entityPlayer = ((CraftPlayer) bukkitPlayer).getHandle();
+        entityPlayer.playerConnection.sendPacket(destroy);
+
     }
 
     @Override

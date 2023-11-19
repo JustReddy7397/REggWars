@@ -1,7 +1,26 @@
-title: "&bMain Shop"
+title: "&bBlocks Shop"
 rows: 6 # 1 = 9, 2 = 18 etc etc
 
 items:
   filler:
+    id: "filler2"
     item:
       material: FILLER
+    slots: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+  wool:
+    id: "wool16" # This is the id of the item, it is used for the quickbuy feature
+    item:
+      material: WHITE_WOOL
+      name: "&bWool"
+      lore:
+        - "&7Click to buy wool!"
+    slot: 10
+    amount: 16
+    price:
+      material: IRON_INGOT
+      amount: 4
+    color: true
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"

@@ -3,8 +3,12 @@ package ga.justreddy.wiki.reggwars.model.hologram;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IHologram;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IHologramLine;
+import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +36,28 @@ public class Hologram implements IHologram {
 
 
     @Override
+    public IHologram spawn() {
+        if (spawned) return this;
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            spawn(PlayerManager.getManager().getGamePlayer(player.getUniqueId()));
+        }
+
+        return this;
+    }
+
+    @Override
+    public IHologram spawn(World world) {
+        if (spawned) return this;
+
+        for (Player player : world.getPlayers()) {
+            spawn(PlayerManager.getManager().getGamePlayer(player.getUniqueId()));
+        }
+
+        return this;
+    }
+
+    @Override
     public IHologram spawn(IGamePlayer player) {
         if (spawned) {
             return this;
@@ -39,6 +65,28 @@ public class Hologram implements IHologram {
 
         lines.values().forEach(hologramLine -> hologramLine.spawn(player));
         this.spawned = true;
+        return this;
+    }
+
+    @Override
+    public IHologram despawn() {
+        if (!spawned) return this;
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            despawn(PlayerManager.getManager().getGamePlayer(player.getUniqueId()));
+        }
+
+        return this;
+    }
+
+    @Override
+    public IHologram despawn(World world) {
+        if (!spawned) return this;
+
+        for (Player player : world.getPlayers()) {
+            despawn(PlayerManager.getManager().getGamePlayer(player.getUniqueId()));
+        }
+
         return this;
     }
 
@@ -61,6 +109,32 @@ public class Hologram implements IHologram {
 
         this.lines.put(++current,
                 new HologramLine(this, location.clone().add(0, 0.33 * current, 0), ChatUtil.format(line)));
+        return this;
+    }
+
+    @Override
+    public IHologram updateLine(int id, String line) {
+        if (!lines.containsKey(id)) {
+            return this;
+        }
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            updateLine(PlayerManager.getManager().getGamePlayer(player.getUniqueId()), id, line);
+        }
+
+        return this;
+    }
+
+    @Override
+    public IHologram updateLine(World world, int id, String line) {
+        if (!lines.containsKey(id)) {
+            return this;
+        }
+
+        for (Player player : world.getPlayers()) {
+            updateLine(PlayerManager.getManager().getGamePlayer(player.getUniqueId()), id, line);
+        }
+
         return this;
     }
 

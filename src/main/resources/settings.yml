@@ -12,3 +12,10 @@ gui:
   # Used for filling empty slots in GUIs
   # To set this in GUIs, set "material" to "FILLER"
   filler: GRAY_STAINED_GLASS_PANE
+  quickbuy:
+    material: RED_STAINED_GLASS_PANE
+    name: "&cEmpty Slot!"
+    lore:
+      - "&7This is a Quick Buy slot!"
+      - ""
+      - "&eSneak Click any item in the shop to add it here!"

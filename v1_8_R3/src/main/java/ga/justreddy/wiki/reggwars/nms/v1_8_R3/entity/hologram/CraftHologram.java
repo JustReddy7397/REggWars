@@ -37,8 +37,8 @@ public class CraftHologram extends CraftArmorStand implements IArmorStand {
     }
 
     @Override
-    public void killEntity() {
-        ((EntityHologram) entity).killEntity();
+    public void killEntity(IGamePlayer player) {
+        ((EntityHologram) entity).killEntity(player);
     }
 
     @Override

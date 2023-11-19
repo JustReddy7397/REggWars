@@ -16,14 +16,23 @@ public class ShopCategory implements IShopCategory {
 
     private final String category;
     private final List<IShopItem> items;
-    private final IShopGui gui;
+    private final FileConfiguration configuration;
+    private IShopGui gui;
 
 
     public ShopCategory(FileConfiguration configuration) {
+        this.configuration = configuration;
         this.category = configuration.getString("category");
         this.items = new ArrayList<>();
         loadItems(configuration);
-        this.gui = new ShopGui(configuration);
+    }
+
+    public void setGui(IShopGui gui) {
+        this.gui = gui;
+    }
+
+    public FileConfiguration getConfig() {
+        return configuration;
     }
 
     @Override

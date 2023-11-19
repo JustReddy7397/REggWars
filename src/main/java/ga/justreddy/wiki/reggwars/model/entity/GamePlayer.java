@@ -4,12 +4,14 @@ import com.cryptomorin.xseries.XSound;
 import ga.justreddy.wiki.reggwars.api.model.entity.ICombatLog;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
+import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerQuickBuy;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerSettings;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
+import ga.justreddy.wiki.reggwars.model.entity.data.PlayerQuickBuy;
 import ga.justreddy.wiki.reggwars.model.entity.data.PlayerSettings;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import org.bukkit.Bukkit;
@@ -34,6 +36,7 @@ public class GamePlayer implements IGamePlayer {
     private boolean fakeDead;
 
     private IPlayerSettings settings;
+    private IPlayerQuickBuy quickBuy;
 
     private ICombatLog combatLog;
 
@@ -42,6 +45,7 @@ public class GamePlayer implements IGamePlayer {
         this.name = name;
         this.player = Bukkit.getPlayer(uniqueId);
         this.settings = new PlayerSettings();
+        this.quickBuy = new PlayerQuickBuy();
         this.combatLog = new CombatLog(this);
     }
 
@@ -184,5 +188,15 @@ public class GamePlayer implements IGamePlayer {
     @Override
     public void setCombatLog(ICombatLog combatLog) {
         this.combatLog = combatLog;
+    }
+
+    @Override
+    public IPlayerQuickBuy getQuickBuy() {
+        return quickBuy;
+    }
+
+    @Override
+    public void setQuickBuy(IPlayerQuickBuy quickBuy) {
+        this.quickBuy = quickBuy;
     }
 }

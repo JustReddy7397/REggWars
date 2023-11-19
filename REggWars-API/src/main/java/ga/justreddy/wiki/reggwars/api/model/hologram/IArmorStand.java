@@ -16,7 +16,7 @@ public interface IArmorStand {
 
     boolean isDead();
 
-    void killEntity();
+    void killEntity(IGamePlayer player);
 
     ArmorStand getEntity();
 

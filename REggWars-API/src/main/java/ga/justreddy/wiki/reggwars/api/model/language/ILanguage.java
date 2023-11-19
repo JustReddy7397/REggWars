@@ -11,8 +11,19 @@ import java.util.List;
  */
 public interface ILanguage {
 
+    /**
+     * Send a message to a player
+     * @param gamePlayer the player
+     * @param message the message
+     */
     void sendMessage(IGamePlayer gamePlayer, Message message);
 
+    /**
+     * Send a message to a player
+     * @param gamePlayer the player
+     * @param message the message
+     * @param replaceables the replaceables
+     */
     void sendMessage(IGamePlayer gamePlayer, Message message, Replaceable... replaceables);
 
     void sendMessage(CommandSender sender, Message message);
