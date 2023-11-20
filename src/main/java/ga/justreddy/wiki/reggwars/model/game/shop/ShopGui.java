@@ -53,10 +53,10 @@ public class ShopGui implements IShopGui, InventoryHolder {
         if (item == null) {
             IShopItem quick = quickBuy.get(slot);
             if (quick == null) return;
-            quick.give(player, shift);
+            quick.give(this, player, shift);
             return;
         }
-        item.give(player, shift);
+        item.give(this, player, shift);
     }
 
     @Override
@@ -65,7 +65,6 @@ public class ShopGui implements IShopGui, InventoryHolder {
         if (p == null) return;
         p.openInventory(inventory);
         if (config.isSet("quick-buy-slots")) {
-            System.out.println("kanker zooi");
             Map<Integer, IShopItem> quickBuy = new HashMap<>();
             ConfigurationSection section = REggWars.getInstance().getSettingsConfig().getConfig()
                     .getConfigurationSection("gui.quickbuy");

@@ -4,6 +4,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerQuickBuy;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author JustReddy
@@ -26,6 +27,16 @@ public class PlayerQuickBuy implements IPlayerQuickBuy {
     @Override
     public String get(int slot) {
         return quickBuy.getOrDefault(slot, null);
+    }
+
+    @Override
+    public int get(String id) {
+        Map.Entry<Integer, String> set =
+                quickBuy.entrySet()
+                        .stream().filter(entry -> entry.getValue().equals(id)).findFirst()
+                        .orElse(null);
+        if (set == null) return -1;
+        return set.getKey();
     }
 
     @Override

@@ -11,6 +11,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopPrice;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
+import ga.justreddy.wiki.reggwars.model.gui.custom.guis.QuickBuyEditorGui;
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -165,10 +166,11 @@ public class ShopItem implements IShopItem {
     }
 
     @Override
-    public void give(IGamePlayer player, boolean shift) {
+    public void give(IShopGui gui, IGamePlayer player, boolean shift) {
 
         if (shift && canQuickBuy) {
             // TODO but for now this
+            new QuickBuyEditorGui(gui, this).open(player);
             return;
         }
 

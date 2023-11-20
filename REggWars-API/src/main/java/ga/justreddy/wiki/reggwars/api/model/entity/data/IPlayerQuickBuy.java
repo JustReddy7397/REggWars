@@ -11,6 +11,8 @@ public interface IPlayerQuickBuy {
 
     String get(int slot);
 
+    int get(String id);
+
     void remove(int slot);
 
     Map<Integer, String> getQuickBuy();

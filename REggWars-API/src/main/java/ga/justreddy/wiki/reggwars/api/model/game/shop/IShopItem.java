@@ -27,6 +27,6 @@ public interface IShopItem {
 
     boolean canQuickBuy();
 
-    void give(IGamePlayer player, boolean shift);
+    void give(IShopGui gui, IGamePlayer player, boolean shift);
 
 }
