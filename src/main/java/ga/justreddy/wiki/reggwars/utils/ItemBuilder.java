@@ -6,6 +6,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -165,6 +166,13 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder withLore(List<String> lore, Replaceable... replaceable) {
+        for (Replaceable replace : replaceable) {
+            lore.replaceAll(s -> s.replace(replace.getKey(), replace.getValue()));
+        }
+        return withLore(lore);
+    }
+
     public ItemBuilder addLore(String line) {
         final ItemMeta meta = stack.getItemMeta();
         List<String> lore = meta.getLore();
@@ -254,23 +262,18 @@ public class ItemBuilder {
             stack.setItemMeta(meta);
             return this;
         } else if (type == Material.WOOL) {
-            MaterialData data = stack.getData();
-            Wool wool = (Wool) data;
-            wool.setColor(getByColor(color));
-            stack.setData(wool);
             stack.setDurability(getByColor(color).getWoolData());
             return this;
         } else if (type == Material.STAINED_GLASS_PANE || type == Material.STAINED_GLASS) {
-            MaterialData data = stack.getData();
-            Dye dye = (Dye) data;
-            dye.setColor(getByColor(color));
-            stack.setData(dye);
+            stack.setDurability(getByColor(color).getWoolData());
+            return this;
+        } else if (type == Material.STAINED_CLAY) {
             stack.setDurability(getByColor(color).getWoolData());
             return this;
         } else {
             throw new IllegalArgumentException("withColor is only applicable for leather armor, wool or glass (panes)!!");
-
         }
+
     }
 
     public ItemBuilder withPotion(PotionType potionType, int level, boolean splash, boolean hasExtendedDuration) {

@@ -64,7 +64,7 @@ public class MainListener implements Listener {
         } else if (holder instanceof InventoryMenu) {
             InventoryMenu menu = (InventoryMenu) holder;
             event.setCancelled(true);
-            menu.inventoryClick(event);
+            menu.onClick(gamePlayer, event);
         } else if (holder instanceof ShopGui) {
             event.setCancelled(true);
             ShopGui shopGui = (ShopGui) holder;

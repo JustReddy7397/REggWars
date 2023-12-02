@@ -6,11 +6,13 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
 import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
+import ga.justreddy.wiki.reggwars.manager.MenuManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
 import ga.justreddy.wiki.reggwars.model.gui.editable.InventoryMenu;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -92,7 +94,7 @@ public class CosmeticMenu extends InventoryMenu {
                 if (!player.hasPermission(dance.getPermission()) || !cosmetics.hasDance(dance.getId())) {
                     text = text.replaceAll("<ew-dances-selected-" + dance.getId() + ">",
                             language.getString
-                                    (Message.ENUMS_COSMETICS_CANT_SELECT)
+                                            (Message.ENUMS_COSMETICS_CANT_SELECT)
                                     .replaceAll("<cost>",
                                             String.valueOf(dance.getCost())));
                 } else {
@@ -118,9 +120,37 @@ public class CosmeticMenu extends InventoryMenu {
     }
 
     @Override
-    public void inventoryClick(InventoryClickEvent e) {
-        // TODO
+    public void onClick(IGamePlayer player, InventoryClickEvent event) {
+        Player bukkitPlayer = player.getPlayer();
+        ConfigurationSection section = configuration.getConfigurationSection("items");
+        for (String path : section.getKeys(false)) {
+            ConfigurationSection button = section.getConfigurationSection(path);
+            if (event.getRawSlot() == button.getInt("slot")) {
+                for (String action : button.getStringList("actions")) {
+                    String[] actions = action.split(";");
+                    switch (actions[0]) {
+                        case "inventory":
+                            MenuManager.getManager().getByName(actions[1]).open(player);
+                            break;
+                        case "player":
+                            bukkitPlayer.performCommand(actions[1]);
+                            break;
+                        case "close":
+                            bukkitPlayer.closeInventory();
+                            break;
+                        case "message":
+                            player.sendLegacyMessage(actions[1]);
+                            break;
+                        case "console":
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), actions[1].replaceAll("<player>", player.getName()));
+                            break;
+                        case "sound ":
+                            player.sendSound(actions[1]);
+                            break;
+                    }
+                }
+                break;
+            }
+        }
     }
-
-
 }

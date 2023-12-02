@@ -6,7 +6,7 @@ import org.bukkit.World;
 import java.io.File;
 
 /**
- * For cages possibly ?
+ * For cages possibly?
  * @author JustReddy
  */
 public interface ISchematic {

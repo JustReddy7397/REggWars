@@ -1,5 +1,7 @@
 package ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity;
 
+import ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity.hologram.EntityHologram;
+import ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity.hologram.HologramStand;
 import net.minecraft.server.v1_8_R3.Entity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -12,6 +14,8 @@ import java.util.Map;
  */
 public enum EntityTypes {
 
+    HOLOGRAM("hologram", 30, EntityHologram.class),
+    HOLOGRAM_2("hologram2", 30, HologramStand.class),
     VILLAGER_SHOP("VillagerShop", 120, VillagerShop.class);
 
     EntityTypes(String name, int id, Class<? extends Entity> custom) {

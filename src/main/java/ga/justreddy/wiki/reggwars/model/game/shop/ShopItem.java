@@ -9,6 +9,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopGui;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopItem;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopPrice;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.model.gui.custom.guis.QuickBuyEditorGui;
@@ -85,10 +86,6 @@ public class ShopItem implements IShopItem {
             builder = new ItemBuilder(item.get().parseItem());
             this.dummy = section.getBoolean("dummy");
         }
-        if (section.contains("item.name")) builder.withName(section.getString("item.name"));
-        if (section.contains("item.lore")) builder.withLore(section.getStringList("item.lore"));
-        this.item = builder.build();
-        this.canQuickBuy = section.getBoolean("quick-buy");
         if (!dummy) {
             Optional<XMaterial> priceMaterial = XMaterial.matchXMaterial(section.getString("price.material"));
             if (!priceMaterial.isPresent())
@@ -97,6 +94,22 @@ public class ShopItem implements IShopItem {
             this.price = new ShopPrice(priceMaterial.get().parseMaterial(), price);
             this.amount = section.getInt("amount");
         }
+
+        if (section.contains("item.name")) builder.withName(section.getString("item.name"));
+        if (price != null) {
+            if (section.contains("item.lore")) builder.withLore(
+                    section.getStringList("item.lore"),
+                    new Replaceable("<price>", price.getPrice() + " " + price.getMaterial().name())
+            );
+        } else {
+            if (section.contains("item.lore")) builder.withLore(
+                    section.getStringList("item.lore")
+            );
+        }
+
+        this.item = builder.build();
+        this.canQuickBuy = section.getBoolean("quick-buy");
+
 
         if (section.contains("enchantments")) {
             for (String enchantment : section.getStringList("enchantments")) {

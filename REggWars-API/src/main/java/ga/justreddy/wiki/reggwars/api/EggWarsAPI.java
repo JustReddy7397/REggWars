@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.api.model.cosmetics.VictoryDance;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 
+import java.io.FileReader;
 import java.util.UUID;
 
 /**
@@ -44,5 +45,9 @@ public interface EggWarsAPI {
      * @param message the kill message to register
      */
     void registerKillMessage(KillMessage message);
+
+    default String getVersion() {
+        return "1.0.0";
+    }
 
 }

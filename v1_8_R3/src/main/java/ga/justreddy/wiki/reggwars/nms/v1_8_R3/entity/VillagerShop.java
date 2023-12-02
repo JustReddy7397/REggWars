@@ -1,5 +1,7 @@
 package ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity;
 
+import ga.justreddy.wiki.reggwars.api.model.hologram.IHologram;
+import ga.justreddy.wiki.reggwars.model.hologram.Hologram;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -8,11 +10,15 @@ import org.bukkit.entity.Villager;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 /**
  * @author andrei1058
  */
 public class VillagerShop extends EntityVillager {
+
+    private final IHologram hologram;
+
     public VillagerShop(Location loc) {
         super(((CraftWorld) loc.getWorld()).getHandle());
         try {
@@ -29,6 +35,8 @@ public class VillagerShop extends EntityVillager {
         this.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         this.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         persistent = true;
+        this.hologram = new Hologram(loc.clone().add(0, 0.5, 0), Arrays.asList("&e&lShop", "&7Click to open"));
+        hologram.spawn(world.getWorld());
     }
 
     public static Villager spawn(Location location) {
@@ -54,6 +62,17 @@ public class VillagerShop extends EntityVillager {
 
     public void makeSound(String s, float f, float f1) {
 
+    }
+
+    @Override
+    public void die() {
+        super.die();
+
+    }
+
+    @Override
+    public void die(DamageSource damagesource) {
+        super.die(damagesource);
     }
 
     protected void initAttributes() {

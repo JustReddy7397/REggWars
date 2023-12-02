@@ -4,7 +4,9 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IArmorStand;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IHologram;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IHologramLine;
+import ga.justreddy.wiki.reggwars.model.hologram.Hologram;
 import ga.justreddy.wiki.reggwars.nms.v1_8_R3.box.NullBoundingBox;
+import ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity.EntityTypes;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
@@ -50,18 +52,24 @@ public class EntityHologram extends EntityArmorStand implements IArmorStand {
         armor.setLocation(location.getX(), location.getY(), location.getZ());
         armor.setName(player, name);
         if (armor instanceof HologramStand) {
+            EntityTypes.spawnEntity((HologramStand) armor, location);
+        } else if (armor instanceof EntityHologram) {
+            EntityTypes.spawnEntity((EntityHologram) armor, location);
+        }
+        /*if (armor instanceof HologramStand) {
             HologramStand stand = (HologramStand) armor;
             stand.yaw = location.getYaw();
             stand.pitch = location.getPitch();
             PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(stand);
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+            ((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(packet);
         } else if (armor instanceof EntityHologram) {
             EntityHologram stand = (EntityHologram) armor;
             stand.yaw = location.getYaw();
             stand.pitch = location.getPitch();
+            armor.getEntity().setRemoveWhenFarAway(false);
             PacketPlayOutSpawnEntityLiving packet = new PacketPlayOutSpawnEntityLiving(stand);
-            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
-        }
+            ((CraftPlayer) player.getPlayer()).getHandle().playerConnection.sendPacket(packet);
+        }*/
         return armor;
     }
 

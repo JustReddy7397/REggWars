@@ -41,7 +41,7 @@ public abstract class InventoryMenu implements InventoryHolder {
 
     public abstract void setMenuItems(IGamePlayer gamePlayer);
 
-    public abstract void inventoryClick(InventoryClickEvent e);
+    public abstract void onClick(IGamePlayer player, InventoryClickEvent event);
 
     public void onClose() {
         if (task != null) task.cancel();

@@ -541,6 +541,7 @@ public class Game implements IGame {
                             players.getPlayer().showPlayer(player);
                         }
                         victim.teleport(team.getSpawnLocation());
+                        victim.getPlayer().setGameMode(org.bukkit.GameMode.SURVIVAL);
                         addRespawnProtection(victim);
                         Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> removeRespawnProtection(victim),
                                 REggWars.getInstance().getSettingsConfig()

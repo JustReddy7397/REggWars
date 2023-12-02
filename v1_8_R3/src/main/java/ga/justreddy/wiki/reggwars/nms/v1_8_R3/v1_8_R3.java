@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IArmorStand;
+import ga.justreddy.wiki.reggwars.api.model.hologram.IHologram;
 import ga.justreddy.wiki.reggwars.api.model.hologram.IHologramLine;
 import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import ga.justreddy.wiki.reggwars.nms.Nms;
@@ -27,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 public final class v1_8_R3 implements Nms {
@@ -261,4 +263,19 @@ public final class v1_8_R3 implements Nms {
     public IArmorStand spawnArmorStand(Location location, IGamePlayer player, String line, IHologramLine hologramLine) {
         return EntityHologram.spawn(location, player, line, hologramLine);
     }
+
+    @Override
+    public void setBlastProofItems() {
+        try {
+            Field field = net.minecraft.server.v1_8_R3.Block.class.getDeclaredField("durability");
+            field.setAccessible(true);
+            field.set(net.minecraft.server.v1_8_R3.Block.getByName("glass"), 100);
+            field.set(net.minecraft.server.v1_8_R3.Block.getByName("stained_glass"), 100);
+            field.set(net.minecraft.server.v1_8_R3.Block.getByName("end_stone"), 100);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

@@ -57,4 +57,6 @@ public interface Nms {
 
     IArmorStand spawnArmorStand(Location location, IGamePlayer player, String line, IHologramLine hologramLine);
 
+    void setBlastProofItems();
+
 }

@@ -4,6 +4,7 @@ import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.manager.MenuManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
+import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.model.gui.editable.InventoryMenu;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
@@ -84,36 +85,33 @@ public class OtherMenu extends InventoryMenu {
             inventory.setItem(button.getInt("slot"), itemBuilder.build());
         }
     }
-
     @Override
-    public void inventoryClick(InventoryClickEvent e) {
-        IGamePlayer gamePlayer =
-                PlayerManager.getManager().getGamePlayer(e.getWhoClicked().getUniqueId());
-        Player player = gamePlayer.getPlayer();
-        ConfigurationSection section = this.configuration.getConfigurationSection("items");
+    public void onClick(IGamePlayer player, InventoryClickEvent event) {
+        Player bukkitPlayer = player.getPlayer();
+        ConfigurationSection section = configuration.getConfigurationSection("items");
         for (String path : section.getKeys(false)) {
             ConfigurationSection button = section.getConfigurationSection(path);
-            if (e.getSlot() == button.getInt("slot")) {
+            if (event.getRawSlot() == button.getInt("slot")) {
                 for (String action : button.getStringList("actions")) {
                     String[] actions = action.split(";");
                     switch (actions[0]) {
                         case "inventory":
-                            MenuManager.getManager().getByName(actions[1]).open(gamePlayer);
+                            MenuManager.getManager().getByName(actions[1]).open(player);
                             break;
                         case "player":
-                            player.performCommand(actions[1]);
+                            bukkitPlayer.performCommand(actions[1]);
                             break;
                         case "close":
-                            player.closeInventory();
+                            bukkitPlayer.closeInventory();
                             break;
                         case "message":
-                            gamePlayer.sendLegacyMessage(actions[1]);
+                            player.sendLegacyMessage(actions[1]);
                             break;
                         case "console":
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), actions[1]);
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), actions[1].replaceAll("<player>", player.getName()));
                             break;
                         case "sound ":
-                            gamePlayer.sendSound(actions[1]);
+                            player.sendSound(actions[1]);
                             break;
                     }
                 }
@@ -121,4 +119,6 @@ public class OtherMenu extends InventoryMenu {
             }
         }
     }
+
+
 }
