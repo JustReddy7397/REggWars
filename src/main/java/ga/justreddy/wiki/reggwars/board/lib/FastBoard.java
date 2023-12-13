@@ -1,4 +1,5 @@
 package ga.justreddy.wiki.reggwars.board.lib;
+import ga.justreddy.wiki.reggwars.board.lib.exceptions.ScoreboardException;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -106,6 +107,7 @@ public class FastBoard {
                         .filter(field -> !Modifier.isStatic(field.getModifiers()))
                         .toArray(Field[]::new);
                 for (Field field : fields) {
+
                     field.setAccessible(true);
                 }
                 PACKETS.put(clazz, fields);
@@ -153,7 +155,7 @@ public class FastBoard {
             sendObjectivePacket(ObjectiveMode.CREATE);
             sendDisplayObjectivePacket();
         } catch (Throwable t) {
-            throw new RuntimeException("Unable to create scoreboard", t);
+            throw new ScoreboardException("Unable to create scoreboard", t);
         }
     }
 
@@ -187,7 +189,7 @@ public class FastBoard {
         try {
             sendObjectivePacket(ObjectiveMode.UPDATE);
         } catch (Throwable t) {
-            throw new RuntimeException("Unable to update scoreboard title", t);
+            throw new ScoreboardException("Unable to update scoreboard title", t);
         }
     }
 
@@ -243,7 +245,7 @@ public class FastBoard {
 
             updateLines(newLines);
         } catch (Throwable t) {
-            throw new RuntimeException("Unable to update scoreboard lines", t);
+            throw new ScoreboardException("Unable to update scoreboard lines", t);
         }
     }
 
@@ -329,7 +331,7 @@ public class FastBoard {
                 }
             }
         } catch (Throwable t) {
-            throw new RuntimeException("Unable to update scoreboard lines", t);
+            throw new ScoreboardException("Unable to update scoreboard lines", t);
         }
     }
 
@@ -383,7 +385,7 @@ public class FastBoard {
 
             sendObjectivePacket(ObjectiveMode.REMOVE);
         } catch (Throwable t) {
-            throw new RuntimeException("Unable to delete scoreboard", t);
+            throw new ScoreboardException("Unable to delete scoreboard", t);
         }
 
         this.deleted = true;

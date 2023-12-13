@@ -19,7 +19,6 @@ import java.util.Map;
 public class Bungee extends Plugin {
 
     @Getter private static Bungee instance;
-    @Getter private Storage storage;
     @Getter private BungeeConfig bungeeConfig;
     @Getter private final Map<String, BungeeGame> games = new HashMap<>();
     @Getter private final Map<String, String> playerServers = new HashMap<>();
@@ -30,7 +29,6 @@ public class Bungee extends Plugin {
     @Override
     public void onEnable() {
         instance = this;
-        storage = new MYSQLStorage(); // TODO
         this.bungeeConfig = new BungeeConfig("bungee-config.yml");
         this.socketServer = new SocketServer();
         this.socketServer.serverSetup(bungeeConfig.getConfig().getInt("socket-port"));
@@ -40,6 +38,7 @@ public class Bungee extends Plugin {
     @Override
     public void onDisable() {
         socketServer.closeConnections();
+        socketServer.getSpigotSocket().clear();
         getProxy().getScheduler().cancel(this);
     }
 }

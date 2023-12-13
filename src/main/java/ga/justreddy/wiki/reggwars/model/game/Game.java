@@ -20,26 +20,23 @@ import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.board.EggWarsBoard;
-import ga.justreddy.wiki.reggwars.bungee.Core;
-import ga.justreddy.wiki.reggwars.bungee.ServerMode;
+import ga.justreddy.wiki.reggwars.Core;
+import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.generator.Generator;
-import ga.justreddy.wiki.reggwars.model.game.shop.Shop;
 import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import ga.justreddy.wiki.reggwars.model.game.team.TeamAssigner;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameEndTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameStartTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.Timer;
-import ga.justreddy.wiki.reggwars.packets.socket.classes.BackToServerPacket;
 import ga.justreddy.wiki.reggwars.socket.BungeeUtils;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
 import org.bukkit.*;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -291,6 +288,7 @@ public class Game implements IGame {
                                     getServer(),
                                     getMaxPlayers(),
                                     getGameState(),
+                                    getGameMode(),
                                     getPlayerNames()
                             )
                     );
@@ -312,6 +310,7 @@ public class Game implements IGame {
                                             getServer(),
                                             getMaxPlayers(),
                                             getGameState(),
+                                            getGameMode(),
                                             getPlayerNames()
                                     )
                             );
@@ -358,6 +357,7 @@ public class Game implements IGame {
                                 getServer(),
                                 getMaxPlayers(),
                                 getGameState(),
+                                getGameMode(),
                                 getPlayerNames()
                         )
                 );
@@ -405,6 +405,7 @@ public class Game implements IGame {
                                 getServer(),
                                 getMaxPlayers(),
                                 getGameState(),
+                                getGameMode(),
                                 getPlayerNames()
                         )
                 );
@@ -438,6 +439,7 @@ public class Game implements IGame {
                                     getServer(),
                                     getMaxPlayers(),
                                     getGameState(),
+                                    getGameMode(),
                                     getPlayerNames()
                             )
                     );
@@ -501,6 +503,7 @@ public class Game implements IGame {
                                     getServer(),
                                     getMaxPlayers(),
                                     getGameState(),
+                                    getGameMode(),
                                     getPlayerNames()
                             )
                     );
@@ -535,6 +538,7 @@ public class Game implements IGame {
                                     getServer(),
                                     getMaxPlayers(),
                                     getGameState(),
+                                    getGameMode(),
                                     getPlayerNames()
                             )
                     );

@@ -66,7 +66,7 @@ public enum Team {
 
     public static Team getByIdentifier(String identifier) {
         for (Team team : Team.values()) {
-            if (team.getIdentifier().equals(identifier.toLowerCase())) return team;
+            if (team.getIdentifier().equalsIgnoreCase(identifier)) return team;
         }
         return null;
     }

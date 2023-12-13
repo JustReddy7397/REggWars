@@ -31,7 +31,7 @@ public class AdminCommand extends Command {
     }
 
     private void runReloadCommand(IGamePlayer player) {
-        REggWars.getInstance().reload();
+
     }
 
 }

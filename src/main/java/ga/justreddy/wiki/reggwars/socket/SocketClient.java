@@ -1,10 +1,9 @@
 package ga.justreddy.wiki.reggwars.socket;
 
 import ga.justreddy.wiki.reggwars.REggWars;
-import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
-import ga.justreddy.wiki.reggwars.bungee.Core;
-import ga.justreddy.wiki.reggwars.bungee.ServerMode;
+import ga.justreddy.wiki.reggwars.Core;
+import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import lombok.Getter;
@@ -94,6 +93,7 @@ public class SocketClient {
                             plugin.getServerName(),
                             game.getMaxPlayers(),
                             game.getGameState(),
+                            game.getGameMode(),
                             new ArrayList<>());
                     games.add(bungeeGame);
 

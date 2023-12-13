@@ -44,13 +44,19 @@ public class EggWarsBoard {
     public void setGameBoard(IGamePlayer player) {
         if (player == null) return;
         removeScoreboard(player);
+
         ILanguage language = player.getSettings().getLanguage();
         FileConfiguration config = language.getConfig();
-        ConfigurationSection section = config.getConfigurationSection("scoreboard.game-board");
+        ConfigurationSection section = config
+                .getConfigurationSection("scoreboard.game-board");
         if (!section.getBoolean("enabled")) return;
-        SimpleDateFormat dateFormat = new SimpleDateFormat(language.getString(Message.SCOREBOARD_DATE_FORMAT));
-        String youText = language.getString(Message.SCOREBOARD_YOU_TEXT);
-        final IGame game = player.getGame();
+
+        SimpleDateFormat dateFormat =
+                new SimpleDateFormat(language.getString(Message.SCOREBOARD_DATE_FORMAT));
+        String youText =
+                language.getString(Message.SCOREBOARD_YOU_TEXT);
+        final IGame game =
+                player.getGame();
         BoardCreator creator = new BoardCreator(player) {
             @Override
             public String placeholder(String text) {
@@ -99,6 +105,7 @@ public class EggWarsBoard {
                 creator.setLines(list);
             }
         }, 0L, 20L).getTaskId();
+
         data.put(player.getUniqueId(), id);
         boards.put(player.getUniqueId(), creator);
     }

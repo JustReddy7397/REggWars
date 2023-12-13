@@ -3,12 +3,11 @@ package ga.justreddy.wiki.reggwars.manager;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
-import ga.justreddy.wiki.reggwars.bungee.Core;
-import ga.justreddy.wiki.reggwars.bungee.ServerMode;
+import ga.justreddy.wiki.reggwars.Core;
+import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.model.game.Game;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
-import ga.justreddy.wiki.reggwars.utils.ShuffleUtil;
 import lombok.Getter;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author JustReddy

@@ -4,16 +4,12 @@ import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import ga.justreddy.wiki.reggwars.api.EggWarsProvider;
 import ga.justreddy.wiki.reggwars.api.model.game.ResetAdapter;
-import ga.justreddy.wiki.reggwars.bungee.Core;
-import ga.justreddy.wiki.reggwars.bungee.ServerMode;
 import ga.justreddy.wiki.reggwars.commands.BaseCommand;
 import ga.justreddy.wiki.reggwars.config.Config;
 import ga.justreddy.wiki.reggwars.exceptions.DependencyNotInstalledException;
 import ga.justreddy.wiki.reggwars.impl.ApiHandler;
 import ga.justreddy.wiki.reggwars.listener.GameListener;
 import ga.justreddy.wiki.reggwars.listener.MainListener;
-import ga.justreddy.wiki.reggwars.listener.bungee.BungeeListener;
-import ga.justreddy.wiki.reggwars.listener.bungee.ServerListener;
 import ga.justreddy.wiki.reggwars.manager.*;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
@@ -31,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.security.interfaces.RSAKey;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -117,13 +112,6 @@ public final class REggWars extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-
-
-        /*if (mode != ServerMode.MULTI_ARENA) {
-            ChatUtil.sendConsole("&7[&dREggWars&7] &cAny mode other then MUTLI_ARENA is currently not supported!");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }*/
 
         if (mode != ServerMode.MULTI_ARENA && storage instanceof SQLStorage) {
             cancelBungee();

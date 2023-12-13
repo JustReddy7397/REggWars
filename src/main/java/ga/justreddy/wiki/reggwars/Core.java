@@ -1,4 +1,4 @@
-package ga.justreddy.wiki.reggwars.bungee;
+package ga.justreddy.wiki.reggwars;
 
 /**
  * @author JustReddy
