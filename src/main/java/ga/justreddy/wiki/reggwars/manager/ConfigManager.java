@@ -1,7 +1,10 @@
 package ga.justreddy.wiki.reggwars.manager;
 
+import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.config.Config;
+import ga.justreddy.wiki.reggwars.config.SerializableConfig;
 import ga.justreddy.wiki.reggwars.utils.ConfigWriter;
+import lombok.SneakyThrows;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -31,54 +34,28 @@ public class ConfigManager {
         this.configs.put(config.getFile().getName().replace(".yml", ""), config);
     }
 
-    public String parseConfiguration(FileConfiguration config) {
-        StringBuilder sb = new StringBuilder();
-        for (String key : config.getKeys(false)) {
-            sb.append(parseSection(key, config.get(key), 0));
-        }
-
-        return sb.toString();
+    public Config get(String name) {
+        return configs.getOrDefault(name, null);
     }
 
-    public void setConfigValues(String contents, File file) {
-        ConfigWriter writer = new ConfigWriter(file);
-        writer.write();
+    public void set(SerializableConfig config) {
+        Config c = get(config.getConfig());
+        if (c == null) return;
+        set(c, config.getObj());
     }
 
-    private String parseSection(String key, Object object, int spaces) {
-        StringBuilder join = new StringBuilder(repeat(spaces) + key + ":");
-        if (object instanceof String) {
-            join.append(" '").append(((String) object)
-                            .replace("'", "''")
-                            .replace("§", "&")
-                    )
-                    .append("'\n");
-        } else if (object instanceof Integer || object instanceof Double ||
-                object instanceof Float || object instanceof Long
-                || object instanceof Boolean) {
-            join.append(" ").append(object).append("\n");
-        } else if (object instanceof List) {
-            join.append("\n");
-            for (Object obj : (List<?>) object) {
-                if (obj instanceof Integer) {
-                    join.append(repeat(spaces)).append("- ").
-                            append(obj.toString()).append("\n");
-                } else {
-                    join.append(repeat(spaces)).append("- '").append(obj.toString().replace("'", "''")).append("'\n");
-                }
-            }
-        } else if (object instanceof ConfigurationSection) {
-            ConfigurationSection section = (ConfigurationSection) object;
-            if (section.getKeys(false).isEmpty()) {
-                join.append(" {}\n");
-            } else {
-                join.append("\n");
-                for (String s : section.getKeys(false)) {
-                    join.append(parseSection(s, section.get(s), spaces + 1));
-                }
-            }
+    @SneakyThrows
+    public void set(File file, FileConfiguration config, Map<String, Object> obj) {
+        for (Map.Entry<String, Object> entry : obj.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            config.set(key, value);
         }
-        return join.toString();
+        config.save(file);
+    }
+
+    public void set(Config config, Map<String, Object> obj) {
+        set(config.getFile(), config.getConfig(), obj);
     }
 
     private String repeat(int spaces) {
@@ -88,6 +65,24 @@ public class ConfigManager {
         }
 
         return sb.toString();
+    }
+
+    @SneakyThrows
+    public void reload() {
+        MenuManager.getManager().reload();
+        LanguageManager.getManager().reload();
+        // TODO make languages and menus sync when reloading them
+        for (Config config : configs.values()) {
+            config.reload();
+            if (!REggWars.getInstance().isBungee()) continue;
+        }
+
+        if (!REggWars.getInstance().isBungee()) return;
+        configs.forEach((string, config) -> {
+            REggWars.getInstance().getSocketClient()
+                    .getSender()
+                    .sendConfigUpdatePacket(REggWars.getInstance().getServerName(), config);
+        });
     }
 
     public Map<String, Config> getConfigs() {

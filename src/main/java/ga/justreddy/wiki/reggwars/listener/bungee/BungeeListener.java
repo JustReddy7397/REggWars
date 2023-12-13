@@ -3,11 +3,9 @@ package ga.justreddy.wiki.reggwars.listener.bungee;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteStreams;
 import ga.justreddy.wiki.reggwars.REggWars;
-import ga.justreddy.wiki.reggwars.bungee.ServerLobbies;
 import ga.justreddy.wiki.reggwars.storage.type.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import java.lang.reflect.Field;
@@ -23,7 +21,7 @@ public class BungeeListener implements PluginMessageListener {
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] data) {
         if (!channel.equalsIgnoreCase("REggWarsAPI")) return;
-        ByteArrayDataInput input = ByteStreams.newDataInput(data);
+   /*     ByteArrayDataInput input = ByteStreams.newDataInput(data);
         String subChannel = input.readUTF();
 
         if (subChannel.equalsIgnoreCase("Count")) {
@@ -54,7 +52,7 @@ public class BungeeListener implements PluginMessageListener {
                Storage storage = REggWars.getInstance().getStorage();
                storage.loadBungeeFiles(name);
             });
-        }
+        }*/
 
     }
 }

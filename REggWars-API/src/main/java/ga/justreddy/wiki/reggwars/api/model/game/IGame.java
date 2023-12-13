@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author JustReddy
@@ -20,6 +21,8 @@ import java.util.Set;
 public interface IGame {
 
     String getName();
+
+    String getServer();
 
     String getDisplayName();
 
@@ -71,7 +74,7 @@ public interface IGame {
 
     void onGamePlayerQuit(IGamePlayer gamePlayer, boolean silent);
 
-    void onGamePlayerJoinSpectator(IGamePlayer gamePlayer);
+    void onGamePlayerJoinSpectator(IGamePlayer gamePlayer, boolean spectating);
 
     void onGamePlayerDeath(IGamePlayer killer, IGamePlayer victim, String path, boolean isFinal);
 
@@ -128,5 +131,12 @@ public interface IGame {
     void removeRespawnProtection(IGamePlayer gamePlayer);
 
     World getWorld();
+
+    default List<String> getPlayerNames() {
+        return getPlayers().stream()
+                .filter(players -> !players.isSpectating())
+                .map(IGamePlayer::getName)
+                .collect(Collectors.toList());
+    }
 
 }

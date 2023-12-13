@@ -20,6 +20,9 @@ import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.board.EggWarsBoard;
+import ga.justreddy.wiki.reggwars.bungee.Core;
+import ga.justreddy.wiki.reggwars.bungee.ServerMode;
+import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.generator.Generator;
@@ -30,6 +33,8 @@ import ga.justreddy.wiki.reggwars.model.game.timer.GameEndTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameStartTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.Timer;
+import ga.justreddy.wiki.reggwars.packets.socket.classes.BackToServerPacket;
+import ga.justreddy.wiki.reggwars.socket.BungeeUtils;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
@@ -52,6 +57,7 @@ import java.util.stream.Stream;
 public class Game implements IGame {
 
     private final String name;
+    private final String server;
     private final FileConfiguration config;
     private final ResetAdapter adapter;
     private World world;
@@ -97,11 +103,17 @@ public class Game implements IGame {
         this.placedBlocks = new ArrayList<>();
         this.protections = new ArrayList<>();
         this.shops = new HashMap<>();
+        this.server = REggWars.getInstance().getServerName();
     }
 
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getServer() {
+        return server;
     }
 
     @Override
@@ -270,6 +282,19 @@ public class Game implements IGame {
         this.startTimer = new GameStartTimer(10, REggWars.getInstance());
         endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
         setGameState(GameState.WAITING); // TODO make it so if disabled, it wont enable again
+        if (REggWars.getInstance().isBungee()) {
+            REggWars.getInstance().getSocketClient()
+                    .getSender()
+                    .sendUpdateGamePacket(
+                            new BungeeGame(
+                                    getName(),
+                                    getServer(),
+                                    getMaxPlayers(),
+                                    getGameState(),
+                                    getPlayerNames()
+                            )
+                    );
+        }
     }
 
     @Override
@@ -277,9 +302,19 @@ public class Game implements IGame {
         switch (state) {
             // TODO
             case STARTING:
-
                 if (getPlayerCount() < minPlayers) {
                     setGameState(GameState.WAITING);
+                    REggWars.getInstance().getSocketClient()
+                            .getSender()
+                            .sendUpdateGamePacket(
+                                    new BungeeGame(
+                                            getName(),
+                                            getServer(),
+                                            getMaxPlayers(),
+                                            getGameState(),
+                                            getPlayerNames()
+                                    )
+                            );
                     gameTimer.stop();
                     startTimer.stop();
                     return;
@@ -304,6 +339,10 @@ public class Game implements IGame {
 
                 break;
             case ENDING:
+                if (endTimer.isStarted() && endTimer.getTicksExceed() <= 0) {
+                    // TODO :)
+                    onGameRestart();
+                }
                 break;
         }
     }
@@ -311,6 +350,17 @@ public class Game implements IGame {
     @Override
     public void onGameStart() {
         setGameState(GameState.PLAYING);
+        REggWars.getInstance().getSocketClient()
+                .getSender()
+                .sendUpdateGamePacket(
+                        new BungeeGame(
+                                getName(),
+                                getServer(),
+                                getMaxPlayers(),
+                                getGameState(),
+                                getPlayerNames()
+                        )
+                );
         if (!gameTimer.isStarted()) gameTimer.start();
         teamAssigner.assignTeam(this);
         Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> {
@@ -347,17 +397,54 @@ public class Game implements IGame {
         generators.forEach(IGenerator::destroy);
         endTimer.start();
         setGameState(GameState.ENDING);
+        REggWars.getInstance().getSocketClient()
+                .getSender()
+                .sendUpdateGamePacket(
+                        new BungeeGame(
+                                getName(),
+                                getServer(),
+                                getMaxPlayers(),
+                                getGameState(),
+                                getPlayerNames()
+                        )
+                );
         sendLegacyMessage("Thanks for playing bitches");
     }
 
     @Override
     public void onGameRestart() {
+        setGameState(GameState.RESTARTING);
         if (world != null) {
             world.getPlayers().forEach(player -> {
-                player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+                if (Core.MODE == ServerMode.BUNGEE) {
+                    BungeeUtils.getInstance().sendBackToServer(
+                            PlayerManager.getManager().getGamePlayer(player.getUniqueId())
+                    );
+                    return;
+                } else if (Core.MODE == ServerMode.MULTI_ARENA) {
+                    player.teleport(Bukkit.getWorld("world").getSpawnLocation());
+                    // TODO
+                    return;
+
+                }
             });
         }
+        if (REggWars.getInstance().isBungee()) {
+            REggWars.getInstance().getSocketClient()
+                    .getSender()
+                    .sendUpdateGamePacket(
+                            new BungeeGame(
+                                    getName(),
+                                    getServer(),
+                                    getMaxPlayers(),
+                                    getGameState(),
+                                    getPlayerNames()
+                            )
+                    );
+        }
+        System.out.println("RESTARTING WORLD");
         adapter.onRestart(this);
+
     }
 
 
@@ -370,23 +457,6 @@ public class Game implements IGame {
 
         p.setAllowFlight(false);
         p.setFlying(false);
-
-        if (isGameState(GameState.DISABLED)) {
-            // TODO sendm essage
-            return;
-        }
-
-        if (isGameState(GameState.PLAYING) || isGameState(GameState.ENDING)) {
-            // tODO send message
-            return;
-        }
-
-        if (players.size() > maxPlayers) {
-            // TODO sendm esage
-            return;
-        }
-
-        if (players.contains(gamePlayer)) return;
 
         players.add(gamePlayer);
         gamePlayer.setGame(this);
@@ -422,6 +492,20 @@ public class Game implements IGame {
         }
 
 
+        if (REggWars.getInstance().isBungee()) {
+            REggWars.getInstance().getSocketClient()
+                    .getSender()
+                    .sendUpdateGamePacket(
+                            new BungeeGame(
+                                    getName(),
+                                    getServer(),
+                                    getMaxPlayers(),
+                                    getGameState(),
+                                    getPlayerNames()
+                            )
+                    );
+        }
+
     }
 
     @Override
@@ -442,6 +526,19 @@ public class Game implements IGame {
         PlayerUtil.refresh(gamePlayer.getPlayer());
         EggWarsGameLeaveEvent event = new EggWarsGameLeaveEvent(this, gamePlayer);
         event.call();
+        if (REggWars.getInstance().isBungee()) {
+            REggWars.getInstance().getSocketClient()
+                    .getSender()
+                    .sendUpdateGamePacket(
+                            new BungeeGame(
+                                    getName(),
+                                    getServer(),
+                                    getMaxPlayers(),
+                                    getGameState(),
+                                    getPlayerNames()
+                            )
+                    );
+        }
         if (gamePlayer.isDead()) return;
 
         if (silent) return;
@@ -456,7 +553,7 @@ public class Game implements IGame {
     }
 
     @Override
-    public void onGamePlayerJoinSpectator(IGamePlayer gamePlayer) {
+    public void onGamePlayerJoinSpectator(IGamePlayer gamePlayer, boolean spectating) {
 
     }
 
@@ -546,7 +643,7 @@ public class Game implements IGame {
                         Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> removeRespawnProtection(victim),
                                 REggWars.getInstance().getSettingsConfig()
                                         .getConfig().getInt("game.respawn-protection") * 20L
-                                );
+                        );
                         // TODO send respawned title and message
                         cancel();
                         return;
@@ -554,7 +651,7 @@ public class Game implements IGame {
 
                     victim.sendTitle(Message.TITLES_RESPAWNING_TITLE, Message.TITLES_RESPAWNING_SUBTITLE,
                             new Replaceable("<time>", String.valueOf(i))
-                            );
+                    );
                     victim.sendMessage(Message.MESSAGES_GAME_RESPAWN, new Replaceable("<time>", String.valueOf(i)));
 
                     --i;
@@ -596,10 +693,10 @@ public class Game implements IGame {
     public IGameTeam getTeamByEggLocation(Location location) {
         try (Stream<IGameTeam> stream = getTeams().stream()) {
             return stream.filter(team ->
-                    team.getEggLocation() != null &&
-                            team.getEggLocation().getBlock().getType() == XMaterial.DRAGON_EGG.parseMaterial()
-                            &&
-                        LocationUtils.equalsBlock(team.getEggLocation(), location)
+                            team.getEggLocation() != null &&
+                                    team.getEggLocation().getBlock().getType() == XMaterial.DRAGON_EGG.parseMaterial()
+                                    &&
+                                    LocationUtils.equalsBlock(team.getEggLocation(), location)
                     )
                     .findFirst()
                     .orElse(null);
@@ -621,7 +718,7 @@ public class Game implements IGame {
     public IGameSign getGeneratorSignByLocation(Location location) {
         IGenerator generator = generators.stream().filter(
                 gen -> LocationUtils.equalsBlock(gen.getGameSign()
-                        .getLocation().getBlock().getLocation(),
+                                .getLocation().getBlock().getLocation(),
                         location.getBlock().getLocation())
         ).findFirst().orElse(null);
         if (generator == null) return null;

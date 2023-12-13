@@ -12,6 +12,7 @@ import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.MapManager;
 import ga.justreddy.wiki.reggwars.manager.MenuManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
+import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.model.entity.data.PlayerSettings;
 import ga.justreddy.wiki.reggwars.model.game.shop.ShopGui;
 import ga.justreddy.wiki.reggwars.model.gui.custom.Gui;
@@ -39,14 +40,6 @@ public class MainListener implements Listener {
         IGamePlayer gamePlayer = PlayerManager.getManager().
                 addGamePlayer(player.getUniqueId(), player.getName());
         event.setJoinMessage(null);
-        if (Core.MODE == ServerMode.BUNGEE) {
-            if (!GameManager.getManager().getGames().isEmpty()) {
-                GameManager.getManager().getGames().values().stream().findFirst()
-                        .get().onGamePlayerJoin(gamePlayer);
-            }
-            return;
-        }
-
     }
 
 
@@ -96,7 +89,7 @@ public class MainListener implements Listener {
             game.onGamePlayerQuit(gamePlayer, true); // TODO
         }
         Bukkit.getScheduler().runTaskAsynchronously(REggWars.getInstance(), () -> {
-            REggWars.getInstance().getStorage().savePlayer(gamePlayer);
+            /*REggWars.getInstance().getStorage().savePlayer(gamePlayer);*/
             FakeTeamManager.getPlayerTeams().remove(gamePlayer.getUniqueId());
             PlayerManager.getManager().removeGamePlayer(gamePlayer.getUniqueId());
         });

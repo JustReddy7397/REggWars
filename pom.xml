@@ -119,5 +119,10 @@
             <artifactId>bungeecord-api</artifactId>
             <version>1.16-R0.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>5.19.0</version>
+        </dependency>
     </dependencies>
 </project>

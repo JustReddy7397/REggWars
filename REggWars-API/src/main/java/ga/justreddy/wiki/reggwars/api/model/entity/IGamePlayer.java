@@ -41,6 +41,10 @@ public interface IGamePlayer {
 
     void setFakeDead(boolean dead);
 
+    boolean isSpectating();
+
+    void setSpectating(boolean spectating);
+
     void sendLegacyMessage(String message);
 
     void sendMessage(Message message);

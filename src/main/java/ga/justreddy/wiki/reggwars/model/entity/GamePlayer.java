@@ -34,6 +34,7 @@ public class GamePlayer implements IGamePlayer {
     private IGameTeam team;
     private boolean dead;
     private boolean fakeDead;
+    private boolean spectating;
 
     private IPlayerSettings settings;
     private IPlayerQuickBuy quickBuy;
@@ -103,6 +104,17 @@ public class GamePlayer implements IGamePlayer {
     public void setFakeDead(boolean dead) {
         this.fakeDead = dead;
     }
+
+    @Override
+    public boolean isSpectating() {
+        return spectating;
+    }
+
+    @Override
+    public void setSpectating(boolean spectating) {
+        this.spectating = spectating;
+    }
+
 
     @Override
     public void sendLegacyMessage(String message) {

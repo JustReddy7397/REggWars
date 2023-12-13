@@ -1,7 +1,6 @@
 package ga.justreddy.wiki.reggwars.storage;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
-import ga.justreddy.wiki.reggwars.model.replays.GameReplayCache;
 import ga.justreddy.wiki.reggwars.storage.type.Storage;
 
 import java.util.List;
@@ -51,48 +50,4 @@ public class MYSQLStorage implements Storage {
         return null;
     }
 
-    @Override
-    public void saveGameReplayCache(GameReplayCache cache) {
-
-    }
-
-    @Override
-    public List<GameReplayCache> getGameReplayCaches(String name) {
-        return null;
-    }
-
-    @Override
-    public GameReplayCache getGameReplayCache(String id) {
-        return null;
-    }
-
-    @Override
-    public boolean doesBungeeFilesExist() {
-        return false;
-    }
-
-    @Override
-    public boolean doesBungeeFileExist(String name) {
-        return false;
-    }
-
-    @Override
-    public void createBungeeFiles(String name, String whatToCreate) {
-
-    }
-
-    @Override
-    public void updateBungeeFiles(String name, String file) {
-
-    }
-
-    @Override
-    public void loadBungeeFiles(String name) {
-
-    }
-
-    @Override
-    public void saveBungeeFiles(String name, String toSave) {
-
-    }
 }

@@ -70,6 +70,9 @@ public class MenuManager {
             InventoryMenu menu = openMenus.get(gamePlayer);
             if (menu == null) continue;
             menu.onClose();
+            if (player.getOpenInventory().getTopInventory() == menu.getInventory()) {
+                player.closeInventory();
+            }
             openMenus.remove(gamePlayer);
         }
         shutdown();

@@ -96,6 +96,10 @@ public class ItemBuilder {
             builder.withFlags(flags.toArray(new ItemFlag[0]));
         }
 
+        if (section.contains("enchantments")) {
+
+        }
+
         return builder;
     }
 

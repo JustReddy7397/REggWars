@@ -3,6 +3,9 @@ package ga.justreddy.wiki.reggwars.manager;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.bungee.Core;
+import ga.justreddy.wiki.reggwars.bungee.ServerMode;
+import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.model.game.Game;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.ShuffleUtil;
@@ -26,6 +29,7 @@ public class GameManager {
 
     private static GameManager manager;
 
+
     public static GameManager getManager() {
         return manager == null ? manager = new GameManager() : manager;
     }
@@ -33,15 +37,21 @@ public class GameManager {
     private final File gamesFolder;
 
     private final Map<String, IGame> games;
+    private final Map<String, BungeeGame> bungeeGames;
 
     private GameManager() {
         this.gamesFolder = new File(REggWars.getInstance()
                 .getDataFolder().getAbsolutePath() + "/data/games/");
         if (!gamesFolder.exists()) gamesFolder.mkdir();
         this.games = new HashMap<>();
+        this.bungeeGames = new HashMap<>();
     }
 
     public void start() {
+        if (Core.MODE == ServerMode.LOBBY) {
+            // TODO request servers if any
+            return;
+        }
         File[] files = gamesFolder.listFiles();
         if (files == null) return;
         for (File file : files) {
@@ -95,4 +105,19 @@ public class GameManager {
     }
 
 
+    public BungeeGame getRandomBungeeGame() {
+        List<BungeeGame> list = new ArrayList<>();
+        BungeeGame game = null;
+        for (BungeeGame g : bungeeGames.values()) {
+            if (g.isGameState(GameState.DISABLED)) continue;
+            if (g.isGameState(GameState.WAITING) || g.isGameState(GameState.STARTING)) {
+                if (g.getPlayers().size() >= g.getMaxPlayers()) {
+                    continue;
+                }
+                list.add(g);
+            }
+        }
+        if (list.isEmpty()) return null;
+        return list.get(0);
+    }
 }

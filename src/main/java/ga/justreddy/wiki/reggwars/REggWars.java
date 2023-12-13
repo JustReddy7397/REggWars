@@ -1,15 +1,12 @@
 package ga.justreddy.wiki.reggwars;
 
-import com.cryptomorin.xseries.XMaterial;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import ga.justreddy.wiki.reggwars.api.EggWarsProvider;
 import ga.justreddy.wiki.reggwars.api.model.game.ResetAdapter;
 import ga.justreddy.wiki.reggwars.bungee.Core;
-import ga.justreddy.wiki.reggwars.bungee.ServerLobbies;
 import ga.justreddy.wiki.reggwars.bungee.ServerMode;
 import ga.justreddy.wiki.reggwars.commands.BaseCommand;
-import ga.justreddy.wiki.reggwars.commands.Command;
 import ga.justreddy.wiki.reggwars.config.Config;
 import ga.justreddy.wiki.reggwars.exceptions.DependencyNotInstalledException;
 import ga.justreddy.wiki.reggwars.impl.ApiHandler;
@@ -22,22 +19,22 @@ import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.map.FlatAdapter;
 import ga.justreddy.wiki.reggwars.model.game.map.SlimeAdapter;
-import ga.justreddy.wiki.reggwars.model.replays.ReplayAdapter;
-import ga.justreddy.wiki.reggwars.model.replays.advancedreplay.AdvancedReplayAdapter;
 import ga.justreddy.wiki.reggwars.nms.Nms;
 import ga.justreddy.wiki.reggwars.schematic.ISchematic;
+import ga.justreddy.wiki.reggwars.socket.SocketClient;
 import ga.justreddy.wiki.reggwars.storage.SQLStorage;
 import ga.justreddy.wiki.reggwars.storage.type.Storage;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
-import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
-import javafx.scene.input.MouseDragEvent;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Map;
+import java.security.interfaces.RSAKey;
+import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Getter
 public final class REggWars extends JavaPlugin {
@@ -54,7 +51,6 @@ public final class REggWars extends JavaPlugin {
 
     // Adapters
     private ResetAdapter resetAdapter;
-    private ReplayAdapter replayAdapter;
 
     // Version specific stuff
     private Nms nms;
@@ -67,8 +63,14 @@ public final class REggWars extends JavaPlugin {
 
     private BaseCommand command;
 
+    private boolean bungee;
+    private SocketClient socketClient;
+    private String serverName;
+
+    private static final Logger LOGGER = Logger.getLogger("REggWars");
+
     private static final String VERSION = getVersion(Bukkit.getServer());
-    
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -92,7 +94,7 @@ public final class REggWars extends JavaPlugin {
                             + VERSION + "."
                             + "Schematic").newInstance();
             ChatUtil.sendConsole("&7[&dREggWars&7] &aSchematic version found: " + VERSION);
-        }catch (Exception e) {
+        } catch (Exception e) {
             ChatUtil.sendConsole("&7[&dREggWars&7] &cSchematic version: " + VERSION + " not supported! Shutting down...");
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -110,85 +112,72 @@ public final class REggWars extends JavaPlugin {
         try {
             Core.MODE = ServerMode.valueOf(settingsConfig.getConfig().getString("modules.mode").toUpperCase());
             mode = Core.MODE;
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.fillInStackTrace();
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
-        if (mode != ServerMode.MULTI_ARENA) {
+
+        /*if (mode != ServerMode.MULTI_ARENA) {
             ChatUtil.sendConsole("&7[&dREggWars&7] &cAny mode other then MUTLI_ARENA is currently not supported!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
-        }
+        }*/
 
         if (mode != ServerMode.MULTI_ARENA && storage instanceof SQLStorage) {
-            cancelBungee(false);
+            cancelBungee();
             return;
         }
 
-        if (mode != ServerMode.MULTI_ARENA && !storage.doesBungeeFilesExist()) {
-            cancelBungee(true);
-            return;
+        isSlimeEnabled = settingsConfig.getConfig().getBoolean("modules.slimeworldmanager");
+        if (isSlimeEnabled) {
+            slime = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+            if (slime == null) {
+                Bukkit.getPluginManager().disablePlugin(this);
+                throw new DependencyNotInstalledException("SlimeWorldManager");
+            }
+            loader = slime.getLoader("file");
+            resetAdapter = new SlimeAdapter();
+        } else {
+            resetAdapter = new FlatAdapter();
         }
 
-        if (mode != ServerMode.MULTI_ARENA && !Bukkit.getServer().spigot().getConfig().getBoolean("settings.bungeecord")) {
-            setEnabled(false);
-            ChatUtil.sendConsole("&7[&dREggWars&7] &cBungee mode is not enabled in spigot.yml!");
-            return;
-        }
+        Bukkit.getPluginManager().registerEvents(new GameListener(), this);
 
-       if (mode != ServerMode.LOBBY) {
-           isSlimeEnabled = settingsConfig.getConfig().getBoolean("modules.slimeworldmanager");
-           if (isSlimeEnabled) {
-               slime = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
-               if (slime == null) {
-                   Bukkit.getPluginManager().disablePlugin(this);
-                   throw new DependencyNotInstalledException("SlimeWorldManager");
-               }
-               loader = slime.getLoader("file");
-               resetAdapter = new SlimeAdapter();
-           } else {
-               resetAdapter = new FlatAdapter();
-           }
+        serverName = settingsConfig.getConfig().getString("bungee.server");
 
-           isReplayEnabled = settingsConfig.getConfig().getBoolean("modules.advancedreplay");
-           if (isReplayEnabled) {
-               replayAdapter = new AdvancedReplayAdapter();
-               Bukkit.getPluginManager().registerEvents(replayAdapter, this);
-           }
-           Bukkit.getPluginManager().registerEvents(new GameListener(), this);
-       }
+        registerManagers();
+
 
         if (mode != ServerMode.MULTI_ARENA) {
-            ServerLobbies.setupLobbies();
+            bungee = true;
+            socketClient = new SocketClient(
+                    settingsConfig.getConfig().getString("bungee.host"),
+                    settingsConfig.getConfig().getInt("bungee.port"),
+                    serverName
+            );
+            socketClient.clientSetup();
         }
-
-        if (mode != ServerMode.MULTI_ARENA) {
-            // TODO - add rabbitmq support :)
-            Bukkit.getMessenger().registerIncomingPluginChannel(this, "REggWarsAPI", new BungeeListener());
-            Bukkit.getServer().getPluginManager().registerEvents(new ServerListener(), this);
-        }
-
 
         getCommand("eggwars").setExecutor(command = new BaseCommand(this));
 
         Bukkit.getPluginManager().registerEvents(new MainListener(), this);
-
-        registerManagers();
-
 
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        if (socketClient != null) socketClient.closeConnections();
     }
 
     @SneakyThrows
     private boolean loadConfig() {
         settingsConfig = new Config("settings.yml");
         generatorsConfig = new Config("generators.yml");
+        ConfigManager.getManager().register(settingsConfig);
+        ConfigManager.getManager().register(generatorsConfig);
         return true;
     }
 
@@ -197,10 +186,8 @@ public final class REggWars extends JavaPlugin {
         ShopManager.getManager().start();
         LanguageManager.getManager().start();
         MenuManager.getManager().start();
-        if (Core.MODE != ServerMode.LOBBY) {
-            MapManager.getManager();
-            GameManager.getManager().start();
-        }
+        MapManager.getManager();
+        GameManager.getManager().start();
         DanceManager.getManager().start();
         KillMessageManager.getManager().start();
     }
@@ -210,16 +197,20 @@ public final class REggWars extends JavaPlugin {
         return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
-    private void cancelBungee(boolean table) {
+    private void cancelBungee() {
         this.setEnabled(false);
-        if (!table) {
-            ChatUtil.sendConsole("&7[&dREggWars&7] &cYou can't use SQLite for Bungee Mode! Use MySQL or MongoDB instead!");
-        } else {
-            ChatUtil.sendConsole("&7[&dREggWars&7] &cUnable to find Table with Bungee Configurations!");
-            ChatUtil.sendConsole("&7[&dREggWars&7] &cSetup your BungeeCord with REggWars first!");
-        }
+        log(Level.SEVERE, "[!] You can't use SQLite for Bungee Mode! Use MySQL or MongoDB instead!");
     }
 
+    public void log(Level level, String message, String... args) {
+        char symbol = 0;
+        if (level.getName().equals("INFO")) {
+            symbol = 'X';
+        } else {
+            symbol = '!';
+        }
+        LOGGER.log(level, MessageFormat.format("[{0}] [{1}] {2}", getName(), symbol, message), args);
+    }
 
 
 }

@@ -43,6 +43,8 @@ public class ArenaCommand extends Command {
                 createGame(gamePlayer, args); break;
             case "fstart":
                 fstart(gamePlayer); break;
+            case "fstop":
+                fstop(gamePlayer); break;
             case "team":
                 teamCommand(gamePlayer, args); break;
             case "waitinglobby":
@@ -53,16 +55,8 @@ public class ArenaCommand extends Command {
                 minPlayersCommand(gamePlayer, args); break;
             case "save":
                 saveGameCommand(gamePlayer); break;
-            case "join":
-                joinCommand(gamePlayer);
         }
 
-    }
-
-    private void joinCommand(IGamePlayer player) {
-        if (player.getGame() != null) return;
-        IGame game = GameManager.getManager().getRandomGame();
-        game.onGamePlayerJoin(player);
     }
 
     private void saveGameCommand(IGamePlayer gamePlayer) {
@@ -113,6 +107,16 @@ public class ArenaCommand extends Command {
         if (!game.isGameState(GameState.WAITING)) return;
 
         game.onGameStart();
+    }
+
+    private void fstop(IGamePlayer player) {
+        IGame game = player.getGame();
+
+        if (game == null) return;
+
+        if (!game.isGameState(GameState.PLAYING)) return;
+
+        game.onGameEnd(null);
     }
 
 

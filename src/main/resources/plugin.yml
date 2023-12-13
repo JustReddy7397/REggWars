@@ -3,5 +3,7 @@ version: '${project.version}'
 main: ga.justreddy.wiki.reggwars.REggWars
 depend:
   - WorldEdit
+softdepend:
+  - SlimeWorldManager
 commands:
   eggwars:

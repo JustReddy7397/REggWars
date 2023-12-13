@@ -17,7 +17,7 @@ public class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onServerListPing(ServerListPingEvent event) {
-        if (Core.MODE == ServerMode.LOBBY) {
+/*        if (Core.MODE == ServerMode.LOBBY) {
             event.setMotd("LOBBY ; ");
         } else {
             IGame game = GameManager.getManager().getGames()
@@ -29,7 +29,7 @@ public class ServerListener implements Listener {
 
             event.setMotd(game.getGameMode().name() + " ; " + game.getName() + " ; " + game.getGameState().name());
 
-        }
+        }*/
     }
 
 }

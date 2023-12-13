@@ -4,11 +4,14 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.bungee.Core;
 import ga.justreddy.wiki.reggwars.bungee.ServerMode;
 import ga.justreddy.wiki.reggwars.commands.Command;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
+import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
+import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.model.game.Game;
 import org.bukkit.entity.Player;
 
@@ -25,17 +28,18 @@ public class JoinCommand extends Command {
     @Override
     public void onCommand(IGamePlayer gamePlayer, String[] args) {
 
-
         if (Core.MODE == ServerMode.LOBBY) {
             // TODO yay
-            ByteArrayDataOutput output = ByteStreams.newDataOutput();
-            output.writeUTF("SOLO"); // TODO :o
-            output.writeUTF("all");
-            Player player = gamePlayer.getPlayer();
-            player.sendPluginMessage(REggWars.getInstance(), "REggWarsAPI", output.toByteArray());
+            joinBungeeGame(gamePlayer);
         } else if (Core.MODE == ServerMode.BUNGEE){
             // TODO HAHA
-            gamePlayer.sendLegacyMessage("&cYou are already in-game!");
+            IGame game = gamePlayer.getGame();
+            if (game != null) {
+                // It should NEVER be null but just in case
+                game.onGamePlayerQuit(gamePlayer, game.isGameState(GameState.PLAYING) || game.isGameState(GameState.ENDING));
+            }
+            joinBungeeGame(gamePlayer);
+
         } else {
             // TODO WOW
 
@@ -55,4 +59,46 @@ public class JoinCommand extends Command {
         }
 
     }
+
+    private void joinBungeeGame(IGamePlayer player) {
+        BungeeGame game = GameManager.getManager().getRandomBungeeGame();
+        // For now it's just a solo game
+        // Planning to add more data to the class later
+        if (game == null) {
+            // TODO
+            player.sendLegacyMessage("&cFailed to find an active game for EGGWARS_SOLO");
+            return;
+        }
+
+        if (game.isGameState(GameState.DISABLED)) {
+            // TODO sendm essage
+            return;
+        }
+
+        if (game.isGameState(GameState.PLAYING)) {
+            // TODO send message
+            return;
+        }
+
+        if (game.isGameState(GameState.ENDING)) {
+            // TODO send message
+            return;
+        }
+
+        if (game.isGameState(GameState.RESTARTING)) {
+            // TODO send message
+            return;
+        }
+
+        if (game.getPlayers().size() > game.getMaxPlayers()) {
+            // TODO send message
+            return;
+        }
+
+        // TODO
+
+        plugin.getSocketClient().getSender()
+                .sendJoinPacket(game, player.getName(), true, false);
+    }
+
 }

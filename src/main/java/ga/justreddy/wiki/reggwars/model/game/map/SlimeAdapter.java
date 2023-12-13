@@ -79,6 +79,7 @@ public class SlimeAdapter extends ResetAdapter {
                         }
 
                         Bukkit.getScheduler().runTask(getOwner(), () -> {
+                            System.out.println("INITIALIZING GAME");
                             game.init(generatedWorld);
                         });
                     });
@@ -103,6 +104,7 @@ public class SlimeAdapter extends ResetAdapter {
                 );
                 FileUtils.delete(originalWorldFolder);
                 try {
+                    System.out.println("DELETING WORLD FROM SLIME");
                     if (loader.worldExists(game.getName())) {
                         loader.deleteWorld(game.getName());
                     }

@@ -1,7 +1,6 @@
 package ga.justreddy.wiki.reggwars.storage.type;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
-import ga.justreddy.wiki.reggwars.model.replays.GameReplayCache;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,24 +25,5 @@ public interface Storage {
     IGamePlayer loadOfflinePlayer(String name);
 
     IGamePlayer loadOfflinePlayer(UUID uuid);
-
-    void saveGameReplayCache(GameReplayCache cache);
-
-    List<GameReplayCache> getGameReplayCaches(String name);
-
-    GameReplayCache getGameReplayCache(String id);
-
-    boolean doesBungeeFilesExist();
-
-    boolean doesBungeeFileExist(String name);
-
-
-    void createBungeeFiles(String name, String whatToCreate);
-
-    void updateBungeeFiles(String name, String file);
-
-    void loadBungeeFiles(String name);
-
-    void saveBungeeFiles(String name, String toSave);
 
 }

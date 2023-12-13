@@ -3,6 +3,7 @@ package ga.justreddy.wiki.reggwars.commands;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.commands.sub.ArenaCommand;
+import ga.justreddy.wiki.reggwars.commands.sub.JoinCommand;
 import ga.justreddy.wiki.reggwars.commands.sub.TestCommand;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
@@ -27,6 +28,7 @@ public class BaseCommand implements CommandExecutor {
         this.commands = new HashMap<>();
         register(new TestCommand(plugin));
         register(new ArenaCommand(plugin));
+        register(new JoinCommand(plugin));
     }
 
     @Override
