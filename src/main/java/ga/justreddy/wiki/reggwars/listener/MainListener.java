@@ -1,6 +1,8 @@
 package ga.justreddy.wiki.reggwars.listener;
 
+import ga.justreddy.wiki.reggwars.Core;
 import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.manager.MenuManager;
@@ -31,6 +33,12 @@ public class MainListener implements Listener {
         IGamePlayer gamePlayer = PlayerManager.getManager().
                 addGamePlayer(player.getUniqueId(), player.getName());
         event.setJoinMessage(null);
+        if (Core.MODE != ServerMode.BUNGEE) {
+            if (REggWars.getInstance().getSpawnLocation() != null) {
+                player.teleport(REggWars.getInstance().getSpawnLocation());
+            }
+            // TODO more stuff :)
+        }
     }
 
 

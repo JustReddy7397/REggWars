@@ -1,7 +1,7 @@
-package ga.justreddy.wiki.reggwars.velocity.config;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config;
 
-import ga.justreddy.wiki.reggwars.velocity.Velocity;
-import ga.justreddy.wiki.reggwars.velocity.config.impl.YamlConfiguration;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.Velocity;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config.impl.YamlConfiguration;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;

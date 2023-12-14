@@ -1,4 +1,4 @@
-package ga.justreddy.wiki.reggwars.impl;
+package ga.justreddy.wiki.reggwars.support;
 
 import ga.justreddy.wiki.reggwars.api.EggWarsAPI;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillEffect;

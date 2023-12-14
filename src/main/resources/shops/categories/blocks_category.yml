@@ -99,7 +99,7 @@ items:
       material: WHITE_WOOL
       name: "&bWool"
       lore:
-        - "Cost: &f<price>"
+        - "&7Cost: &f<price>"
         - ""
         - "&7A decent build material that"
         - "&7changes it color based on your team"
@@ -122,7 +122,7 @@ items:
       material: WHITE_TERRACOTTA
       name: "&bClay"
       lore:
-        - "Cost: &f<price>"
+        - "&7Cost: &f<price>"
         - ""
         - "&7A fine build material that"
         - "&7changes it color based on your team"
@@ -145,7 +145,7 @@ items:
       material: WHITE_STAINED_GLASS
       name: "&bBlast Proof Glass"
       lore:
-        - "Cost: &f<price>"
+        - "&7Cost: &f<price>"
         - ""
         - "&7A strong build material that"
         - "&7protects your egg from explosions!"
@@ -168,7 +168,7 @@ items:
       material: ENDSTONE
       name: "&bEndstone"
       lore:
-        - "Cost: &f<price>"
+        - "&7Cost: &f<price>"
         - ""
         - "&7A very strong build material that"
         - "&7protects your egg from explosions!"
@@ -191,7 +191,7 @@ items:
       material: OAK_PLANKS
       name: "&bOak Planks"
       lore:
-        - "Cost: &6<price>"
+        - "&7Cost: &6<price>"
         - ""
         - "&7A great choice for protection your bed!"
         - ""
@@ -213,7 +213,7 @@ items:
       material: OBSIDIAN
       name: "&bObsidian"
       lore:
-        - "Cost: &2<price>"
+        - "&7Cost: &2<price>"
         - ""
         - "&7The best choice for protecting your bed!"
         - ""

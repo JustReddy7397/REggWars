@@ -1,4 +1,4 @@
-package ga.justreddy.wiki.reggwars.bungee;
+package ga.justreddy.wiki.reggwars.support.bungeemode.bungee;
 
 import java.io.File;
 import java.io.IOException;

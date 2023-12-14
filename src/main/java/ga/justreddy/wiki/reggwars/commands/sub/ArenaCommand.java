@@ -28,7 +28,7 @@ public class ArenaCommand extends Command {
         setDescription("Arena commands");
         setAliases(Collections.singletonList("game"));
         setSyntax("fuck you");
-        setPermission("eggwars.command.game");
+        setPermission("eggwars.command.arena");
     }
 
     @Override

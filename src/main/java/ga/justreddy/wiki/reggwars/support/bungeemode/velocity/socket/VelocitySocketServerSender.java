@@ -1,7 +1,6 @@
-package ga.justreddy.wiki.reggwars.bungee.socket;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.socket;
 
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
-import ga.justreddy.wiki.reggwars.model.game.Game;
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
 import ga.justreddy.wiki.reggwars.packets.socket.PacketType;
 import ga.justreddy.wiki.reggwars.packets.socket.SocketConnection;
@@ -10,23 +9,25 @@ import ga.justreddy.wiki.reggwars.packets.socket.classes.GamesPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.GamesSendPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.StringPacket;
 
-import java.io.Flushable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 /**
  * @author JustReddy
  */
-public class SocketServerSender {
+public class VelocitySocketServerSender {
 
-    private final SocketServer socketServer;
+    private final VelocitySocketServer socketServer;
     private final LinkedBlockingQueue<TargetPacket> sendQueue = new LinkedBlockingQueue<>();
 
-    public SocketServerSender(SocketServer socketServer) {
+    public VelocitySocketServerSender(VelocitySocketServer socketServer) {
         this.socketServer = socketServer;
     }
 
@@ -87,9 +88,9 @@ public class SocketServerSender {
         return servers;
     }
 
-
     public void sendGamesPacket(String server, List<BungeeGame> bungeeGames) {
         GamesSendPacket packet = new GamesSendPacket(server, bungeeGames);
         sendPacketToServer(packet, server);
     }
+
 }

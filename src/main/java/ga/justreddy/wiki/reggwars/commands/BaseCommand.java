@@ -47,7 +47,7 @@ public class BaseCommand implements CommandExecutor {
             return true;
         }
 
-        ga.justreddy.wiki.reggwars.commands.Command command = commands.getOrDefault(args[0], null);
+        ga.justreddy.wiki.reggwars.commands.Command command = getCommand(args[0]);
 
         if (command == null) {
             return true;
@@ -65,6 +65,20 @@ public class BaseCommand implements CommandExecutor {
 
     private void register(ga.justreddy.wiki.reggwars.commands.Command command) {
         commands.put(command.getName(), command);
+    }
+
+    private ga.justreddy.wiki.reggwars.commands.Command getCommand(String name) {
+        ga.justreddy.wiki.reggwars.commands.Command command =
+                commands.getOrDefault(name, null);
+        if (command == null) {
+            command = commands.
+                    values().
+                    stream().
+                    filter(cmd -> cmd.getAliases().contains(name)).
+                    findFirst().
+                    orElse(null);
+        }
+        return command;
     }
 
 }

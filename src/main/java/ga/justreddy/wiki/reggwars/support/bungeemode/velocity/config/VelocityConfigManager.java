@@ -1,4 +1,4 @@
-package ga.justreddy.wiki.reggwars.velocity.config;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config;
 
 import lombok.AccessLevel;
 import lombok.Getter;

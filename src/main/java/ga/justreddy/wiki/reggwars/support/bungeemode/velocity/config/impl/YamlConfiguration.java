@@ -1,7 +1,6 @@
-package ga.justreddy.wiki.reggwars.velocity.config.impl;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config.impl;
 
-import com.google.common.base.Charsets;
-import ga.justreddy.wiki.reggwars.velocity.Velocity;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.Velocity;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -9,10 +8,8 @@ import static org.yaml.snakeyaml.DumperOptions.FlowStyle.BLOCK;
 
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author JustReddy

@@ -1,37 +1,29 @@
-package ga.justreddy.wiki.reggwars.velocity.socket;
+package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.socket;
 
-import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ServerConnection;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
-import com.velocitypowered.api.proxy.server.ServerInfo;
-import ga.justreddy.wiki.reggwars.bungee.Bungee;
-import ga.justreddy.wiki.reggwars.bungee.socket.SocketServer;
-import ga.justreddy.wiki.reggwars.bungee.socket.SocketServerSender;
+import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.Bungee;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.*;
-import ga.justreddy.wiki.reggwars.velocity.Velocity;
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.logging.Level;
+
 
 /**
  * @author JustReddy
  */
-public class VelocitySocketServerReceiver {
+public class SocketServerReceiver {
 
-    private final Velocity plugin;
-    private final VelocitySocketServer socketServer;
-    private final VelocitySocketServerSender sender;
+    private final Bungee plugin;
+    private final SocketServer socketServer;
+    private final SocketServerSender sender;
 
-    public VelocitySocketServerReceiver(VelocitySocketServer socketServer) {
-        plugin = Velocity.getInstance();
+    public SocketServerReceiver(SocketServer socketServer) {
+        plugin = Bungee.getInstance();
         this.socketServer = socketServer;
         this.sender = socketServer.getSender();
     }
@@ -115,36 +107,25 @@ public class VelocitySocketServerReceiver {
     }
 
     private boolean joinArena(JoinPacket joinPacket) {
-        Optional<Player> optionalPlayer = plugin.getServer().getPlayer(joinPacket.getPlayer());
-        if (!optionalPlayer.isPresent()) {
+        ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(joinPacket.getPlayer());
+        if (proxiedPlayer == null) {
             return false;
         }
-
-        Player player = optionalPlayer.get();
-
-        Optional<ServerConnection> connection = player.getCurrentServer();
-        if (!connection.isPresent()) {
-            return false;
-        }
-
-        ServerConnection server = connection.get();
-
         if (joinPacket.isFirstJoin()) {
-            plugin.getPlayerServers().put(joinPacket.getPlayer(), server.getServerInfo().getName());
+            plugin.getPlayerServers().put(joinPacket.getPlayer(), proxiedPlayer.getServer().getInfo().getName());
         }
         if (!joinPacket.isLocalJoin()) {
-            if (server.getServerInfo()
+            if (proxiedPlayer.getServer().getInfo()
                     .getName().equals(joinPacket.getGame().getServer())) {
                 return true;
             }
-            Optional<RegisteredServer> optionalRegistered = plugin.getServer().getServer(joinPacket.getGame().getServer());
-            if (!optionalRegistered.isPresent()) {
-                player.sendMessage(Component.text("Fuck off"));
+            ServerInfo info = plugin.getProxy().getServerInfo(joinPacket.getGame().getServer());
+            if (info == null) {
+                proxiedPlayer.sendMessage("Fuck off");
                 return false;
             }
-            RegisteredServer registeredServer = optionalRegistered.get();
-            player.sendMessage(Component.text("CONNECTING TO " + registeredServer.getServerInfo().getName()));
-            player.createConnectionRequest(registeredServer);
+            proxiedPlayer.sendMessage("CONNECTING TO " + info.getName());
+            proxiedPlayer.connect(info);
             return true;
         }
 
@@ -152,61 +133,47 @@ public class VelocitySocketServerReceiver {
     }
 
     private void sendBackToServer(BackToServerPacket backToServerPacket) {
-        Optional<Player> optionalPlayer = plugin.getServer().getPlayer(backToServerPacket.getPlayer());
-        if (!optionalPlayer.isPresent()) {
+        ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(backToServerPacket.getPlayer());
+        if (proxiedPlayer == null) {
             return;
         }
-
-        Player player = optionalPlayer.get();
 
         String firstChoiceServer;
         String secondChoiceServer;
 
         if (backToServerPacket.getServerPriority().equals(BackToServerPacket.ServerPriority.PREVIOUS)) {
-            firstChoiceServer = plugin.getPlayerServers().get(player.getUsername());
+            firstChoiceServer = plugin.getPlayerServers().get(proxiedPlayer.getName());
             secondChoiceServer = backToServerPacket.getLobby();
         } else {
             firstChoiceServer = backToServerPacket.getLobby();
-            secondChoiceServer = plugin.getPlayerServers().get(player.getUsername());
+            secondChoiceServer = plugin.getPlayerServers().get(proxiedPlayer.getName());
         }
 
-        if (!connectToServer(player, firstChoiceServer)) {
-            connectToServer(player, secondChoiceServer);
+        if (!connectToServer(proxiedPlayer, firstChoiceServer)) {
+            connectToServer(proxiedPlayer, secondChoiceServer);
         }
+
 
         plugin.getPlayerServers().remove(backToServerPacket.getPlayer());
     }
 
-    private boolean connectToServer(Player player, String serverString) {
+    private boolean connectToServer(ProxiedPlayer player, String serverString) {
         if (serverString == null) {
             return false;
         }
 
-        Optional<RegisteredServer> optionalRegisteredServer = plugin
-                .getServer().getServer(serverString);
-        if (!optionalRegisteredServer.isPresent()) {
+        ServerInfo targetServer = plugin.getProxy().getServerInfo(serverString);
+
+        if (targetServer == null) {
             return false;
         }
 
-        RegisteredServer registeredServer = optionalRegisteredServer.get();
-
-
-        ServerInfo targetServer = registeredServer.getServerInfo();
-
-        Optional<ServerConnection> connection = player.getCurrentServer();
-        if (!connection.isPresent()) {
-            return false;
-        }
-
-        ServerConnection server = connection.get();
-
-
-        if (server.getServerInfo().equals(targetServer)) {
+        if (player.getServer().getInfo().equals(targetServer)) {
             return true;
         }
 
         if (socketServer.getSpigotSocket().containsKey(serverString)) {
-            player.createConnectionRequest(registeredServer);
+            player.connect(targetServer);
             return true;
         }
 

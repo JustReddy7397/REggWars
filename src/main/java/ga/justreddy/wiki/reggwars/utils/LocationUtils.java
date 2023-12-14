@@ -1,7 +1,6 @@
 package ga.justreddy.wiki.reggwars.utils;
 
 
-import com.sun.corba.se.pept.transport.ReaderThread;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 

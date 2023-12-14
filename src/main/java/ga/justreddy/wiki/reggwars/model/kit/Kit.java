@@ -1,7 +1,6 @@
 package ga.justreddy.wiki.reggwars.model.kit;
 
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
-import javafx.util.converter.DefaultStringConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 

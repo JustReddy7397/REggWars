@@ -1,4 +1,4 @@
-package ga.justreddy.wiki.reggwars.velocity.config.impl;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config.impl;
 
 import java.util.List;
 import java.util.Map;

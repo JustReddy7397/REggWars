@@ -7,7 +7,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.ResetAdapter;
 import ga.justreddy.wiki.reggwars.commands.BaseCommand;
 import ga.justreddy.wiki.reggwars.config.Config;
 import ga.justreddy.wiki.reggwars.exceptions.DependencyNotInstalledException;
-import ga.justreddy.wiki.reggwars.impl.ApiHandler;
+import ga.justreddy.wiki.reggwars.support.ApiHandler;
 import ga.justreddy.wiki.reggwars.listener.GameListener;
 import ga.justreddy.wiki.reggwars.listener.MainListener;
 import ga.justreddy.wiki.reggwars.manager.*;
@@ -21,9 +21,11 @@ import ga.justreddy.wiki.reggwars.socket.SocketClient;
 import ga.justreddy.wiki.reggwars.storage.SQLStorage;
 import ga.justreddy.wiki.reggwars.storage.type.Storage;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
+import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -66,6 +68,8 @@ public final class REggWars extends JavaPlugin {
 
     private static final String VERSION = getVersion(Bukkit.getServer());
 
+    @Getter private Location spawnLocation;
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -98,6 +102,12 @@ public final class REggWars extends JavaPlugin {
         ChatUtil.sendConsole("&7[&dREggWars&7] &aFinding API...");
         EggWarsProvider.setApi(new ApiHandler());
         ChatUtil.sendConsole("&7[&dREggWars&7] &aAPI found!");
+
+        this.spawnLocation =
+        LocationUtils.getLocation(
+                getSettingsConfig().getConfig().getString("spawn")
+        );
+
 
         if (Bukkit.getServer().getSpawnRadius() != 0) {
             Bukkit.getServer().setSpawnRadius(0);
@@ -198,6 +208,17 @@ public final class REggWars extends JavaPlugin {
             symbol = '!';
         }
         LOGGER.log(level, MessageFormat.format("[{0}] [{1}] {2}", getName(), symbol, message), args);
+    }
+
+    public void reload() {
+        ConfigManager.getManager().reload();
+    }
+
+    @SneakyThrows
+    public void setSpawnLocation(Location location) {
+        getSettingsConfig().getConfig().set("spawn", LocationUtils.toLocation(location));
+        getSettingsConfig().save();
+        this.spawnLocation = location;
     }
 
 

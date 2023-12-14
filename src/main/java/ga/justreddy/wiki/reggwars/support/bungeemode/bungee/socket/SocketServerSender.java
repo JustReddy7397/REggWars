@@ -1,6 +1,5 @@
-package ga.justreddy.wiki.reggwars.velocity.socket;
+package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.socket;
 
-import ga.justreddy.wiki.reggwars.bungee.socket.SocketServer;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
 import ga.justreddy.wiki.reggwars.packets.socket.PacketType;
@@ -13,22 +12,19 @@ import ga.justreddy.wiki.reggwars.packets.socket.classes.StringPacket;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 /**
  * @author JustReddy
  */
-public class VelocitySocketServerSender {
+public class SocketServerSender {
 
-    private final VelocitySocketServer socketServer;
+    private final SocketServer socketServer;
     private final LinkedBlockingQueue<TargetPacket> sendQueue = new LinkedBlockingQueue<>();
 
-    public VelocitySocketServerSender(VelocitySocketServer socketServer) {
+    public SocketServerSender(SocketServer socketServer) {
         this.socketServer = socketServer;
     }
 
@@ -89,9 +85,9 @@ public class VelocitySocketServerSender {
         return servers;
     }
 
+
     public void sendGamesPacket(String server, List<BungeeGame> bungeeGames) {
         GamesSendPacket packet = new GamesSendPacket(server, bungeeGames);
         sendPacketToServer(packet, server);
     }
-
 }

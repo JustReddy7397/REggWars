@@ -69,12 +69,8 @@ public class ConfigManager {
 
     @SneakyThrows
     public void reload() {
-        MenuManager.getManager().reload();
-        LanguageManager.getManager().reload();
-        // TODO make languages and menus sync when reloading them
         for (Config config : configs.values()) {
             config.reload();
-            if (!REggWars.getInstance().isBungee()) continue;
         }
 
         if (!REggWars.getInstance().isBungee()) return;

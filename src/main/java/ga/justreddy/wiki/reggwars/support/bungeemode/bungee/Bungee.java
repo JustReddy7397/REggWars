@@ -1,11 +1,7 @@
-package ga.justreddy.wiki.reggwars.bungee;
+package ga.justreddy.wiki.reggwars.support.bungeemode.bungee;
 
-import ga.justreddy.wiki.reggwars.bungee.socket.SocketServer;
-import ga.justreddy.wiki.reggwars.bungee.socket.SocketServerSender;
+import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.socket.SocketServer;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
-import ga.justreddy.wiki.reggwars.model.game.Game;
-import ga.justreddy.wiki.reggwars.storage.MYSQLStorage;
-import ga.justreddy.wiki.reggwars.storage.type.Storage;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.plugin.Plugin;
