@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.api.model.entity;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerCosmetics;
+import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerQuests;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerQuickBuy;
 import ga.justreddy.wiki.reggwars.api.model.entity.data.IPlayerSettings;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
@@ -80,6 +81,10 @@ public interface IGamePlayer {
     IPlayerQuickBuy getQuickBuy();
 
     void setQuickBuy(IPlayerQuickBuy quickBuy);
+
+    IPlayerQuests getQuests();
+
+    void setQuests(IPlayerQuests quests);
 
 
 }

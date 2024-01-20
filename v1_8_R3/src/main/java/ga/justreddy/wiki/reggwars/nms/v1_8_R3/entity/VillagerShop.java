@@ -1,23 +1,25 @@
 package ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity;
 
-import ga.justreddy.wiki.reggwars.api.model.hologram.IHologram;
-import ga.justreddy.wiki.reggwars.model.hologram.Hologram;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
+import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.manager.HookManager;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.UUID;
 
 /**
  * @author andrei1058
  */
 public class VillagerShop extends EntityVillager {
 
-    private final IHologram hologram;
+    private Hologram hologram;
 
     public VillagerShop(Location loc) {
         super(((CraftWorld) loc.getWorld()).getHandle());
@@ -35,8 +37,18 @@ public class VillagerShop extends EntityVillager {
         this.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         this.setPositionRotation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
         persistent = true;
-        this.hologram = new Hologram(loc.clone().add(0, 0.5, 0), Arrays.asList("&e&lShop", "&7Click to open"));
-        hologram.spawn(world.getWorld());
+        if (HookManager.getManager().hasHook("DecentHolograms")) {
+            this.hologram = REggWars.getInstance().getNms().spawnHologram(
+                    "shop_" + UUID.randomUUID().toString().substring(0, 8),
+                    loc.clone().add(0, 2.5, 0),
+                    null,
+                    Arrays.asList("&a&lShop", "&7Right click to open")
+            );
+            for (Player player : world.getWorld().getPlayers()) {
+                if (hologram.isShowState(player)) continue;
+                hologram.show(player, 0);
+            }
+        }
     }
 
     public static Villager spawn(Location location) {
@@ -44,6 +56,7 @@ public class VillagerShop extends EntityVillager {
         VillagerShop shop = new VillagerShop(location);
         shop.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         EntityTypes.spawnEntity(shop, location);
+
         return (Villager) shop.getBukkitEntity();
     }
 
@@ -66,12 +79,15 @@ public class VillagerShop extends EntityVillager {
 
     @Override
     public void die() {
+        this.hologram.destroy();
+        this.hologram = null;
         super.die();
-
     }
 
     @Override
     public void die(DamageSource damagesource) {
+        this.hologram.destroy();
+        this.hologram = null;
         super.die(damagesource);
     }
 

@@ -1,17 +1,11 @@
 package ga.justreddy.wiki.reggwars.nms.v1_8_R3;
 
 import com.cryptomorin.xseries.XMaterial;
-import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
-import ga.justreddy.wiki.reggwars.api.model.hologram.IArmorStand;
-import ga.justreddy.wiki.reggwars.api.model.hologram.IHologram;
-import ga.justreddy.wiki.reggwars.api.model.hologram.IHologramLine;
-import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import ga.justreddy.wiki.reggwars.nms.Nms;
 import ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity.VillagerShop;
-import ga.justreddy.wiki.reggwars.nms.v1_8_R3.entity.hologram.EntityHologram;
 import ga.justreddy.wiki.reggwars.packets.FakeTeam;
 import ga.justreddy.wiki.reggwars.packets.FakeTeamManager;
 import ga.justreddy.wiki.reggwars.utils.NumberUtil;
@@ -21,7 +15,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -31,8 +24,7 @@ import org.bukkit.generator.ChunkGenerator;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public final class v1_8_R3 implements Nms {
-
+public class v1_8_R3 implements Nms {
 
     private static int id = 0;
 
@@ -257,11 +249,6 @@ public final class v1_8_R3 implements Nms {
         Villager villager = VillagerShop.spawn(location);
         removeEntityAI(villager);
         villager.setRemoveWhenFarAway(false);
-    }
-
-    @Override
-    public IArmorStand spawnArmorStand(Location location, IGamePlayer player, String line, IHologramLine hologramLine) {
-        return EntityHologram.spawn(location, player, line, hologramLine);
     }
 
     @Override

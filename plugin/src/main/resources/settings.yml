@@ -1,0 +1,65 @@
+# Everything here requires a restart when edited
+
+debug: false
+
+modules:
+  slimeworldmanager: false
+  mode: MULTI_ARENA # MULTI_ARENA, BUNGEE, LOBBY
+
+game:
+  respawn-protection: 5 # In seconds
+  use-cages: false
+
+player:
+  cosmetics:
+    default-dance: 0
+    default-trail: 0
+    default-kill-effect: 0
+    default-kill-message: 0
+    default-cage: 0
+    default-death-cry: 0
+
+
+# You have to configure this only if you are using bungee mode, otherwise ignore it.
+bungee:
+  # Server name - name of this server that is used in the bungeecord config.
+  # WARNING!
+  # It's really important to use the same name here as in the bungecord config - otherwise the plugin won't work.
+  # So if this spigot server is named "srv1" in your bungeecord config, leave this option set to "srv1".
+  server: "srv1"
+  # Bungeecord server hostname, if your spigot and bungeecord server are on the same machine leave it set to "localhost".
+  host: "localhost"
+  # Bungeecord socket server port, set it to the same value as in the bungee-config.yml in your bungeecord server.
+  # WARNING!
+  # This is NOT your bungeecord server port,
+  # it's your socket server port which can be changed in the file mentioned above.
+  port: 3000
+  # What should happen to the player who left the game?
+  # Use JOIN_SERVER to put the player back to the server from where they had joined the game.
+  # Use LOBBY_SERVER to put player in the lobby server.
+  # USE GAME_SERVER to leave the player in the server that he was playing on.
+  # Use LEAVE_COMMAND to make spigot server console execute custom command when the player leaves the game.
+  on-leave: LOBBY_SERVER
+  # Lobby server.
+  # Use the bungeecord server name that you set in bungeecord config.yml.
+  lobby: lobby
+  # Leave commands.
+  # They are used only when "on-leave" option is set to "LEAVE_COMMAND" and will be executed from the spigot server's console.
+  # You can use %player% placeholder - it will be replaced with the player's name.
+  # Do not put slash (/) at the beginning!
+  leave-commands:
+    - "cmd <player>"
+    - "tell <player> &aYou have left the game!"
+
+
+gui:
+  # Used for filling empty slots in GUIs
+  # To set this in GUIs, set "material" to "FILLER"
+  filler: GRAY_STAINED_GLASS_PANE
+  quickbuy:
+    material: RED_STAINED_GLASS_PANE
+    name: "&cEmpty Slot!"
+    lore:
+      - "&7This is a Quick Buy slot!"
+      - ""
+      - "&eSneak Click any item in the shop to add it here!"

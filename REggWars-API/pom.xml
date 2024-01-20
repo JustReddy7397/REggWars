@@ -9,6 +9,12 @@
     <version>1.0</version>
     <packaging>jar</packaging>
 
+<!--    <parent>
+        <groupId>ga.justreddy.wiki</groupId>
+        <artifactId>REggWars</artifactId>
+        <version>1.0</version>
+    </parent>-->
+
     <name>REggWars-API</name>
 
     <properties>
@@ -16,7 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <build>
+    <!--<build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -38,6 +44,14 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/maven/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
@@ -50,7 +64,7 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
-    </build>
+    </build>-->
 
     <repositories>
         <repository>

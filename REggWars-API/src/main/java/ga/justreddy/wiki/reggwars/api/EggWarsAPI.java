@@ -29,22 +29,28 @@ public interface EggWarsAPI {
     IGame getGame(String name);
 
     /**
-     * Register a victory dance
-     * @param dance the victory dance to register
+     * Remove a victory dance
+     * If you want to remove the default victory dance, for example.
+     * And make your own default victory dance with the id 0
+     * @param id the id of the victory dance
      */
-    void registerVictoryDance(VictoryDance dance);
+    void removeVictoryDance(int id);
 
     /**
-     * Register a kill effect
-     * @param effect the kill effect to register
+     * Remove a kill effect
+     * If you want to remove the default kill effect, for example.
+     * And make your own default kill effect with the id 0
+     * @param id the id of the kill effect
      */
-    void registerKillEffect(KillEffect effect);
+    void removeKillEffect(int id);
 
     /**
-     * Register a kill message
-     * @param message the kill message to register
+     * Remove a kill message
+     * If you want to remove the default kill message, for example.
+     * And make your own default kill message with the id 0
+     * @param id the id of the kill message
      */
-    void registerKillMessage(KillMessage message);
+    void removeKillMessage(int id);
 
     default String getVersion() {
         return "1.0.0";

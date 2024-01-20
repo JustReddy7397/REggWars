@@ -7,7 +7,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
  */
 public abstract class KillEffect extends Cosmetic {
 
-    protected KillEffect(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
+    public KillEffect(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
         super(id, subname, cost, permission, rarity);
     }
 

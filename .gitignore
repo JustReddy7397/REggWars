@@ -111,3 +111,7 @@ buildNumber.properties
 
 # Common working directory
 run/
+
+plugin/target
+plugin/plugin.iml
+dist/target

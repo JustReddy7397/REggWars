@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.api.model.entity.data;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author JustReddy
@@ -11,7 +12,7 @@ public interface IPlayerCosmetics {
 
     void setSelectedCage(int id);
 
-    List<Integer> getCages();
+    Set<Integer> getCages();
 
     void addCage(int id);
 
@@ -23,7 +24,7 @@ public interface IPlayerCosmetics {
 
     void setSelectedDance(int id);
 
-    List<Integer> getDances();
+    Set<Integer> getDances();
 
     void addDance(int id);
 
@@ -35,7 +36,7 @@ public interface IPlayerCosmetics {
 
     void setSelectedKillEffect(int id);
 
-    List<Integer> getKillEffects();
+    Set<Integer> getKillEffects();
 
     void addKillEffect(int id);
 
@@ -43,15 +44,11 @@ public interface IPlayerCosmetics {
 
     void removeKillEffect(int id);
 
-    int getSelectedTrail();
-
-    void setSelectedTrail(int id);
-
-    List<Integer> getTrails();
-
     int getSelectedKillMessage();
 
     void setSelectedKillMessage(int id);
+
+    Set<Integer> getKillMessages();
 
     void addKillMessage(int id);
 
@@ -59,7 +56,11 @@ public interface IPlayerCosmetics {
 
     void removeKillMessage(int id);
 
-    List<Integer> getKillMessages();
+    int getSelectedTrail();
+
+    void setSelectedTrail(int id);
+
+    Set<Integer> getTrails();
 
     void addTrail(int id);
 
@@ -77,7 +78,7 @@ public interface IPlayerCosmetics {
 
     void removeDeathCry(int id);
 
-    List<Integer> getDeathCries();
+    Set<Integer> getDeathCries();
 
 
 }

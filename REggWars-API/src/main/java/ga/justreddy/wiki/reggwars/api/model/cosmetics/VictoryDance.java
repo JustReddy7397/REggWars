@@ -7,7 +7,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
  */
 public abstract class VictoryDance extends Cosmetic {
 
-    protected VictoryDance(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
+    public VictoryDance(int id, String subname, int cost, String permission, CosmeticRarity rarity) {
         super(id, subname, cost, permission, rarity);
     }
 

@@ -72,7 +72,7 @@ public interface IGame {
 
     void onGamePlayerJoin(IGamePlayer gamePlayer);
 
-    void onGamePlayerQuit(IGamePlayer gamePlayer, boolean silent);
+    void onGamePlayerQuit(IGamePlayer gamePlayer, boolean silent, boolean local);
 
     void onGamePlayerJoinSpectator(IGamePlayer gamePlayer, boolean spectating);
 
