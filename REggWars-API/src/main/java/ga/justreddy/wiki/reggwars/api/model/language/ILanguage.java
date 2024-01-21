@@ -4,6 +4,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -45,5 +46,7 @@ public interface ILanguage {
     String getId();
 
     FileConfiguration getConfig();
+
+    File getFile();
 
 }

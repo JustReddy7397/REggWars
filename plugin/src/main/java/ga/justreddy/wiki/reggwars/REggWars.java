@@ -231,6 +231,8 @@ public final class REggWars extends JavaPlugin {
 
     public void reload() {
         ConfigManager.getManager().reload();
+        LanguageManager.getManager().reload();
+        socketClient.getSender().sendLanguagesUpdatePacket();
     }
 
     @SneakyThrows

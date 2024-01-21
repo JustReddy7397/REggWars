@@ -115,4 +115,9 @@ public class SocketClientSender {
         sendPacket(messagePacket);
     }
 
+    public void sendLanguagesUpdatePacket() {
+        LanguagesUpdatePacket languagesUpdatePacket = new LanguagesUpdatePacket();
+        sendPacket(languagesUpdatePacket);
+    }
+
 }

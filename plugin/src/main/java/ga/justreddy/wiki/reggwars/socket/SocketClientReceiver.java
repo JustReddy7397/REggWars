@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.config.SerializableConfig;
 import ga.justreddy.wiki.reggwars.manager.ConfigManager;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
+import ga.justreddy.wiki.reggwars.manager.LanguageManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
@@ -151,6 +152,18 @@ public class SocketClientReceiver {
                     socketClient.log(Level.INFO, "[X] Updating config " + config.getConfig());
                 }
                 ConfigManager.getManager().set(config);
+                break;
+            }
+            case LANGUAGES_UPDATE: {
+                if (!(packet instanceof LanguagesUpdatePacket)) return;
+                LanguagesUpdatePacket languagesUpdatePacket = (LanguagesUpdatePacket) packet;
+                Map<String, Map<String, Object>> languages = languagesUpdatePacket.getLanguages();
+                if (socketClient.isDebug()) {
+                    socketClient.log(Level.INFO, "[X] Updating languages " + languages.size());
+                }
+                for (Map.Entry<String, Map<String, Object>> entry : languages.entrySet()) {
+                    LanguageManager.getManager().update(entry.getKey(), entry.getValue());
+                }
                 break;
             }
         }

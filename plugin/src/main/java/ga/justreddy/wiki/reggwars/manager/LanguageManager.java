@@ -5,6 +5,7 @@ import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.model.language.Language;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
+import lombok.SneakyThrows;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -37,7 +38,7 @@ public class LanguageManager {
         FileConfiguration config = YamlConfiguration.loadConfiguration(defaultLanguage);
         String id = config.getString("settings.id");
         String displayname = config.getString("settings.displayname");
-        register(id, config);
+        register(defaultLanguage, id, config);
         ChatUtil.sendConsole("&7[&dREggWars&7] &aRegistered language: " + id + " (" + displayname + ")");
     }
 
@@ -66,7 +67,7 @@ public class LanguageManager {
                 ChatUtil.sendConsole("&7[&dREggWars&7] &cFailed to load " + name + "! ID already exists!");
                 continue;
             }
-            register(id, config);
+            register(file, id, config);
             ChatUtil.sendConsole("&7[&dREggWars&7] &aRegistered language: " + id + " (" + displayname + ")");
         }
 
@@ -85,16 +86,27 @@ public class LanguageManager {
         FileConfiguration config = YamlConfiguration.loadConfiguration(defaultLanguage);
         String id = config.getString("settings.id");
         String displayname = config.getString("settings.displayname");
-        register(id, config);
+        register(defaultLanguage, id, config);
         ChatUtil.sendConsole("&7[&dREggWars&7] &aRegistered language: " + id + " (" + displayname + ")");
         start();
+    }
+
+    @SneakyThrows
+    public void update(String id, Map<String, Object> objects) {
+        ILanguage language = getLanguage(id);
+        if (language == null) return;
+        FileConfiguration configuration = language.getConfig();
+        for (Map.Entry<String, Object> entry : objects.entrySet()) {
+            configuration.set(entry.getKey(), entry.getValue());
+        }
+        configuration.save(language.getFile());
     }
 
     public void stop() {
         languages.clear();
     }
 
-    private void register(String id, FileConfiguration configuration) {
+    private void register(File file, String id, FileConfiguration configuration) {
         for (Message message : Message.values()) {
             if (!configuration.isSet(message.getPath())) {
                 if (message.getDef().length > 1) {
@@ -105,11 +117,14 @@ public class LanguageManager {
                 }
             }
         }
-        languages.put(id, new Language(configuration, id));
+        languages.put(id, new Language(file, configuration, id));
     }
 
     public ILanguage getLanguage(String id) {
         return languages.getOrDefault(id, null);
     }
 
+    public Map<String, ILanguage> getLanguages() {
+        return languages;
+    }
 }

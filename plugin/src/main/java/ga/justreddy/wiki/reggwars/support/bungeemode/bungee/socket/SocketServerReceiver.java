@@ -117,6 +117,12 @@ public class SocketServerReceiver {
                 }
                 break;
             }
+            case LANGUAGES_UPDATE: {
+                if (!(packet instanceof LanguagesUpdatePacket)) return;
+                LanguagesUpdatePacket languagesUpdatePacket = (LanguagesUpdatePacket) packet;
+                sender.sendPacketToAllExcept(languagesUpdatePacket, languagesUpdatePacket.getServer());
+                break;
+            }
         }
     }
 

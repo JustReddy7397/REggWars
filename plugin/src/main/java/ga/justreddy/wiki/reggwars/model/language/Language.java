@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ import java.util.List;
 @Data
 public class Language implements ILanguage {
 
+    File file;
     FileConfiguration config;
     String id;
 
