@@ -1,0 +1,11 @@
+storage:
+  type: SQLITE # SQLITE, MYSQL, MONGO
+  mysql:
+    host: localhost
+    port: 3306
+    database: database
+    username: root
+    password: password
+    table-prefix: eggwars_
+  mongo:
+    uri: "mongodb://localhost:27017"
