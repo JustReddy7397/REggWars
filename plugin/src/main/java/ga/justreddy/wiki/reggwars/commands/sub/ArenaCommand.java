@@ -6,6 +6,8 @@ import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.game.team.Team;
+import ga.justreddy.wiki.reggwars.api.model.language.Message;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.commands.Command;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.model.creator.GameCreator;
@@ -34,7 +36,7 @@ public class ArenaCommand extends Command {
     @Override
     public void onCommand(IGamePlayer gamePlayer, String[] args) {
         if (args.length < 2) {
-            // TODO send help message
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_HELP);
             return;
         }
 
@@ -88,8 +90,9 @@ public class ArenaCommand extends Command {
 
         if (args.length < 3) {
             // TODO send proper message
-            player.sendLegacyMessage(
-                    "/ew arena create <name>");
+            player.sendMessage(Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/ew arena create <name>")
+                    );
             return;
         }
 

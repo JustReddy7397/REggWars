@@ -6,11 +6,17 @@ import com.grinderwolf.swm.api.exceptions.WorldLoadedException;
 import com.grinderwolf.swm.api.exceptions.WorldTooBigException;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
 import ga.justreddy.wiki.reggwars.api.model.game.team.Team;
+import ga.justreddy.wiki.reggwars.api.model.language.Message;
+import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
+import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.WorldManager;
+import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
+import io.netty.util.internal.shaded.org.jctools.queues.SpscLinkedQueue;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
@@ -61,7 +67,8 @@ public class GameCreator implements Listener {
         if (stringMap.containsKey(uuid)) return; // TODO
         File file = getFile(name);
         if (file.exists()) {
-            return; // TODO
+            player.sendMessage(Message.MESSAGES_ARENA_ALREADY_EXISTS);
+            return;
         }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         game.set("settings.team-size", 1);
@@ -73,25 +80,31 @@ public class GameCreator implements Listener {
         world.getSpawnLocation().getBlock().setType(Material.STONE);
         player.teleport(world.getSpawnLocation().add(0.0, 1, 0.0));
         stringMap.put(uuid, world.getName());
+        player.sendMessage(Message.MESSAGES_ARENA_CREATED);
         // TODO add items
     }
 
     @SneakyThrows
     public void save(IGamePlayer player) {
         UUID uuid = player.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         if (!isSetupComplete(game)) {
-            // TODO send message
-            player.sendLegacyMessage("setup not complete");
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_COMPLETED);
             return;
         }
         World world = Bukkit.getServer().getWorld(stringMap.get(uuid));
         for (Player p : world.getPlayers()) {
-            p.teleport(Bukkit.getWorld("world").getSpawnLocation());
-            // TODO
+            if (REggWars.getInstance().getSpawnLocation() == null) break;
+            p.teleport(REggWars.getInstance().getSpawnLocation());
         }
 
         world.save();
@@ -109,93 +122,123 @@ public class GameCreator implements Listener {
                          WorldLoadedException |
                          WorldTooBigException |
                          IOException e) {
+                    stringMap.remove(uuid);
                     throw new RuntimeException(e);
                 }
                 Bukkit.getScheduler().runTask(REggWars.getInstance(), () -> {
                     WorldManager.getManager().removeWorld(world);
                     WorldManager.getManager().copySlimeWorld(world.getName());
                     GameManager.getManager().register(stringMap.get(uuid), game);
-                    player.sendLegacyMessage("saved");
-                    stringMap.remove(uuid);
-                    // TODO
+                    player.sendMessage(Message.MESSAGES_ARENA_SAVED,
+                            new Replaceable("<name>", stringMap.get(uuid)));
                 });
             });
         } else {
             WorldManager.getManager().copyWorld(world);
             WorldManager.getManager().removeWorld(world);
             GameManager.getManager().register(stringMap.get(uuid), game);
-            player.sendLegacyMessage("saved");
-            stringMap.remove(uuid);
+            player.sendMessage(Message.MESSAGES_ARENA_SAVED,
+                    new Replaceable("<name>", stringMap.get(uuid)));
         }
+        stringMap.remove(uuid);
     }
 
     @SneakyThrows
     public void addTeam(IGamePlayer gamePlayer, Team team) {
         UUID uuid = gamePlayer.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         if (doesTeamExist(game, team)) return; // TODO
         game.set("teams." + team.getIdentifier() + ".egg", "");
         game.set("teams." + team.getIdentifier() + ".spawn", "");
         game.save(file);
-        // TODO send proper message
-        gamePlayer.sendLegacyMessage("Added team: " + team.getIdentifier());
+        gamePlayer.sendMessage(Message.MESSAGES_ARENA_TEAM_ADDED,
+                new Replaceable("<team>", team.getDisplayName()));
     }
 
     @SneakyThrows
     public void setEgg(IGamePlayer gamePlayer, Team team) {
         UUID uuid = gamePlayer.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         if (!doesTeamExist(game, team)) return; // TODO
         game.set("teams." + team.getIdentifier() + ".egg", LocationUtils.toLocation(gamePlayer.getLocation().getBlock().getLocation()));
         game.save(file);
-        // TODO send proper message
-        gamePlayer.sendLegacyMessage("Set egg for team: " + team.getIdentifier());
+        gamePlayer.sendMessage(Message.MESSAGES_ARENA_TEAM_SET_EGG,
+                new Replaceable("<team>", team.getDisplayName()));
     }
 
+    // TODO EDIT SO RESPAWN AND CAGE SPAWN ARE DIFFERENT
     @SneakyThrows
     public void setSpawn(IGamePlayer gamePlayer, Team team) {
         UUID uuid = gamePlayer.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         if (!doesTeamExist(game, team)) return; // TODO
         game.set("teams." + team.getIdentifier() + ".spawn", LocationUtils.toLocation(gamePlayer.getLocation().getBlock().getLocation()));
         game.save(file);
-        // TODO send proper message
-        gamePlayer.sendLegacyMessage("Set spawn for team: " + team.getIdentifier());
+        gamePlayer.sendMessage(Message.MESSAGES_ARENA_TEAM_SET_SPAWN,
+                new Replaceable("<team>", team.getDisplayName()));
     }
 
     @SneakyThrows
     public void setWaitingLobby(IGamePlayer player) {
         UUID uuid = player.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         game.set("waiting-lobby", LocationUtils.toLocation(player.getLocation()));
         game.save(file);
-        // TODO send proper message
-        player.sendLegacyMessage("Set waiting-lobby");
+        player.sendMessage(Message.MESSAGES_ARENA_WAITING_LOBBY_SET);
     }
 
     @SneakyThrows
     public void setSpectatorSpawn(IGamePlayer player) {
         UUID uuid = player.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         game.set("spectator-location", LocationUtils.toLocation(player.getLocation()));
         game.save(file);
-        // TODO send proper message
-        player.sendLegacyMessage("Set spectator-location");
+        player.sendMessage(Message.MESSAGES_ARENA_SPECTATOR_SET);
     }
 
     public void check(IGamePlayer gamePlayer) {
@@ -220,9 +263,10 @@ public class GameCreator implements Listener {
         UUID uuid = player.getUniqueId();
         if (!stringMap.containsKey(player.getUniqueId())) return;
         Block block = event.getClickedBlock();
-        if (block == null ) return;
+        if (block == null) return;
         String name = stringMap.get(uuid);
         File file = getFile(name);
+        IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(uuid);
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
         String location;
         if (itemStack.getType() == Material.STICK) {
@@ -231,16 +275,16 @@ public class GameCreator implements Listener {
                 case LEFT_CLICK_BLOCK:
                     config.set("bounds.lobby.high", location);
                     config.save(file);
-                    player.sendMessage("high bound lobby set");
+                    gamePlayer.sendMessage(Message.MESSAGES_ARENA_BOUND_LOBBY_HIGH);
                     event.setCancelled(true);
                     break;
                 case RIGHT_CLICK_BLOCK:
                     config.set("bounds.lobby.low", location);
                     config.save(file);
-                    player.sendMessage("low bound lobby set");
+                    gamePlayer.sendMessage(Message.MESSAGES_ARENA_BOUND_LOBBY_LOW);
                     event.setCancelled(true);
                     break;
-                    // TODO
+                // TODO
             }
         } else if (itemStack.getType() == Material.BLAZE_ROD) {
             location = LocationUtils.toLocation(event.getClickedBlock().getLocation());
@@ -248,16 +292,16 @@ public class GameCreator implements Listener {
                 case LEFT_CLICK_BLOCK:
                     config.set("bounds.game.high", location);
                     config.save(file);
-                    player.sendMessage("high bound game set");
+                    gamePlayer.sendMessage(Message.MESSAGES_ARENA_BOUND_ARENA_HIGH);
                     event.setCancelled(true);
                     break;
                 case RIGHT_CLICK_BLOCK:
                     config.set("bounds.game.low", location);
                     config.save(file);
-                    player.sendMessage("low bound game set");
+                    gamePlayer.sendMessage(Message.MESSAGES_ARENA_BOUND_ARENA_LOW);
                     event.setCancelled(true);
                     break;
-                    // TODO
+                // TODO
             }
 
         }
@@ -269,6 +313,7 @@ public class GameCreator implements Listener {
         Player player = event.getPlayer();
         if (!stringMap.containsKey(player.getUniqueId())) return;
         if (event.getLines().length < 4) return;
+        IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(player.getUniqueId());
         String first = event.getLine(0);
         String second = event.getLine(1);
         String third = event.getLine(2);
@@ -278,7 +323,7 @@ public class GameCreator implements Listener {
             GeneratorType type = GeneratorType.getType(second.toUpperCase());
             if (type == null) {
                 event.getBlock().setType(Material.AIR);
-                player.sendMessage("Invalid generator type!"); // TODO
+                gamePlayer.sendMessage(Message.MESSAGES_ARENA_GENERATOR_WRONG_TYPE);
                 return;
             }
 
@@ -286,12 +331,15 @@ public class GameCreator implements Listener {
 
             try {
                 startlevel = Integer.parseInt(third);
-            }catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 event.getBlock().setType(Material.AIR);
-                player.sendMessage("The generator start level must be between 0-"
-                + (config.getConfigurationSection("spawners." + type.name().toLowerCase())
-                                .getKeys(false).size() - 1)
-                ); // TODO
+                gamePlayer.sendMessage(Message.MESSAGES_ARENA_INVALID_GENERATOR_LEVEL,
+                        new Replaceable("<level>",
+                                config.getConfigurationSection("spawners."
+                                                + type.name().toLowerCase())
+                                        .getKeys(false).size() + ""
+                        )
+                );
                 return;
             }
 
@@ -306,7 +354,7 @@ public class GameCreator implements Listener {
             c.set("generators." + current + ".location", LocationUtils.toLocation(event.getBlock().getLocation()));
             c.set("generators." + current + ".type", type.name());
             c.save(file);
-            player.sendMessage("generator added!"); // TODO
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_GENERATOR_ADDED);
         }
 
     }
@@ -335,8 +383,8 @@ public class GameCreator implements Listener {
         for (String key : generators) {
             ConfigurationSection section = config.getConfigurationSection("generators." + key);
             if (section.isSet("startLevel") && section.isSet("maxLevel")
-            && section.isSet("material") && section.isSet("location")
-            && section.isSet("type")) {
+                    && section.isSet("material") && section.isSet("location")
+                    && section.isSet("type")) {
                 ++count;
             }
         }
