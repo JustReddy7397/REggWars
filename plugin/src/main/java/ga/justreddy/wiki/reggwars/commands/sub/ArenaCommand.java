@@ -42,21 +42,29 @@ public class ArenaCommand extends Command {
 
         switch (args[1]) {
             case "create":
-                createGame(gamePlayer, args); break;
+                createGame(gamePlayer, args);
+                break;
             case "fstart":
-                fstart(gamePlayer); break;
+                fstart(gamePlayer);
+                break;
             case "fstop":
-                fstop(gamePlayer); break;
+                fstop(gamePlayer);
+                break;
             case "team":
-                teamCommand(gamePlayer, args); break;
+                teamCommand(gamePlayer, args);
+                break;
             case "waitinglobby":
-                waitingLobby(gamePlayer, args); break;
+                waitingLobby(gamePlayer, args);
+                break;
             case "spectator":
-                spectatorCommand(gamePlayer, args); break;
+                spectatorCommand(gamePlayer, args);
+                break;
             case "minplayers":
-                minPlayersCommand(gamePlayer, args); break;
+                minPlayersCommand(gamePlayer, args);
+                break;
             case "save":
-                saveGameCommand(gamePlayer); break;
+                saveGameCommand(gamePlayer);
+                break;
         }
 
     }
@@ -67,18 +75,18 @@ public class ArenaCommand extends Command {
 
     private void minPlayersCommand(IGamePlayer gamePlayer, String[] args) {
         if (args.length < 3) {
-            // TODO send proper message
-            gamePlayer.sendLegacyMessage(
-                    "/ew arena minplayers <amount>");
+            gamePlayer.sendMessage(
+                    Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/ew arena minplayers <amount>")
+            );
             return;
         }
 
         int players;
         try {
             players = Integer.parseInt(args[2]);
-        }catch (NumberFormatException e) {
-            gamePlayer.sendLegacyMessage("haha invalid player count@!!!");
-            // TODO
+        } catch (NumberFormatException e) {
+            gamePlayer.sendMessage(Message.MESSAGES_ARENA_NOT_NUMBER);
             return;
         }
 
@@ -89,10 +97,9 @@ public class ArenaCommand extends Command {
     private void createGame(IGamePlayer player, String[] args) {
 
         if (args.length < 3) {
-            // TODO send proper message
             player.sendMessage(Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
                     new Replaceable("<usage>", "/ew arena create <name>")
-                    );
+            );
             return;
         }
 
@@ -125,60 +132,60 @@ public class ArenaCommand extends Command {
 
     private void teamCommand(IGamePlayer gamePlayer, String[] args) {
         if (args.length < 3) {
-            // TODO send proper message
-            gamePlayer.sendLegacyMessage(
-                    "/ew arena team <create/setegg/setspawn>");
+            gamePlayer.sendMessage(
+                    Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/ew arena team <create/setegg/setspawn>"));
             return;
         }
 
 
         if (args[2].equalsIgnoreCase("create")) {
             if (args.length < 4) {
-                // TODO send proper message
-                gamePlayer.sendLegacyMessage(
-                        "/ew arena team create <team>");
+                gamePlayer.sendMessage(
+                        Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                        new Replaceable("<usage>", "/ew arena team create <team>"));
                 return;
             }
             Team team = Team.getByIdentifier(args[3]);
             if (team == null) {
-                // TODO send proper message
-                gamePlayer.sendLegacyMessage("Invalid team!");
+                gamePlayer.sendMessage(Message.MESSAGES_ARENA_INVALID_TEAM, new Replaceable("<team>", args[3]));
                 return;
             }
             GameCreator.getCreator().addTeam(gamePlayer, team);
         } else if (args[2].equalsIgnoreCase("setegg")) {
             if (args.length < 4) {
-                // TODO send proper message
-                gamePlayer.sendLegacyMessage(
-                        "/ew arena team setegg <team>");
+                gamePlayer.sendMessage(
+                        Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                        new Replaceable("<usage>", "/ew arena team setegg <team>"));
                 return;
             }
             Team team = Team.getByIdentifier(args[3]);
             if (team == null) {
-                // TODO send proper message
-                gamePlayer.sendLegacyMessage("Invalid team!");
+                gamePlayer.sendMessage(Message.MESSAGES_ARENA_INVALID_TEAM,
+                        new Replaceable("<team>", args[3]));
                 return;
             }
             GameCreator.getCreator().setEgg(gamePlayer, team);
         } else if (args[2].equalsIgnoreCase("setspawn")) {
             if (args.length < 4) {
-                // TODO send proper message
-                gamePlayer.sendLegacyMessage(
-                        "/ew arena team setspawn <team>");
+                gamePlayer.sendMessage(
+                        Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                        new Replaceable("<usage>", "/ew arena team setspawn <team>"));
                 return;
             }
             Team team = Team.getByIdentifier(args[3]);
             if (team == null) {
-                // TODO send proper message
-                gamePlayer.sendLegacyMessage("Invalid team!");
+                gamePlayer.sendMessage(Message.MESSAGES_ARENA_INVALID_TEAM,
+                        new Replaceable("<team>", args[3]));
                 return;
             }
             GameCreator.getCreator().setSpawn(gamePlayer, team);
         } else {
-            // TODO send proper message
-            gamePlayer.sendLegacyMessage(
-                    "/ew arena team <create/setegg/setspawn>");
+            gamePlayer.sendMessage(
+                    Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/ew arena team <create/setegg/setspawn>"));
         }
+
 
 
     }
@@ -190,9 +197,6 @@ public class ArenaCommand extends Command {
     public void spectatorCommand(IGamePlayer player, String[] args) {
         GameCreator.getCreator().setSpectatorSpawn(player);
     }
-
-
-
 
 
 }

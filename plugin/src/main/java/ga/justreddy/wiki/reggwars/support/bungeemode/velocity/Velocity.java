@@ -53,7 +53,6 @@ public class Velocity {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        // TODO
         this.message = MiniMessage.miniMessage();
         VelocityConfigManager.initialize(folder.toFile());
         this.socketServer = new VelocitySocketServer();

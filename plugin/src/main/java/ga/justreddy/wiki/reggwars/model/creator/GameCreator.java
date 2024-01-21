@@ -250,8 +250,7 @@ public class GameCreator implements Listener {
                         .equalsIgnoreCase("")
                 && config.isSet("teams." + team.getIdentifier() + ".egg")
                 && !config.getString("teams." + team.getIdentifier() + ".egg", "")
-                .equalsIgnoreCase("")
-                ;
+                .equalsIgnoreCase("");
     }
 
     @SneakyThrows
@@ -284,7 +283,6 @@ public class GameCreator implements Listener {
                     gamePlayer.sendMessage(Message.MESSAGES_ARENA_BOUND_LOBBY_LOW);
                     event.setCancelled(true);
                     break;
-                // TODO
             }
         } else if (itemStack.getType() == Material.BLAZE_ROD) {
             location = LocationUtils.toLocation(event.getClickedBlock().getLocation());
@@ -301,7 +299,6 @@ public class GameCreator implements Listener {
                     gamePlayer.sendMessage(Message.MESSAGES_ARENA_BOUND_ARENA_LOW);
                     event.setCancelled(true);
                     break;
-                // TODO
             }
 
         }
@@ -362,14 +359,20 @@ public class GameCreator implements Listener {
     @SneakyThrows
     public void setMinPlayers(IGamePlayer player, int players) {
         UUID uuid = player.getUniqueId();
-        if (!stringMap.containsKey(uuid)) return; // TODO
+        if (!stringMap.containsKey(uuid)) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
         File file = getFile(stringMap.get(uuid));
-        if (!file.exists()) return; // TODO
+        if (!file.exists()) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
         FileConfiguration game = YamlConfiguration.loadConfiguration(file);
         game.set("settings.minPlayers", players);
         game.save(file);
-        // TODO send proper message
-        player.sendLegacyMessage("Set waiting-lobby");
+        player.sendMessage(Message.MESSAGES_ARENA_MIN_PLAYERS_SET,
+                new Replaceable("<amount>", players));
     }
 
     private int getGenerators(FileConfiguration config) {

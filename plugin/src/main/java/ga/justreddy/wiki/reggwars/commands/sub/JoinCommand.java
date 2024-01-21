@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.Core;
 import ga.justreddy.wiki.reggwars.ServerMode;
+import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.commands.Command;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
@@ -40,7 +41,9 @@ public class JoinCommand extends Command {
             // TODO WOW
 
             if (gamePlayer.getGame() != null && !gamePlayer.isDead()) {
-                gamePlayer.sendLegacyMessage("&cYou are already in-game");
+                gamePlayer.sendMessage(
+                        Message.MESSAGES_ERROR_ALREADY_IN_GAME
+                );
                 return;
             }
 
@@ -48,8 +51,9 @@ public class JoinCommand extends Command {
             if (game != null) {
                 game.onGamePlayerJoin(gamePlayer);
             } else {
-                // TODO
-                gamePlayer.sendLegacyMessage("&cFailed to find active game!");
+                gamePlayer.sendMessage(
+                        Message.MESSAGES_ERROR_FAILED_TO_FIND_GAME
+                );
             }
 
         }

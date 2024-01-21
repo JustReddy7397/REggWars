@@ -92,6 +92,10 @@ public enum Message {
             "&d/ew arena minplayers <amount>",
             "&d/ew arena save"
             ),
+    MESSAGES_ERROR_ALREADY_IN_GAME("messages.error.already-in-game",
+            "&cYou are already in a game!"),
+    MESSAGES_ERROR_FAILED_TO_FIND_GAME("messages.error.failed-to-find-game",
+            "&cFailed to find a game!"),
     MESSAGES_ARENA_CREATED("messages.arena.created",
             "&aSuccessfully created arena &d<name>"),
     MESSAGES_ARENA_ALREADY_EXISTS("messages.arena.already-exists",
@@ -127,7 +131,13 @@ public enum Message {
     MESSAGES_ARENA_INVALID_GENERATOR_LEVEL("messages.arena.invalid-generator-level",
             "&cThe generator start level must be between 0-<level>!"),
     MESSAGES_ARENA_GENERATOR_ADDED("messages.arena.generator-added",
-            "&aSuccessfully added a generator!");
+            "&aSuccessfully added a generator!"),
+    MESSAGES_ARENA_MIN_PLAYERS_SET("messages.arena.min-players-set",
+            "&aSuccessfully set the minimum players to &d<amount>"),
+    MESSAGES_ARENA_NOT_NUMBER("messages.arena.not-number",
+            "&cThat is not a number!"),
+    MESSAGES_ARENA_INVALID_TEAM("messages.arena.invalid-team",
+            "&cInvalid team: <team>!");
 
 
     private final String path;

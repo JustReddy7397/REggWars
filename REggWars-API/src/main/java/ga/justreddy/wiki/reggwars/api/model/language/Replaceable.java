@@ -13,6 +13,11 @@ public class Replaceable {
         this.value = value;
     }
 
+    public Replaceable(String key, Object value) {
+        this.key = key;
+        this.value = value.toString();
+    }
+
     public String getKey() {
         return key;
     }
