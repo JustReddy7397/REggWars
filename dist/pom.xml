@@ -70,6 +70,10 @@
                                     <pattern>com.alessiodp.libby</pattern>
                                     <shadedPattern>ga.justreddy.wiki.reggwars.libs.com.alessiodp.libby</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>dev.demeng.sentinel.wrapper</pattern>
+                                    <shadedPattern>ga.justreddy.wiki.reggwars.libs.dev.demeng.sentinel.wrapper</shadedPattern>
+                                </relocation>
                             </relocations>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <filters>
