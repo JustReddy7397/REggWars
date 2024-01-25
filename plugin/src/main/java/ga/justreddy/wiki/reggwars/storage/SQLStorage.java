@@ -13,6 +13,7 @@ import java.sql.*;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author JustReddy
@@ -56,12 +57,12 @@ public class SQLStorage implements Storage {
     }
 
     @Override
-    public IGamePlayer loadOfflinePlayer(String name) {
+    public CompletableFuture<IGamePlayer> loadOfflinePlayer(String name) {
         return null;
     }
 
     @Override
-    public IGamePlayer loadOfflinePlayer(UUID uuid) {
+    public CompletableFuture<IGamePlayer> loadOfflinePlayer(UUID uuid) {
         return null;
     }
 

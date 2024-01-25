@@ -1,5 +1,5 @@
 storage:
-  type: SQLITE # SQLITE, MYSQL, MONGO
+  type: SQLITE # SQLITE, MYSQL, MONGO, HIKARI
   mysql:
     host: localhost
     port: 3306
@@ -9,3 +9,22 @@ storage:
     table-prefix: eggwars_
   mongo:
     uri: "mongodb://localhost:27017"
+  hikari:
+    host: localhost
+    port: 3306
+    database: database
+    username: root
+    password: password
+    table-prefix: eggwars_
+    settings:
+      cachePrepStmts: true
+      prepStmtCacheSize: 250
+      prepStmtCacheSqlLimit: 2048
+    pool:
+      name: "REggWars"
+      maximumPoolSize: 10
+      minimumIdle: 10
+      allowPoolSuspension: true
+      maxLifetime: 1800000
+      connectionTimeout: 30000
+      leakDetectionThreshold: 0

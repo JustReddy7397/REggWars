@@ -4,6 +4,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author JustReddy
@@ -22,8 +23,8 @@ public interface Storage {
 
     IGamePlayer loadPlayer(IGamePlayer player);
 
-    IGamePlayer loadOfflinePlayer(String name);
+    CompletableFuture<IGamePlayer> loadOfflinePlayer(String name);
 
-    IGamePlayer loadOfflinePlayer(UUID uuid);
+    CompletableFuture<IGamePlayer> loadOfflinePlayer(UUID uuid);
 
 }
