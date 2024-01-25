@@ -23,7 +23,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 
 import java.util.ArrayList;
 
@@ -86,6 +88,26 @@ public class SpectatorListener implements Listener {
     @EventHandler
     public void onEntityDamageEvent(EntityDamageEvent event) {
         IGamePlayer player = PlayerManager.getManager().getGamePlayer(event.getEntity().getUniqueId());
+        if (player == null) return;
+        IGame game = player.getGame();
+        if (game == null) return;
+        if (!player.isDead() || !player.isFakeDead()) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPickupItemEvent(PlayerPickupItemEvent event) {
+        IGamePlayer player = PlayerManager.getManager().getGamePlayer(event.getPlayer().getUniqueId());
+        if (player == null) return;
+        IGame game = player.getGame();
+        if (game == null) return;
+        if (!player.isDead() || !player.isFakeDead()) return;
+        event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onItemDropEvent(PlayerDropItemEvent event) {
+        IGamePlayer player = PlayerManager.getManager().getGamePlayer(event.getPlayer().getUniqueId());
         if (player == null) return;
         IGame game = player.getGame();
         if (game == null) return;
