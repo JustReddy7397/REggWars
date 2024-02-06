@@ -1,7 +1,7 @@
 
 ## Authors
 
-- [@JustReddy](https://www.github.com/justreddy7397)
+- [@JustReddy](https://www.github.com/justreddy7397).
   Please don't copy my stuff, or if you do, atleast credit me for it thank you very much.
 
 
