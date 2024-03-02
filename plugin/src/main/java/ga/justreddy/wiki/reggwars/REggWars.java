@@ -23,6 +23,7 @@ import ga.justreddy.wiki.reggwars.schematic.ISchematic;
 import ga.justreddy.wiki.reggwars.socket.SocketClient;
 import ga.justreddy.wiki.reggwars.storage.SQLStorage;
 import ga.justreddy.wiki.reggwars.storage.type.Storage;
+import ga.justreddy.wiki.reggwars.support.bungeemode.messenger.IMessenger;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import lombok.Getter;
@@ -67,6 +68,8 @@ public final class REggWars extends JavaPlugin {
     private boolean bungee;
     private SocketClient socketClient;
     private String serverName;
+
+    private IMessenger<?> messenger;
 
     private static final Logger LOGGER = Logger.getLogger("REggWars");
 
@@ -159,12 +162,13 @@ public final class REggWars extends JavaPlugin {
 
         if (mode != ServerMode.MULTI_ARENA) {
             bungee = true;
-            socketClient = new SocketClient(
+
+            /*socketClient = new SocketClient(
                     settingsConfig.getConfig().getString("bungee.host"),
                     settingsConfig.getConfig().getInt("bungee.port"),
                     serverName
             );
-            socketClient.clientSetup();
+            socketClient.clientSetup();*/
         }
 
         getCommand("eggwars").setExecutor(command = new BaseCommand(this));

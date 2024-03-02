@@ -28,7 +28,8 @@ public class LibraryManager {
         Library mongo_bson = create("org.mongodb", "bson", "4.2.3", "MongoBson");
         Library rabbit = create("com.rabbitmq", "amqp-client", "5.12.0", "RabbitMQ");
         Library xseries = create("com.github.cryptomorin", "XSeries", "9.4.0", "XSeries");
-        libraryManager.loadLibraries(sqlite, mongo_driver, mongo_core, mongo_bson, rabbit, xseries);
+        Library redis = create("redis.clients", "jedis", "5.0.0", "Jedis");
+        libraryManager.loadLibraries(sqlite, mongo_driver, mongo_core, mongo_bson, rabbit, xseries, redis);
     }
 
     private Library create(String groupId, String artifactId, String version, String loaderId) {

@@ -22,18 +22,32 @@ player:
 
 # You have to configure this only if you are using bungee mode, otherwise ignore it.
 bungee:
-  # Server name - name of this server that is used in the bungeecord config.
-  # WARNING!
-  # It's really important to use the same name here as in the bungecord config - otherwise the plugin won't work.
-  # So if this spigot server is named "srv1" in your bungeecord config, leave this option set to "srv1".
-  server: "srv1"
-  # Bungeecord server hostname, if your spigot and bungeecord server are on the same machine leave it set to "localhost".
-  host: "localhost"
-  # Bungeecord socket server port, set it to the same value as in the bungee-config.yml in your bungeecord server.
-  # WARNING!
-  # This is NOT your bungeecord server port,
-  # it's your socket server port which can be changed in the file mentioned above.
-  port: 3000
+  # Types: SOCKET, RABBITMQ, REDIS
+  type: SOCKET
+  socket:
+    # Server name - name of this server that is used in the bungeecord config.
+    # WARNING!
+    # It's really important to use the same name here as in the bungeecord config - otherwise the plugin won't work.
+    # So if this spigot server is named "srv1" in your bungeecord config, leave this option set to "srv1".
+    server: "srv1"
+    # Bungeecord server hostname,
+    # if your spigot and bungeecord server are on the same machine leave it set to "localhost".
+    host: "localhost"
+    # Bungeecord socket server port, set it to the same value as in the bungee-config.yml in your bungeecord server.
+    # WARNING!
+    # This is NOT your bungeecord server port,
+    # it's your socket server port that can be changed in the file mentioned above.
+    port: 3000
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "guest"
+    password: "guest"
+    virtual-host: "/"
+  redis:
+    host: "localhost"
+    port: 6379
+
   # What should happen to the player who left the game?
   # Use JOIN_SERVER to put the player back to the server from where they had joined the game.
   # Use LOBBY_SERVER to put player in the lobby server.
