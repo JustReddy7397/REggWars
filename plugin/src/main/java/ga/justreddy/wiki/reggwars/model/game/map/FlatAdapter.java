@@ -6,6 +6,7 @@ import ga.justreddy.wiki.reggwars.api.model.game.ResetAdapter;
 import ga.justreddy.wiki.reggwars.manager.MapManager;
 import ga.justreddy.wiki.reggwars.manager.WorldManager;
 import ga.justreddy.wiki.reggwars.socket.SocketClient;
+import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.IMessenger;
 import ga.justreddy.wiki.reggwars.utils.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -21,8 +22,8 @@ import java.util.logging.Level;
  */
 public class FlatAdapter extends ResetAdapter {
 
-    private final SocketClient client
-            = REggWars.getInstance().getSocketClient();
+    private final IMessenger<?> client
+            = REggWars.getInstance().getMessenger();
 
 
     private final boolean debug = REggWars

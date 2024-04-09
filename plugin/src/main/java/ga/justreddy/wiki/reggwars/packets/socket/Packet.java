@@ -1,5 +1,7 @@
 package ga.justreddy.wiki.reggwars.packets.socket;
 
+import ga.justreddy.wiki.reggwars.REggWars;
+
 import java.io.Serializable;
 
 /**
@@ -8,6 +10,7 @@ import java.io.Serializable;
 public class Packet implements Serializable {
 
     private PacketType packetType;
+    private String server = REggWars.getInstance().getServerName();
 
     public Packet(PacketType packetType) {
         this.packetType = packetType;
@@ -21,4 +24,11 @@ public class Packet implements Serializable {
         this.packetType = packetType;
     }
 
+    public void setServer(String server) {
+        this.server = server;
+    }
+
+    public String getServer() {
+        return server;
+    }
 }

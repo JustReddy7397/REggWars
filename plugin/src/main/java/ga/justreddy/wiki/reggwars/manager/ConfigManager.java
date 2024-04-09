@@ -75,7 +75,7 @@ public class ConfigManager {
 
         if (!REggWars.getInstance().isBungee()) return;
         configs.forEach((string, config) -> {
-            REggWars.getInstance().getSocketClient()
+            REggWars.getInstance().getMessenger()
                     .getSender()
                     .sendConfigUpdatePacket(REggWars.getInstance().getServerName(), config);
         });

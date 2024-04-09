@@ -13,6 +13,7 @@ import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.model.gui.custom.guis.QuickBuyEditorGui;
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
+import ga.justreddy.wiki.reggwars.utils.Util;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -218,7 +219,8 @@ public class ShopItem implements IShopItem {
                 if (shouldColor) {
                     IGameTeam team = player.getTeam();
                     Color color = team.getTeam().getColor();
-                    builder.withColor(color);
+                    XMaterial woolMaterialByColor = Util.getWoolMaterialByColor(color);
+                    builder.withType(woolMaterialByColor.parseMaterial());
                 }
                 takeMoney(player);
                 inventory.addItem(builder.build());

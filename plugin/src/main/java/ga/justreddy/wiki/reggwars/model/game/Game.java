@@ -33,7 +33,7 @@ import ga.justreddy.wiki.reggwars.model.game.timer.GameEndTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameStartTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.Timer;
-import ga.justreddy.wiki.reggwars.socket.BungeeUtils;
+import ga.justreddy.wiki.reggwars.utils.BungeeUtils;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
@@ -284,7 +284,7 @@ public class Game implements IGame {
         endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
         setGameState(GameState.WAITING); // TODO make it so if disabled, it wont enable again
         if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getSocketClient()
+            REggWars.getInstance().getMessenger()
                     .getSender()
                     .sendUpdateGamePacket(
                             new BungeeGame(
@@ -306,7 +306,7 @@ public class Game implements IGame {
             case STARTING:
                 if (getPlayerCount() < minPlayers) {
                     setGameState(GameState.WAITING);
-                    REggWars.getInstance().getSocketClient()
+                    REggWars.getInstance().getMessenger()
                             .getSender()
                             .sendUpdateGamePacket(
                                     new BungeeGame(
@@ -353,7 +353,7 @@ public class Game implements IGame {
     @Override
     public void onGameStart() {
         setGameState(GameState.PLAYING);
-        REggWars.getInstance().getSocketClient()
+        REggWars.getInstance().getMessenger()
                 .getSender()
                 .sendUpdateGamePacket(
                         new BungeeGame(
@@ -404,7 +404,7 @@ public class Game implements IGame {
         for (IGamePlayer player : actualPlayers) {
             player.getQuests().update(player, QuestType.PLAY_GAMES);
         }
-        REggWars.getInstance().getSocketClient()
+        REggWars.getInstance().getMessenger()
                 .getSender()
                 .sendUpdateGamePacket(
                         new BungeeGame(
@@ -438,7 +438,7 @@ public class Game implements IGame {
             });
         }
         if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getSocketClient()
+            REggWars.getInstance().getMessenger()
                     .getSender()
                     .sendUpdateGamePacket(
                             new BungeeGame(
@@ -503,7 +503,7 @@ public class Game implements IGame {
 
 
         if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getSocketClient()
+            REggWars.getInstance().getMessenger()
                     .getSender()
                     .sendUpdateGamePacket(
                             new BungeeGame(
@@ -547,7 +547,7 @@ public class Game implements IGame {
         EggWarsGameLeaveEvent event = new EggWarsGameLeaveEvent(this, gamePlayer);
         event.call();
         if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getSocketClient()
+            REggWars.getInstance().getMessenger()
                     .getSender()
                     .sendUpdateGamePacket(
                             new BungeeGame(

@@ -53,13 +53,13 @@ public class ArenaCommand extends Command {
             case "team":
                 teamCommand(gamePlayer, args);
                 break;
-            case "waitinglobby":
+            case "setlobby":
                 waitingLobby(gamePlayer, args);
                 break;
             case "spectator":
                 spectatorCommand(gamePlayer, args);
                 break;
-            case "minplayers":
+            case "setmin":
                 minPlayersCommand(gamePlayer, args);
                 break;
             case "save":
@@ -77,7 +77,7 @@ public class ArenaCommand extends Command {
         if (args.length < 3) {
             gamePlayer.sendMessage(
                     Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
-                    new Replaceable("<usage>", "/ew arena minplayers <amount>")
+                    new Replaceable("<usage>", "/ew arena setmin <amount>")
             );
             return;
         }
@@ -114,9 +114,10 @@ public class ArenaCommand extends Command {
 
         if (game == null) return;
 
-        if (!game.isGameState(GameState.WAITING)) return;
+        if (game.isGameState(GameState.WAITING) || game.isGameState(GameState.STARTING)) {
+            game.onGameStart();
+        }
 
-        game.onGameStart();
     }
 
     private void fstop(IGamePlayer player) {

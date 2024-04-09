@@ -97,7 +97,7 @@ public class JoinCommand extends Command {
 
         // TODO
 
-        plugin.getSocketClient().getSender()
+        plugin.getMessenger().getSender()
                 .sendJoinPacket(game, player.getName(), true, false);
     }
 

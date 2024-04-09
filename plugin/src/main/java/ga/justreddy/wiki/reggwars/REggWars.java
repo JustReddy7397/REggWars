@@ -9,7 +9,9 @@ import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.commands.BaseCommand;
 import ga.justreddy.wiki.reggwars.config.Config;
 import ga.justreddy.wiki.reggwars.exceptions.DependencyNotInstalledException;
-import ga.justreddy.wiki.reggwars.socket.BungeeUtils;
+import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.rabbit.RabbitMessenger;
+import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.redis.RedisMessenger;
+import ga.justreddy.wiki.reggwars.utils.BungeeUtils;
 import ga.justreddy.wiki.reggwars.support.ApiHandler;
 import ga.justreddy.wiki.reggwars.listener.GameListener;
 import ga.justreddy.wiki.reggwars.listener.MainListener;
@@ -20,10 +22,9 @@ import ga.justreddy.wiki.reggwars.model.game.map.FlatAdapter;
 import ga.justreddy.wiki.reggwars.model.game.map.SlimeAdapter;
 import ga.justreddy.wiki.reggwars.nms.Nms;
 import ga.justreddy.wiki.reggwars.schematic.ISchematic;
-import ga.justreddy.wiki.reggwars.socket.SocketClient;
 import ga.justreddy.wiki.reggwars.storage.SQLStorage;
 import ga.justreddy.wiki.reggwars.storage.type.Storage;
-import ga.justreddy.wiki.reggwars.support.bungeemode.messenger.IMessenger;
+import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.IMessenger;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import lombok.Getter;
@@ -34,7 +35,6 @@ import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.text.MessageFormat;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +66,6 @@ public final class REggWars extends JavaPlugin {
     private BaseCommand command;
 
     private boolean bungee;
-    private SocketClient socketClient;
     private String serverName;
 
     private IMessenger<?> messenger;
@@ -163,12 +162,42 @@ public final class REggWars extends JavaPlugin {
         if (mode != ServerMode.MULTI_ARENA) {
             bungee = true;
 
-            /*socketClient = new SocketClient(
-                    settingsConfig.getConfig().getString("bungee.host"),
-                    settingsConfig.getConfig().getInt("bungee.port"),
-                    serverName
-            );
-            socketClient.clientSetup();*/
+            switch (settingsConfig.getConfig().getString("bungee.type")) {
+                case "SOCKET": {
+                    // TODO
+/*
+                    socketClient = new SocketClient(
+                            settingsConfig.getConfig().getString("bungee.socket.host"),
+                            settingsConfig.getConfig().getInt("bungee.socket.port"),
+                            serverName
+                    );
+                    socketClient.clientSetup();
+*/
+                    break;
+                }
+                case "RABBITMQ": {
+                    messenger = new RabbitMessenger(
+                            settingsConfig.getConfig().getString("bungee.rabbitmq.host"),
+                            settingsConfig.getConfig().getInt("bungee.rabbitmq.port"),
+                            settingsConfig.getConfig().getString("bungee.rabbitmq.username"),
+                            settingsConfig.getConfig().getString("bungee.rabbitmq.password"),
+                            settingsConfig.getConfig().getString("bungee.rabbitmq.vhost")
+                    );
+                    break;
+                }
+                case "REDIS": {
+                    messenger = new RedisMessenger(
+                            settingsConfig.getConfig().getString("bungee.redis.host"),
+                            settingsConfig.getConfig().getInt("bungee.redis.port")
+                    );
+                    break;
+                }
+            }
+            if (messenger == null) {
+                Bukkit.getPluginManager().disablePlugin(this);
+                return;
+            }
+            messenger.setup();
         }
 
         getCommand("eggwars").setExecutor(command = new BaseCommand(this));
@@ -183,11 +212,19 @@ public final class REggWars extends JavaPlugin {
             if (Core.MODE == ServerMode.BUNGEE) {
                 ILanguage language = player.getSettings().getLanguage();
                 String message = language.getString(Message.MESSAGES_SERVER_RESTARTED);
+                messenger.getSender().sendMessagePacket(player.getUniqueId(), message);
+/*
                 getSocketClient().getSender().sendMessagePacket(player.getUniqueId(), message);
+*/
                 BungeeUtils.getInstance().sendBackToServer(player);
             }
         });
+        if (messenger != null) {
+            messenger.close();
+        }
+/*
         if (socketClient != null) socketClient.closeConnections();
+*/
         HookManager.getManager().disable();
 
     }
@@ -236,7 +273,7 @@ public final class REggWars extends JavaPlugin {
     public void reload() {
         ConfigManager.getManager().reload();
         LanguageManager.getManager().reload();
-        socketClient.getSender().sendLanguagesUpdatePacket();
+        messenger.getSender().sendLanguagesUpdatePacket();
     }
 
     @SneakyThrows

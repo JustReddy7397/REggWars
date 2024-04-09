@@ -1,8 +1,8 @@
 package ga.justreddy.wiki.reggwars.manager;
 
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
-import ga.justreddy.wiki.reggwars.api.model.leaderboard.Leaderboard;
-import ga.justreddy.wiki.reggwars.api.model.leaderboard.PerPlayerLeaderboard;
+import ga.justreddy.wiki.reggwars.model.leaderboard.Leaderboard;
+import ga.justreddy.wiki.reggwars.model.leaderboard.PerPlayerLeaderboard;
 
 import java.util.ArrayList;
 import java.util.HashMap;

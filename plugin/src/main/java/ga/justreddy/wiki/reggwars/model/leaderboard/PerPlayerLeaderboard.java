@@ -33,9 +33,9 @@ public abstract class PerPlayerLeaderboard extends Leaderboard{
     }
 
     public void set(GamePlayer player, List<String> originalLines) {
-        if (leaderboards.containsKey(player)) return;
+        /*if (leaderboards.containsKey(player)) return;
         Hologram hologram = new Hologram(originalLines, location);
-        leaderboards.put(player, hologram);
+        leaderboards.put(player, hologram);*/
     }
 
 }
