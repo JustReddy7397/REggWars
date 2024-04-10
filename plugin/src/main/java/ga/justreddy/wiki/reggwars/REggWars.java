@@ -41,8 +41,11 @@ import java.util.logging.Logger;
 @Getter
 public final class REggWars extends JavaPlugin {
 
-    @Getter
     private static REggWars instance;
+
+    public static REggWars getInstance() {
+        return instance;
+    }
 
     private boolean isSlimeEnabled;
     private boolean isReplayEnabled;

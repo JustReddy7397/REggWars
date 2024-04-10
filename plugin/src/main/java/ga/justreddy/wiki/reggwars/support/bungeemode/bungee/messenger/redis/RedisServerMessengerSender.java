@@ -1,12 +1,10 @@
-package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.rabbit;
+package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.redis;
 
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.IMessengerSender;
-import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.rabbit.RabbitMessenger;
-import lombok.SneakyThrows;
+import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.redis.RedisMessenger;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,27 +12,15 @@ import java.util.Set;
 /**
  * @author JustReddy
  */
-public class RabbitServerMessengerSender implements IMessengerSender {
+public class RedisServerMessengerSender implements IMessengerSender {
 
-    private final RabbitServerMessenger messenger;
 
-    public RabbitServerMessengerSender(RabbitServerMessenger messenger) {
+    private final RedisServerMessenger messenger;
+
+    public RedisServerMessengerSender(RedisServerMessenger messenger) {
         this.messenger = messenger;
     }
 
-    private void publish(byte[] data) {
-        try {
-            if (!messenger.getChannel().isOpen()) {
-                messenger.setChannel(messenger.getConnection().createChannel());
-                messenger.setup();
-            }
-            messenger.getChannel().basicPublish("REggWars", "info", null, data);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SneakyThrows
     @Override
     public void sendPacket(Packet packet) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -42,7 +28,9 @@ public class RabbitServerMessengerSender implements IMessengerSender {
             oos.writeObject(packet);
             oos.flush();
             byte[] data = bos.toByteArray();
-            publish(data);
+            messenger.getJedis().publish(messenger.getChannelBytes(), data);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

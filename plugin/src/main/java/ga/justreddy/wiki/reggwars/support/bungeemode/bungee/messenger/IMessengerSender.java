@@ -15,6 +15,8 @@ import java.util.*;
  */
 public interface IMessengerSender {
 
+    void sendPacket(Packet packet);
+
     void sendPacket(Packet packet, String server);
 
     void sendPacketToServer(Packet packet, String server);

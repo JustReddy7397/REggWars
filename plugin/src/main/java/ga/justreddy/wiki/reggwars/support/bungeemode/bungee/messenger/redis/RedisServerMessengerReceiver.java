@@ -1,28 +1,56 @@
-package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.rabbit;
+package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.redis;
 
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.BackToServerPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.JoinPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.MessagePacket;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.Bungee;
+import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.IMessenger;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.IMessengerReceiver;
 import ga.justreddy.wiki.reggwars.utils.iridium.IridiumColorAPI;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import redis.clients.jedis.BinaryJedisPubSub;
+
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author JustReddy
  */
-public class RabbitServerMessengerReceiver implements IMessengerReceiver {
+public class RedisServerMessengerReceiver implements IMessengerReceiver {
 
-    private final RabbitServerMessenger messenger;
 
-    public RabbitServerMessengerReceiver(RabbitServerMessenger messenger) {
+    private final RedisServerMessenger messenger;
+
+    private final BinaryJedisPubSub pubSub;
+
+    public RedisServerMessengerReceiver(RedisServerMessenger messenger) {
         this.messenger = messenger;
+        this.pubSub = new BinaryJedisPubSub() {
+            @Override
+            public void onPMessage(byte[] pattern, byte[] channel, byte[] message) {
+                String channelString = new String(channel, StandardCharsets.UTF_8);
+                if (!channelString.equalsIgnoreCase(messenger.getChannel())) return;
+                try (ByteArrayInputStream bis = new ByteArrayInputStream(message);
+                     ObjectInputStream ois = new ObjectInputStream(bis)
+                ) {
+                    Object o = ois.readObject();
+                    if (!(o instanceof Packet)) return;
+                    Packet packet = (Packet) o;
+                    handlePacket(packet);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+        subscribe();
+    }
 
+    public void subscribe() {
+        messenger.getJedis().subscribe(pubSub, messenger.getChannelBytes());
     }
 
     @Override
@@ -140,5 +168,4 @@ public class RabbitServerMessengerReceiver implements IMessengerReceiver {
 
         return true;
     }
-
 }

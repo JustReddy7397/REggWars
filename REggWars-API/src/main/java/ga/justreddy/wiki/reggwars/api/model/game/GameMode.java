@@ -7,7 +7,16 @@ import java.io.Serializable;
  */
 public enum GameMode implements Serializable {
 
-    SOLO,
-    TEAM
+    SOLO("SOLO"),
+    TEAM("TEAM");
 
+    private final String name;
+
+    GameMode(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 }
