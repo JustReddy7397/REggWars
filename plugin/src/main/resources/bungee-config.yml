@@ -28,3 +28,9 @@ bungee:
   redis:
     host: "localhost"
     port: 6379
+
+# GRADIENTS ARE SUPPORTED :D
+# SET TO "" TO DISABLE
+messages:
+  no-game-found: "&cCan't find a game for &3REGGWARS_<type>"
+  connecting: "&bConnecting to: &3REGGWARS_<type>"

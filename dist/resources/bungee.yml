@@ -1,7 +1,0 @@
-name: REggWars
-version: '${project.version}'
-main: ga.justreddy.wiki.reggwars.bungee.Bungee
-depend:
-  - WorldEdit
-commands:
-  eggwars:

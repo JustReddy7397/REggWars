@@ -1,0 +1,36 @@
+# This file contains all settings related to bungeecord server.
+#
+# You have to configure it only if you are using bungee mode (eggwars arenas on multiple servers),
+# otherwise you don't have to upload eggwars plugin to your bungeecord server.
+
+
+
+# You have to configure this only if you are using bungee mode, otherwise ignore it.
+bungee:
+  # Types: SOCKET, RABBITMQ, REDIS
+  type: SOCKET
+  socket:
+    # Socket server port
+    #
+    # It can be any free port (not being used by any other service),
+    # that your socket server used for communication between spigot servers and bungeecord will run on.
+    #
+    # Remember to change the port in every spigot server eggwars settings.yml file to the one set below.
+    port: 3000
+  rabbitmq:
+    host: "localhost"
+    port: 5672
+    username: "guest"
+    password: "guest"
+    virtual-host: "/"
+  # NOTE: Since I can't test this myself due to some issues,
+  # I can't guarantee that this will work.
+  redis:
+    host: "localhost"
+    port: 6379
+
+# GRADIENTS ARE SUPPORTED :D
+# SET TO "" TO DISABLE
+messages:
+  no-game-found: "&cCan't find a game for &3REGGWARS_<type>"
+  connecting: "&bConnecting to: &3REGGWARS_<type>"
