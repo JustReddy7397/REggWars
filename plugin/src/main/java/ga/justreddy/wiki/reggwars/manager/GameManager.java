@@ -14,10 +14,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author JustReddy
@@ -36,6 +33,7 @@ public class GameManager {
 
     private final Map<String, IGame> games;
     private final Map<String, BungeeGame> bungeeGames;
+    private final Map<UUID, String> playerQueues;
 
     private GameManager() {
         this.gamesFolder = new File(REggWars.getInstance()
@@ -43,6 +41,7 @@ public class GameManager {
         if (!gamesFolder.exists()) gamesFolder.mkdir();
         this.games = new HashMap<>();
         this.bungeeGames = new HashMap<>();
+        this.playerQueues = new HashMap<>();
     }
 
     public void start() {
@@ -57,10 +56,13 @@ public class GameManager {
         ChatUtil.sendConsole("&7[&dREggWars&7] &aLoaded &l" + games.size() + "&r &agames");
     }
 
-    public void register(String name, FileConfiguration configuration) {
-        Game game = new Game(name, configuration);
+    public IGame register(String name, FileConfiguration configuration) {
+        IGame game = new Game(name, configuration);
         games.put(name, game);
-        REggWars.getInstance().getResetAdapter().onEnable(game);
+        if (Core.MODE != ServerMode.LOBBY) {
+            REggWars.getInstance().getResetAdapter().onEnable(game);
+        }
+        return game;
     }
 
     public void reload() {

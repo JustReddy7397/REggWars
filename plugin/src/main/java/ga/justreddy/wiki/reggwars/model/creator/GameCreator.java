@@ -4,7 +4,9 @@ import com.grinderwolf.swm.api.exceptions.InvalidWorldException;
 import com.grinderwolf.swm.api.exceptions.WorldAlreadyExistsException;
 import com.grinderwolf.swm.api.exceptions.WorldLoadedException;
 import com.grinderwolf.swm.api.exceptions.WorldTooBigException;
+import ga.justreddy.wiki.reggwars.Core;
 import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.GeneratorType;
@@ -15,6 +17,7 @@ import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.WorldManager;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
+import ga.justreddy.wiki.reggwars.model.game.Game;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import io.netty.util.internal.shaded.org.jctools.queues.SpscLinkedQueue;
 import lombok.Getter;
@@ -85,7 +88,7 @@ public class GameCreator implements Listener {
     }
 
     @SneakyThrows
-    public void save(IGamePlayer player) {
+    public void save(IGamePlayer player, boolean enable) {
         UUID uuid = player.getUniqueId();
         if (!stringMap.containsKey(uuid)) {
             player.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
@@ -101,15 +104,64 @@ public class GameCreator implements Listener {
             player.sendMessage(Message.MESSAGES_ARENA_NOT_COMPLETED);
             return;
         }
+        game.set("settings.enabled", enable);
+        game.save(file);
+        game = YamlConfiguration.loadConfiguration(file);
         World world = Bukkit.getServer().getWorld(stringMap.get(uuid));
         for (Player p : world.getPlayers()) {
-            if (REggWars.getInstance().getSpawnLocation() == null) break;
+            if (REggWars.getInstance().getSpawnLocation() == null) {
+                p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation());
+                continue;
+            };
             p.teleport(REggWars.getInstance().getSpawnLocation());
         }
 
         world.save();
-        Bukkit.unloadWorld(world.getName(), true);
-        if (REggWars.getInstance().isSlimeEnabled()) {
+        Bukkit.unloadWorld(world.getName(), false);
+
+
+        FileConfiguration finalGame = game;
+        Bukkit.getScheduler().runTaskAsynchronously(REggWars.getInstance(), () -> {
+
+            if (REggWars.getInstance().isSlimeEnabled()) {
+
+                try {
+                    REggWars.getInstance().getSlime().importWorld(
+                            world.getWorldFolder(),
+                            world.getName(),
+                            REggWars.getInstance().getLoader());
+                }catch (WorldAlreadyExistsException |
+                        InvalidWorldException |
+                        WorldLoadedException |
+                        WorldTooBigException |
+                        IOException e) {
+                    stringMap.remove(uuid);
+                    player.sendLegacyMessage("&cThere went something wrong with importing the world :(");
+                    throw new RuntimeException(e);
+                }
+
+                Bukkit.getScheduler().runTask(REggWars.getInstance(), () -> {
+                    WorldManager.getManager().removeWorld(world);
+                    if (Core.MODE == ServerMode.LOBBY) {
+                        player.sendLegacyMessage("&aBungee Mode detected... saving to all available game servers!");
+                        File f = new File("slime_worlds/" + world.getName() + ".slime");
+                        Game actualGame = (Game) GameManager.getManager().register(stringMap.get(uuid), finalGame);
+                        REggWars.getInstance().getMessenger()
+                                .getSender()
+                                .sendGameAddPacket(actualGame);
+                    } else {
+                        WorldManager.getManager().copySlimeWorld(world.getName());
+                        Game actualGame = (Game) GameManager.getManager().register(stringMap.get(uuid), finalGame);
+                    }
+                });
+            } else {
+
+            }
+
+
+        });
+
+        /*if (REggWars.getInstance().isSlimeEnabled()) {
             Bukkit.getScheduler().runTaskAsynchronously(REggWars.getInstance(), () -> {
                 try {
                     REggWars.getInstance().getSlime().importWorld(
@@ -139,7 +191,7 @@ public class GameCreator implements Listener {
             GameManager.getManager().register(stringMap.get(uuid), game);
             player.sendMessage(Message.MESSAGES_ARENA_SAVED,
                     new Replaceable("<name>", stringMap.get(uuid)));
-        }
+        }*/
         stringMap.remove(uuid);
     }
 
@@ -305,6 +357,35 @@ public class GameCreator implements Listener {
     }
 
     @SneakyThrows
+    public void setShop(IGamePlayer player, String shopType) {
+        UUID uuid = player.getUniqueId();
+        if (!stringMap.containsKey(uuid)) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_CREATING);
+            return;
+        }
+        File file = getFile(stringMap.get(uuid));
+        if (!file.exists()) {
+            player.sendMessage(Message.MESSAGES_ARENA_NOT_FOUND);
+            return;
+        }
+
+        if (shopType.equalsIgnoreCase("normal") || shopType.equalsIgnoreCase("upgrade")) {
+            FileConfiguration game = YamlConfiguration.loadConfiguration(file);
+
+            int keys = game.getConfigurationSection("shops").getKeys(false).size();
+            game.set("shops." + keys + ".type", shopType);
+            game.set("shops." + keys + ".location", LocationUtils.toLocation(player.getLocation()));
+            game.save(file);
+            player.sendMessage(Message.MESSAGES_ARENA_SHOP_ADDED, new Replaceable("<type>",
+                    shopType.equalsIgnoreCase("normal") ? "normal" : "upgrade"
+                    ));
+            return;
+        } else {
+            player.sendMessage(Message.MESSAGES_ARENA_SHOP_INVALID_TYPE);
+        }
+    }
+
+    @SneakyThrows
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
         Player player = event.getPlayer();
@@ -451,6 +532,7 @@ public class GameCreator implements Listener {
         }
         return null;
     }
+
 
 
 }

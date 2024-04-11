@@ -111,6 +111,10 @@ public class Game implements IGame {
         return name;
     }
 
+    public FileConfiguration getConfig() {
+        return config;
+    }
+
     @Override
     public String getServer() {
         return server;
@@ -259,7 +263,7 @@ public class Game implements IGame {
         ConfigurationSection shops = config.getConfigurationSection("shops");
         for (String key : shops.getKeys(false)) {
             String type = shops.getString(key + ".type");
-            IShop shop = ShopManager.getManager().getShopByType(ShopType.getById(type));
+            IShop shop = ShopManager.getManager().getShopByType(ShopType.getById(type.toUpperCase()));
             if (shop == null) continue;
             this.shops.put(LocationUtils.getLocation(shops.getString(key + ".location")), shop);
         }

@@ -3,7 +3,6 @@ package ga.justreddy.wiki.reggwars.support.bungeemode.bungee;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.rabbit.RabbitServerMessenger;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.redis.RedisServerMessenger;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.socket.SocketServerMessenger;
-import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.socket.SocketServer;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.IMessenger;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
@@ -34,7 +33,6 @@ public class Bungee extends Plugin {
     @Override
     public void onEnable() {
         instance = this;
-        ChatUtil.sendConsoleBungee("<GRADIENT:2C08BA>Cool string with a gradient</GRADIENT:028A97>");
         this.bungeeConfig = new BungeeConfig("bungee-config.yml");
         switch (bungeeConfig.getConfig().getString("bungee.type").toLowerCase()) {
             case "socket":
@@ -45,15 +43,17 @@ public class Bungee extends Plugin {
                         bungeeConfig.getConfig().getInt("bungee.rabbitmq.port"),
                         bungeeConfig.getConfig().getString("bungee.rabbitmq.username"),
                         bungeeConfig.getConfig().getString("bungee.rabbitmq.password"),
-                        bungeeConfig.getConfig().getString("bungee.rabbitmq.vhost");
+                        bungeeConfig.getConfig().getString("bungee.rabbitmq.vhost"));
                 break;
             case "redis":
                 messenger = new RedisServerMessenger(bungeeConfig.getConfig().getString("bungee.redis.host"),
-                        bungeeConfig.getConfig().getInt("bungee.redis.port")
+                        bungeeConfig.getConfig().getInt("bungee.redis.port"));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + bungeeConfig.getConfig().getString("bungee.type").toLowerCase());
         }
+
+        messenger.setup();
 
     }
 

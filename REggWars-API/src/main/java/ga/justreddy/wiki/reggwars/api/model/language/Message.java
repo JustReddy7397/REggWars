@@ -137,7 +137,11 @@ public enum Message {
     MESSAGES_ARENA_NOT_NUMBER("messages.arena.not-number",
             "&cThat is not a number!"),
     MESSAGES_ARENA_INVALID_TEAM("messages.arena.invalid-team",
-            "&cInvalid team: <team>!");
+            "&cInvalid team: <team>!"),
+    MESSAGES_ARENA_SHOP_ADDED("messages.arena.shop-added",
+            "&aSuccessfully added a <type> shop!"),
+    MESSAGES_ARENA_SHOP_INVALID_TYPE("messages.arena.invalid-shop-type",
+            "&cInvalid shop type!"),;
 
 
     private final String path;

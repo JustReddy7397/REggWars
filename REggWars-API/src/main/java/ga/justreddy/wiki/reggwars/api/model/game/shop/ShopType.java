@@ -20,7 +20,7 @@ public enum ShopType {
 
     public static ShopType getById(String id) {
         for (ShopType type : values()) {
-            if (type.getId().equals(id)) {
+            if (type.getId().equalsIgnoreCase(id)) {
                 return type;
             }
         }

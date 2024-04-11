@@ -97,8 +97,9 @@ public class JoinCommand extends Command {
 
         // TODO
 
+        boolean isLocalOrJoinServer = game.getServer().equals(REggWars.getInstance().getServerName());
         plugin.getMessenger().getSender()
-                .sendJoinPacket(game, player.getName(), true, false);
+                .sendJoinPacket(game, player.getUniqueId(), player.getName(), isLocalOrJoinServer, isLocalOrJoinServer);
     }
 
 }

@@ -64,6 +64,16 @@ public class WorldManager {
     }
 
     @SneakyThrows
+    public void copyWorld(String name) {
+        File worldFolder = new File(Bukkit.getWorldContainer().getParent(), name);
+        File mapFolder = new File(REggWars.getInstance().getDataFolder(), "/data/worlds/" + name);
+        if (mapFolder.exists()) {
+            FileUtils.delete(mapFolder);
+        }
+        FileUtils.copy(worldFolder, mapFolder);
+    }
+
+    @SneakyThrows
     public void copySlimeWorld(String name) {
         File worldFolder = new File("slime_worlds/", name + ".slime");
         File mapFolder = new File(REggWars.getInstance().getDataFolder(), "/data/slime/" + name + ".slime");

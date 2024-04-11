@@ -71,7 +71,7 @@ public final class REggWars extends JavaPlugin {
     private boolean bungee;
     private String serverName;
 
-    private IMessenger<?> messenger;
+    private IMessenger<REggWars> messenger;
 
     private static final Logger LOGGER = Logger.getLogger("REggWars");
 

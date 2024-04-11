@@ -1,4 +1,4 @@
-package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.socket;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.socket;
 
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
@@ -8,6 +8,7 @@ import ga.justreddy.wiki.reggwars.packets.socket.TargetPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.GamesPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.GamesSendPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.StringPacket;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.IMessengerSender;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -22,12 +23,12 @@ import java.util.logging.Level;
 /**
  * @author JustReddy
  */
-public class VelocitySocketServerSender {
+public class SocketServerSenderMessenger implements IMessengerSender {
 
-    private final VelocitySocketServer socketServer;
+    private final SocketServerMessenger socketServer;
     private final LinkedBlockingQueue<TargetPacket> sendQueue = new LinkedBlockingQueue<>();
 
-    public VelocitySocketServerSender(VelocitySocketServer socketServer) {
+    public SocketServerSenderMessenger(SocketServerMessenger socketServer) {
         this.socketServer = socketServer;
     }
 
@@ -59,38 +60,54 @@ public class VelocitySocketServerSender {
         }
     }
 
-    public void sendPacketToServer(Packet packet, String server) {
+    @Override
+    public void sendPacket(Packet packet) {
+        sendQueue.add(new TargetPacket(packet, new HashSet<>(socketServer.getSpigotSocket().keySet())));
+    }
+
+    @Override
+    public void sendPacket(Packet packet, String server) {
         sendQueue.add(new TargetPacket(packet, Collections.singleton(server)));
     }
 
+    @Override
+    public void sendPacketToServer(Packet packet, String server) {
+        sendPacket(packet, server);
+    }
+
+    @Override
     public void sendPacketToAllExcept(Packet packet, String exceptServer) {
         Set<String> servers = getServersExcept(exceptServer);
         sendQueue.add(new TargetPacket(packet, servers));
     }
 
+    @Override
     public void sendPacketToAll(Packet packet) {
         sendQueue.add(new TargetPacket(packet, new HashSet<>(socketServer.getSpigotSocket().keySet())));
     }
 
+    @Override
     public void sendAllGames(String server, List<BungeeGame> games) {
         GamesPacket gamesPacket = new GamesPacket(PacketType.GAMES_ADD, games);
         sendPacketToServer(gamesPacket, server);
     }
 
+    @Override
     public void sendRemoveServerGames(String server) {
         StringPacket stringPacket = new StringPacket(PacketType.SERVER_GAMES_REMOVE, server);
         sendPacketToAllExcept(stringPacket, server);
     }
 
-    private Set<String> getServersExcept(String server) {
+    @Override
+    public Set<String> getServersExcept(String server) {
         Set<String> servers = new HashSet<>(socketServer.getSpigotSocket().keySet());
         servers.remove(server);
         return servers;
     }
 
+    @Override
     public void sendGamesPacket(String server, List<BungeeGame> bungeeGames) {
         GamesSendPacket packet = new GamesSendPacket(server, bungeeGames);
         sendPacketToServer(packet, server);
     }
-
 }

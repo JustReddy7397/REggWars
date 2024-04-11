@@ -9,16 +9,23 @@ import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.grinderwolf.swm.plugin.loaders.LoaderUtils;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.manager.WorldManager;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
-import ga.justreddy.wiki.reggwars.model.game.map.SlimeWorldHasher;
+import ga.justreddy.wiki.reggwars.utils.world.BukkitWorldHasher;
+import ga.justreddy.wiki.reggwars.utils.world.SlimeWorldHasher;
 import ga.justreddy.wiki.reggwars.utils.md5.MD5;
 import lombok.SneakyThrows;
 import org.bukkit.Color;
+import org.bukkit.World;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author JustReddy
@@ -26,7 +33,35 @@ import java.nio.file.Paths;
 public class Util {
 
     @SneakyThrows
-    public static SlimeWorldHasher hashWorld(File file) {
+    public static BukkitWorldHasher hashWorldBukkit(File file) {
+        if (!file.isDirectory()) return null;
+        String name = file.getName();
+        if (getFileSizeMegaBytes(file) > 20) {
+            throw new RuntimeException("World is too big!");
+        }
+        return new BukkitWorldHasher(name, file, "bukkit");
+    }
+
+    private static double getFileSizeMegaBytes(File file) {
+        return (double) file.length() / (1024 * 1024);
+    }
+
+
+    @SneakyThrows
+    public static File downloadWorldBukkit(BukkitWorldHasher hasher) {
+        File destination = new File(hasher.getName());
+        if (!destination.exists()) destination.mkdir();
+        FileUtils.copy(hasher.getFile(), destination);
+        return destination;
+    }
+
+    @SneakyThrows
+    public static World createTheWorld(File file) {
+        return WorldManager.getManager().createNewWorld(file.getName());
+    }
+
+    @SneakyThrows
+    public static SlimeWorldHasher hashWorldSlime(File file) {
         System.out.println(file);
         if (!file.exists()) return null;
         byte[] data = Files.readAllBytes(file.toPath());
@@ -36,7 +71,7 @@ public class Util {
     }
 
     @SneakyThrows
-    public static File downloadWorld(SlimeWorldHasher hasher) {
+    public static File downloadWorldSlime(SlimeWorldHasher hasher) {
         File destination = new File("slime_worlds");
         if (!destination.exists()) destination.mkdir();
         File file = new File("slime_worlds/" + hasher.getName() + ".slime");
@@ -62,7 +97,7 @@ public class Util {
     }
 
 
-    public static SlimeWorld loadWorld(File file) throws IOException, CorruptedWorldException, NewerFormatException {
+    public static SlimeWorld loadWorldSlime(File file) throws IOException, CorruptedWorldException, NewerFormatException {
         byte[] data = Files.readAllBytes(file.toPath());
         SlimePropertyMap spm = new SlimePropertyMap();
         spm.setString(SlimeProperties.WORLD_TYPE, "flat");

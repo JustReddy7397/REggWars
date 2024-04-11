@@ -1,9 +1,12 @@
-package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.socket;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.socket;
 
-import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.Bungee;
 import ga.justreddy.wiki.reggwars.packets.socket.SocketConnection;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config.VelocityConfigManager;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.IMessenger;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.IMessengerReceiver;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.IMessengerSender;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.Velocity;
 import lombok.Getter;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,36 +20,39 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
-
 /**
  * @author JustReddy
  */
 @Getter
-public class SocketServer {
+public class SocketServerMessenger implements IMessenger<Velocity> {
 
-    private final Bungee bungee;
+    private final Velocity bungee;
     private final Logger logger;
     private final boolean debug;
     private final Map<String, SocketConnection> spigotSocket = new HashMap<>();
-    private final SocketServerSender sender;
-    private final SocketServerReceiver receiver;
+    private final IMessengerSender sender;
+    private final IMessengerReceiver receiver;
     private ServerSocket serverSocket;
 
-    public SocketServer() {
-        bungee = Bungee.getInstance();
-        logger = ProxyServer.getInstance().getLogger();
-        debug = bungee.getBungeeConfig().getConfig().getBoolean("debug");
-        sender = new SocketServerSender(this);
-        receiver = new SocketServerReceiver(this);
+    private final int port;
+
+    public SocketServerMessenger(int port) {
+        this.port = port;
+        bungee = Velocity.getInstance();
+        logger = bungee.getLogger();
+        debug = VelocityConfigManager.getConfig().getBoolean("debug");
+        this.sender = new SocketServerSenderMessenger(this);
+        this.receiver = new SocketServerReceiverMessenger(this);
     }
 
-    public void serverSetup(int port) {
-        ProxyServer.getInstance().getScheduler().runAsync(bungee, () -> {
+    @Override
+    public void setup() {
+        bungee.getServer().getScheduler().buildTask(bungee, () -> {
             try {
                 serverSocket = new ServerSocket(port);
 
-                ProxyServer.getInstance().getScheduler().runAsync(bungee, () -> sender.send(serverSocket));
+                bungee.getServer().getScheduler()
+                        .buildTask(bungee, () -> acceptConnection(serverSocket));
 
                 log(Level.INFO, "[X] Successfully started the socket server!");
 
@@ -59,6 +65,49 @@ public class SocketServer {
         });
     }
 
+    @Override
+    public void connect() {
+
+    }
+
+    @Override
+    public void close() {
+        try {
+            serverSocket.close();
+            for (SocketConnection socketConnection : spigotSocket.values()) {
+                socketConnection.getSocket().close();
+            }
+        } catch (IOException e) {
+            if (debug) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void receive() {
+
+    }
+
+    @Override
+    public Velocity getPlugin() {
+        return Velocity.getInstance();
+    }
+
+    @Override
+    public IMessengerSender getSender() {
+        return sender;
+    }
+
+    @Override
+    public IMessengerReceiver getReceiver() {
+        return receiver;
+    }
+
+    public void log(Level level, String message, String... args) {
+        logger.log(level, MessageFormat.format("[{0}] {1}", "REggWars", message), args);
+    }
+
     private void acceptConnection(ServerSocket serverSocket) {
         try {
             Socket socket = serverSocket.accept();
@@ -66,7 +115,8 @@ public class SocketServer {
                 log(Level.INFO, "[X] Accepted connection from client {0}", socket.getInetAddress().toString());
             }
 
-            ProxyServer.getInstance().getScheduler().runAsync(bungee, () -> acceptConnection(serverSocket));
+            bungee.getServer().getScheduler()
+                    .buildTask(bungee, () -> acceptConnection(serverSocket));
 
             clientSetup(socket);
         } catch (IOException e) {
@@ -94,7 +144,7 @@ public class SocketServer {
 
     private void serverReceive(String server, ObjectInputStream in) {
         try {
-            receiver.serverMessageReader(serverSocket, server, in);
+            ((SocketServerReceiverMessenger)receiver).serverMessageReader(serverSocket, server, in);
         } catch (IOException e) {
             log(Level.WARNING, "[!] Disconnected from the {0} server!", server);
 
@@ -112,23 +162,5 @@ public class SocketServer {
             }
         }
     }
-
-    public void closeConnections() {
-        try {
-            serverSocket.close();
-            for (SocketConnection socketConnection : spigotSocket.values()) {
-                socketConnection.getSocket().close();
-            }
-        } catch (IOException e) {
-            if (debug) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void log(Level level, String message, String... args) {
-        logger.log(level, MessageFormat.format("[{0}] {1}", bungee.getDescription().getName(), message), args);
-    }
-
 
 }

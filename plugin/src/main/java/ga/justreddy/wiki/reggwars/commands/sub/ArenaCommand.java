@@ -18,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * @author JustReddy
@@ -62,6 +63,8 @@ public class ArenaCommand extends Command {
             case "setmin":
                 minPlayersCommand(gamePlayer, args);
                 break;
+            case "setshop":
+                setShopCommand(gamePlayer, args);
             case "save":
                 saveGameCommand(gamePlayer);
                 break;
@@ -69,8 +72,35 @@ public class ArenaCommand extends Command {
 
     }
 
-    private void saveGameCommand(IGamePlayer gamePlayer) {
-        GameCreator.getCreator().save(gamePlayer);
+    private void setShopCommand(IGamePlayer gamePlayer, String[] args) {
+
+        if (args.length < 3) {
+            gamePlayer.sendMessage(
+                    Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/ew arena setshop <normal/upgrade>")
+            );
+            return;
+        }
+
+        String shopType = args[2];
+
+        GameCreator.getCreator().setShop(gamePlayer, shopType);
+
+    }
+
+    private void saveGameCommand(IGamePlayer gamePlayer, String[] args) {
+
+        if (args.length < 3) {
+            gamePlayer.sendMessage(
+                    Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/ew arena save <enable>")
+            );
+            return;
+        }
+
+        boolean bool = Boolean.parseBoolean(args[2]);
+
+        GameCreator.getCreator().save(gamePlayer, bool);
     }
 
     private void minPlayersCommand(IGamePlayer gamePlayer, String[] args) {

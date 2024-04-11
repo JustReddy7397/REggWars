@@ -1,20 +1,21 @@
-package ga.justreddy.wiki.reggwars.model.game.map;
+package ga.justreddy.wiki.reggwars.utils.world;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.io.File;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * @author JustReddy
  */
 @RequiredArgsConstructor
 @Data
-public class SlimeWorldHasher implements Serializable {
+public class BukkitWorldHasher implements Serializable {
 
-    private final String hashCode;
     private final String name;
-    private final byte[] data;
+    private final File file;
     private final String type;
 
 

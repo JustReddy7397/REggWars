@@ -1,16 +1,18 @@
-package ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.redis;
+package ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.redis;
 
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.velocitypowered.api.proxy.server.ServerInfo;
 import ga.justreddy.wiki.reggwars.packets.socket.Packet;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.BackToServerPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.JoinPacket;
 import ga.justreddy.wiki.reggwars.packets.socket.classes.MessagePacket;
-import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.Bungee;
-import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.IMessenger;
-import ga.justreddy.wiki.reggwars.support.bungeemode.bungee.messenger.IMessengerReceiver;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.messenger.IMessengerReceiver;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.Velocity;
+import ga.justreddy.wiki.reggwars.support.bungeemode.velocity.config.VelocityConfigManager;
 import ga.justreddy.wiki.reggwars.utils.iridium.IridiumColorAPI;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.config.ServerInfo;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.kyori.adventure.text.Component;
 import redis.clients.jedis.BinaryJedisPubSub;
 
 import java.io.ByteArrayInputStream;
@@ -63,12 +65,12 @@ public class RedisServerMessengerReceiver implements IMessengerReceiver {
             case MESSAGE: {
                 if (!(packet instanceof MessagePacket)) return;
                 MessagePacket messagePacket = (MessagePacket) packet;
-                ProxiedPlayer proxiedPlayer = Bungee.getInstance().getProxy().getPlayer(messagePacket.getUuid());
+                Player proxiedPlayer = Velocity.getInstance().getServer().getPlayer(messagePacket.getUuid()).orElse(null);
                 if (proxiedPlayer == null) {
                     return;
                 }
                 for (String message : messagePacket.getMessages()) {
-                    proxiedPlayer.sendMessage(new TextComponent(IridiumColorAPI.process(message)));
+                    proxiedPlayer.sendMessage(Component.text(IridiumColorAPI.process(message)));
                 }
 
                 break;
@@ -93,32 +95,36 @@ public class RedisServerMessengerReceiver implements IMessengerReceiver {
     }
 
     private boolean joinArena(JoinPacket joinPacket) {
-        ProxiedPlayer proxiedPlayer = Bungee.getInstance().getProxy().getPlayer(joinPacket.getPlayer());
+        Player proxiedPlayer = Velocity.getInstance().getServer().getPlayer(joinPacket.getPlayer()).orElse(null);
         if (proxiedPlayer == null) {
             return false;
         }
+
+
         if (joinPacket.isFirstJoin()) {
-            Bungee.getInstance().getPlayerServers().put(joinPacket.getPlayer(), proxiedPlayer.getServer().getInfo().getName());
+            Velocity.getInstance().getPlayerServers().put(joinPacket.getPlayer(), proxiedPlayer.getCurrentServer().get().getServerInfo().getName());
         }
         if (!joinPacket.isLocalJoin()) {
-            if (proxiedPlayer.getServer().getInfo()
+            if (proxiedPlayer.getCurrentServer().get().getServerInfo()
                     .getName().equals(joinPacket.getGame().getServer())) {
                 return true;
             }
-            ServerInfo info = Bungee.getInstance().getProxy().getServerInfo(joinPacket.getGame().getServer());
+            ServerInfo info = Velocity.getInstance().getServer().getServer(joinPacket.getGame().getServer()).get().getServerInfo();
             if (info == null) {
-                if (!Bungee.getInstance().isEmptyString("messages.no-game-found")) {
-                    proxiedPlayer.sendMessage(new TextComponent(IridiumColorAPI.process(Bungee.getInstance().getBungeeConfig()
-                            .getConfig().getString("messages.no-game-found").replaceAll("<type>", joinPacket.getGame().getGameMode().getName()))));
+                if (!Velocity.getInstance().isEmptyString("messages.no-game-found")) {
+                    proxiedPlayer.sendMessage(Component.text(IridiumColorAPI.process(VelocityConfigManager.getConfig().getString("messages.no-game-found").replaceAll("<type>", joinPacket.getGame().getGameMode().getName()))));
                 }
                 return false;
             }
-            if (proxiedPlayer.getServer().getInfo().getName().equals(info.getName())) return true;
-            if (!Bungee.getInstance().isEmptyString("messages.connecting")) {
-                proxiedPlayer.sendMessage(new TextComponent(IridiumColorAPI.process(Bungee.getInstance().getBungeeConfig()
-                        .getConfig().getString("messages.connecting").replaceAll("<type>", joinPacket.getGame().getGameMode().getName()))));
+            if (proxiedPlayer.getCurrentServer().get().getServerInfo().getName().equalsIgnoreCase(info.getName())) return true;
+            if (!Velocity.getInstance().isEmptyString("messages.connecting")) {
+                proxiedPlayer.sendMessage(Component.text(IridiumColorAPI.process(VelocityConfigManager.getConfig()
+                        .getString("messages.connecting").replaceAll("<type>", joinPacket.getGame().getGameMode().getName()))));
             }
-            proxiedPlayer.connect(info);
+            RegisteredServer server = Velocity.getInstance().getServer().getServer(info.getName()).orElse(null);
+            if (server != null) {
+                proxiedPlayer.createConnectionRequest(server).fireAndForget();
+            }
             return true;
         }
 
@@ -126,7 +132,7 @@ public class RedisServerMessengerReceiver implements IMessengerReceiver {
     }
 
     private void sendBackToServer(BackToServerPacket backToServerPacket) {
-        ProxiedPlayer proxiedPlayer = Bungee.getInstance().getProxy().getPlayer(backToServerPacket.getPlayer());
+        Player proxiedPlayer = Velocity.getInstance().getServer().getPlayer(backToServerPacket.getPlayer()).orElse(null);
         if (proxiedPlayer == null) {
             return;
         }
@@ -135,36 +141,43 @@ public class RedisServerMessengerReceiver implements IMessengerReceiver {
         String secondChoiceServer;
 
         if (backToServerPacket.getServerPriority().equals(BackToServerPacket.ServerPriority.PREVIOUS)) {
-            firstChoiceServer = Bungee.getInstance().getPlayerServers().get(proxiedPlayer.getName());
+            firstChoiceServer = Velocity.getInstance().getPlayerServers().get(proxiedPlayer.getUsername());
             secondChoiceServer = backToServerPacket.getLobby();
         } else {
             firstChoiceServer = backToServerPacket.getLobby();
-            secondChoiceServer = Bungee.getInstance().getPlayerServers().get(proxiedPlayer.getName());
+            secondChoiceServer = Velocity.getInstance().getPlayerServers().get(proxiedPlayer.getUsername());
         }
 
         if (!connectToServer(proxiedPlayer, firstChoiceServer)) {
             connectToServer(proxiedPlayer, secondChoiceServer);
         }
 
-        Bungee.getInstance().getPlayerServers().remove(backToServerPacket.getPlayer());
+        Velocity.getInstance().getPlayerServers().remove(backToServerPacket.getPlayer());
     }
 
-    private boolean connectToServer(ProxiedPlayer player, String serverString) {
+    private boolean connectToServer(Player player, String serverString) {
         if (serverString == null) {
             return false;
         }
 
-        ServerInfo targetServer = Bungee.getInstance().getProxy().getServerInfo(serverString);
+        RegisteredServer targetServer = Velocity.getInstance().getServer().getServer(serverString).orElse(null);
 
         if (targetServer == null) {
             return false;
         }
 
-        if (player.getServer().getInfo().equals(targetServer)) {
+        ServerConnection currentServer = player.getCurrentServer().orElse(null);
+
+        if (currentServer == null) {
+            return false;
+        }
+
+        if (currentServer.getServerInfo().getName().equalsIgnoreCase(targetServer.getServerInfo().getName())) {
             return true;
         }
 
-        player.connect(targetServer);
+        player.createConnectionRequest(targetServer)
+                .fireAndForget();
 
         return true;
     }
