@@ -76,6 +76,7 @@ public class BaseCommand implements CommandExecutor {
             command = commands.
                     values().
                     stream().
+                    filter(cmd -> cmd.getAliases() != null).
                     filter(cmd -> cmd.getAliases().contains(name)).
                     findFirst().
                     orElse(null);

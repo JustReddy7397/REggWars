@@ -106,6 +106,7 @@ public class LanguageManager {
         languages.clear();
     }
 
+    @SneakyThrows
     private void register(File file, String id, FileConfiguration configuration) {
         for (Message message : Message.values()) {
             if (!configuration.isSet(message.getPath())) {
@@ -117,6 +118,7 @@ public class LanguageManager {
                 }
             }
         }
+        configuration.save(file);
         languages.put(id, new Language(file, configuration, id));
     }
 

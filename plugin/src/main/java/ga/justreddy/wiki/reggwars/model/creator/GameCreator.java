@@ -372,7 +372,10 @@ public class GameCreator implements Listener {
         if (shopType.equalsIgnoreCase("normal") || shopType.equalsIgnoreCase("upgrade")) {
             FileConfiguration game = YamlConfiguration.loadConfiguration(file);
 
-            int keys = game.getConfigurationSection("shops").getKeys(false).size();
+            int keys = 0;
+            if (game.isSet("shops")) {
+                keys = game.getConfigurationSection("shops").getKeys(false).size();
+            }
             game.set("shops." + keys + ".type", shopType);
             game.set("shops." + keys + ".location", LocationUtils.toLocation(player.getLocation()));
             game.save(file);

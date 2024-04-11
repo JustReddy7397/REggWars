@@ -65,8 +65,9 @@ public class ArenaCommand extends Command {
                 break;
             case "setshop":
                 setShopCommand(gamePlayer, args);
+                break;
             case "save":
-                saveGameCommand(gamePlayer);
+                saveGameCommand(gamePlayer, args);
                 break;
         }
 
@@ -74,7 +75,10 @@ public class ArenaCommand extends Command {
 
     private void setShopCommand(IGamePlayer gamePlayer, String[] args) {
 
+        System.out.println("Konnichiwa~!");
+
         if (args.length < 3) {
+
             gamePlayer.sendMessage(
                     Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
                     new Replaceable("<usage>", "/ew arena setshop <normal/upgrade>")

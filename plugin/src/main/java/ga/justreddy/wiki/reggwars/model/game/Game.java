@@ -36,6 +36,7 @@ import ga.justreddy.wiki.reggwars.model.game.timer.Timer;
 import ga.justreddy.wiki.reggwars.utils.BungeeUtils;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
+import ga.justreddy.wiki.reggwars.utils.Util;
 import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
@@ -287,20 +288,7 @@ public class Game implements IGame {
         this.startTimer = new GameStartTimer(10, REggWars.getInstance());
         endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
         setGameState(GameState.WAITING); // TODO make it so if disabled, it wont enable again
-        if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getMessenger()
-                    .getSender()
-                    .sendUpdateGamePacket(
-                            new BungeeGame(
-                                    getName(),
-                                    getServer(),
-                                    getMaxPlayers(),
-                                    getGameState(),
-                                    getGameMode(),
-                                    getPlayerNames()
-                            )
-                    );
-        }
+        Util.updateGame(this);
     }
 
     @Override
@@ -310,18 +298,7 @@ public class Game implements IGame {
             case STARTING:
                 if (getPlayerCount() < minPlayers) {
                     setGameState(GameState.WAITING);
-                    REggWars.getInstance().getMessenger()
-                            .getSender()
-                            .sendUpdateGamePacket(
-                                    new BungeeGame(
-                                            getName(),
-                                            getServer(),
-                                            getMaxPlayers(),
-                                            getGameState(),
-                                            getGameMode(),
-                                            getPlayerNames()
-                                    )
-                            );
+                    Util.updateGame(this);
                     gameTimer.stop();
                     startTimer.stop();
                     return;
@@ -357,18 +334,7 @@ public class Game implements IGame {
     @Override
     public void onGameStart() {
         setGameState(GameState.PLAYING);
-        REggWars.getInstance().getMessenger()
-                .getSender()
-                .sendUpdateGamePacket(
-                        new BungeeGame(
-                                getName(),
-                                getServer(),
-                                getMaxPlayers(),
-                                getGameState(),
-                                getGameMode(),
-                                getPlayerNames()
-                        )
-                );
+        Util.updateGame(this);
         if (!gameTimer.isStarted()) gameTimer.start();
         teamAssigner.assignTeam(this);
         Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> {
@@ -408,18 +374,7 @@ public class Game implements IGame {
         for (IGamePlayer player : actualPlayers) {
             player.getQuests().update(player, QuestType.PLAY_GAMES);
         }
-        REggWars.getInstance().getMessenger()
-                .getSender()
-                .sendUpdateGamePacket(
-                        new BungeeGame(
-                                getName(),
-                                getServer(),
-                                getMaxPlayers(),
-                                getGameState(),
-                                getGameMode(),
-                                getPlayerNames()
-                        )
-                );
+        Util.updateGame(this);
         sendLegacyMessage("Thanks for playing bitches");
     }
 
@@ -441,20 +396,7 @@ public class Game implements IGame {
                 }
             });
         }
-        if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getMessenger()
-                    .getSender()
-                    .sendUpdateGamePacket(
-                            new BungeeGame(
-                                    getName(),
-                                    getServer(),
-                                    getMaxPlayers(),
-                                    getGameState(),
-                                    getGameMode(),
-                                    getPlayerNames()
-                            )
-                    );
-        }
+        Util.updateGame(this);
         System.out.println("RESTARTING WORLD");
         adapter.onRestart(this);
 
@@ -506,20 +448,7 @@ public class Game implements IGame {
         }
 
 
-        if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getMessenger()
-                    .getSender()
-                    .sendUpdateGamePacket(
-                            new BungeeGame(
-                                    getName(),
-                                    getServer(),
-                                    getMaxPlayers(),
-                                    getGameState(),
-                                    getGameMode(),
-                                    getPlayerNames()
-                            )
-                    );
-        }
+        Util.updateGame(this);
 
     }
 
@@ -550,20 +479,7 @@ public class Game implements IGame {
 
         EggWarsGameLeaveEvent event = new EggWarsGameLeaveEvent(this, gamePlayer);
         event.call();
-        if (REggWars.getInstance().isBungee()) {
-            REggWars.getInstance().getMessenger()
-                    .getSender()
-                    .sendUpdateGamePacket(
-                            new BungeeGame(
-                                    getName(),
-                                    getServer(),
-                                    getMaxPlayers(),
-                                    getGameState(),
-                                    getGameMode(),
-                                    getPlayerNames()
-                            )
-                    );
-        }
+        Util.updateGame(this);
         if (gamePlayer.isDead()) return;
 
         if (silent) return;

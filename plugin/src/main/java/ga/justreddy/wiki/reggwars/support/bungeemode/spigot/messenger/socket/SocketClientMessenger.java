@@ -44,7 +44,8 @@ public class SocketClientMessenger implements IMessenger<REggWars> {
         plugin = REggWars.getInstance();
         logger = Bukkit.getLogger();
         debug = plugin.getConfig().getBoolean("debug");
-
+        sender = null;
+        receiver = null;
 /*
         sender = new SocketClientSender(this);
         receiver = new SocketClientReceiver(this);
@@ -138,9 +139,7 @@ public class SocketClientMessenger implements IMessenger<REggWars> {
 
     private void clientReceive(ObjectInputStream in) {
         try {
-/*
-            receiver.clientMessageReader(socket, in);
-*/
+            ((SocketClientMessengerReceiver) receiver).clientMessageReader(socket, in);
         } catch (IOException e) {
             if (!socket.isClosed()) {
                 close();

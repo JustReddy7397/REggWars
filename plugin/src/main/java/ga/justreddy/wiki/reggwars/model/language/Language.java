@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author JustReddy
@@ -36,7 +37,30 @@ public class Language implements ILanguage {
     public void sendMessage(IGamePlayer gamePlayer, Message message, Replaceable... replaceables) {
         Player player = gamePlayer.getPlayer();
         if (player == null) return;
+
+        Object objPath = config.get(message.getPath());
+
+        if (objPath instanceof List) {
+
+            List<String> path = getStringList(message);
+            for (String str : path) {
+                for (Replaceable ra : replaceables) {
+                    if (ra.getKey().isEmpty() && ra.getValue().isEmpty()) continue;
+                    str = str.replaceAll(ra.getKey(), ra.getValue());
+                }
+                if (str.startsWith("json:")) {
+                    REggWars.getInstance().getNms().sendJsonMessage(player,
+                            str.replaceAll("json:", "")
+                    );
+                    continue;
+                }
+                player.sendMessage(ChatUtil.format(str));
+            }
+            return;
+        }
+
         String path = getString(message);
+
         for (Replaceable ra : replaceables) {
             if (ra.getKey().isEmpty() && ra.getValue().isEmpty()) continue;
             path = path.replaceAll(ra.getKey(), ra.getValue());
@@ -58,6 +82,25 @@ public class Language implements ILanguage {
 
     @Override
     public void sendMessage(CommandSender sender, Message message, Replaceable... replaceables) {
+
+        Object objPath = config.get(message.getPath());
+
+        if (objPath instanceof List) {
+
+            List<String> path = getStringList(message);
+            for (String str : path) {
+                for (Replaceable ra : replaceables) {
+                    if (ra.getKey().isEmpty() && ra.getValue().isEmpty()) continue;
+                    str = str.replaceAll(ra.getKey(), ra.getValue());
+                }
+                if (str.startsWith("json:")) {
+                    continue;
+                }
+                sender.sendMessage(ChatUtil.format(str));
+            }
+            return;
+        }
+
         String path = getString(message);
         for (Replaceable ra : replaceables) {
             if (ra.getKey().isEmpty() && ra.getValue().isEmpty()) continue;

@@ -6,24 +6,6 @@ package ga.justreddy.wiki.reggwars.api.model.language;
 
 public enum Message {
 
-
-    // Enums
-    ENUMS_COSMETICS_UNLOCKED("enums.cosmetics.unlocked",
-            "&aUnlocked"
-            ),
-    ENUMS_COSMETICS_LOCKED("enums.cosmetics.locked",
-            "&cLocked"
-            ),
-    ENUMS_COSMETICS_SELECTED("enums.cosmetics.selected",
-            "&aSelected"
-            ),
-    ENUMS_COSMETICS_NOT_SELECTED("enums.cosmetics.not-selected",
-            "&aClick to select"
-            ),
-    ENUMS_COSMETICS_CANT_SELECT("enums.cosmetics.cant-select",
-            "&cCost: &6<cost>"
-            ),
-
     // Scoreboard
     SCOREBOARD_DATE_FORMAT("scoreboard.date-format",
             "dd/MM/yyyy"),
@@ -62,6 +44,23 @@ public enum Message {
     TITLES_DIED_SUBTITLE("titles.died.subtitle",
             "&eBetter luck next time!"),
 
+    // Enums
+    ENUMS_COSMETICS_UNLOCKED("enums.cosmetics.unlocked",
+            "&aUnlocked"
+    ),
+    ENUMS_COSMETICS_LOCKED("enums.cosmetics.locked",
+            "&cLocked"
+    ),
+    ENUMS_COSMETICS_SELECTED("enums.cosmetics.selected",
+            "&aSelected"
+    ),
+    ENUMS_COSMETICS_NOT_SELECTED("enums.cosmetics.not-selected",
+            "&aClick to select"
+    ),
+    ENUMS_COSMETICS_CANT_SELECT("enums.cosmetics.cant-select",
+            "&cCost: &6<cost>"
+    ),
+
     // Messages
     MESSAGES_GAME_RESPAWN("messages.game.respawn",
             "&eYou will respawn in &c<time> &eseconds"),
@@ -90,7 +89,7 @@ public enum Message {
             "&d/ew arena waitinglobby",
             "&d/ew arena spectator",
             "&d/ew arena minplayers <amount>",
-            "&d/ew arena save"
+            "&d/ew arena save <enable>"
             ),
     MESSAGES_ERROR_ALREADY_IN_GAME("messages.error.already-in-game",
             "&cYou are already in a game!"),

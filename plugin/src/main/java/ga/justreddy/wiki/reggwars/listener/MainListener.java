@@ -48,6 +48,10 @@ public class MainListener implements Listener {
                 break;
         }
 
+
+    }
+
+    private void handleLobbyEvent(Player player, IGamePlayer gamePlayer) {
         if (Core.MODE != ServerMode.BUNGEE) {
             if (REggWars.getInstance().getSpawnLocation() != null) {
                 player.teleport(REggWars.getInstance().getSpawnLocation());

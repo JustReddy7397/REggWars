@@ -55,8 +55,8 @@ public class SocketClientSender {
         sendQueue.add(packet);
     }
 
-    public void sendJoinPacket(BungeeGame game, String player, boolean joinServer, boolean localJoin) {
-        JoinPacket joinPacket = new JoinPacket(game, player, joinServer, localJoin);
+    public void sendJoinPacket(BungeeGame game, UUID uuid, String player, boolean joinServer, boolean localJoin) {
+        JoinPacket joinPacket = new JoinPacket(game, uuid, player, joinServer, localJoin);
         sendPacket(joinPacket);
     }
 

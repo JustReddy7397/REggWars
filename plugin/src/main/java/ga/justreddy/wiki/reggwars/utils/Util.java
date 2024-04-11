@@ -7,7 +7,9 @@ import com.grinderwolf.swm.api.world.SlimeWorld;
 import com.grinderwolf.swm.api.world.properties.SlimeProperties;
 import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.grinderwolf.swm.plugin.loaders.LoaderUtils;
+import ga.justreddy.wiki.reggwars.Core;
 import ga.justreddy.wiki.reggwars.REggWars;
+import ga.justreddy.wiki.reggwars.ServerMode;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.manager.WorldManager;
 import ga.justreddy.wiki.reggwars.model.game.BungeeGame;
@@ -112,6 +114,7 @@ public class Util {
     }
 
     public static void updateGame(IGame game) {
+        if (Core.MODE == ServerMode.MULTI_ARENA) return;
         BungeeGame bungeeGame = new BungeeGame(
                 game.getName(),
                 REggWars.getInstance().getServerName(),
