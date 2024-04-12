@@ -1,9 +1,9 @@
-package ga.justreddy.wiki.reggwars.model.leaderboard.impl;
+package ga.justreddy.wiki.reggwars.model.leaderboard;
 
 import eu.decentsoftware.holograms.api.holograms.Hologram;
+import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
+import ga.justreddy.wiki.reggwars.api.model.leaderboard.PerPlayerLeaderboard;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
-import ga.justreddy.wiki.reggwars.model.leaderboard.LeaderboardType;
-import ga.justreddy.wiki.reggwars.model.leaderboard.PerPlayerLeaderboard;
 import org.bukkit.Location;
 
 import java.util.Map;
@@ -13,8 +13,27 @@ import java.util.Map;
  */
 public class KillsLeaderBoard extends PerPlayerLeaderboard {
 
+    public KillsLeaderBoard(String id, Location location) {
+        super(id, location);
+    }
 
-    public KillsLeaderBoard(String id, Location location, LeaderboardType type) {
+    @Override
+    public void update() {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public void destroy() {
+
+    }
+
+    @Override
+    public void update(IGamePlayer player) {
+
+    }
+
+
+    /*public KillsLeaderBoard(String id, Location location, LeaderboardType type) {
         super(id, location, type);
     }
 
@@ -34,6 +53,6 @@ public class KillsLeaderBoard extends PerPlayerLeaderboard {
     @Override
     public void destroy() {
 
-    }
+    }*/
 
 }

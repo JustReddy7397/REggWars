@@ -40,6 +40,9 @@ public class AdminCommand extends Command {
             case "setspawn":
                 runSetSpawnCommand(gamePlayer);
                 break;
+            case "leaderboard":
+                // TODO
+                break;
         }
 
     }

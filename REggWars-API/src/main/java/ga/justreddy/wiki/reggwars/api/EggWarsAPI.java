@@ -5,6 +5,7 @@ import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.VictoryDance;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.leaderboard.Leaderboard;
 
 import java.io.FileReader;
 import java.util.UUID;
@@ -51,6 +52,14 @@ public interface EggWarsAPI {
      * @param id the id of the kill message
      */
     void removeKillMessage(int id);
+
+    void registerLeaderboard(Leaderboard leaderboard);
+
+    void removeLeaderboard(IGamePlayer player, String id);
+
+    void clearLeaderboards(IGamePlayer player);
+
+    void addLeaderboard(IGamePlayer player, String id);
 
     default String getVersion() {
         return "1.0.0";

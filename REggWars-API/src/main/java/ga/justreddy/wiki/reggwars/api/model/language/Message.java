@@ -23,13 +23,13 @@ public enum Message {
             ),
     SCOREBOARD_PLAYING_LINES("scoreboard.game-board.playing",
             "",
-            "Waiting...",
+            "<teams>",
             "",
             "&ejustreddy.tech"
             ),
     SCOREBOARD_WAITING_LINES("scoreboard.game-board.waiting",
             "",
-            "<teams>",
+            "Waiting...",
             "",
             "&ejustreddy.tech"
             ),

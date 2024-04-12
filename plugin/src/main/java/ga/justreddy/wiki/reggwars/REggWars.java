@@ -11,6 +11,8 @@ import ga.justreddy.wiki.reggwars.config.Config;
 import ga.justreddy.wiki.reggwars.exceptions.DependencyNotInstalledException;
 import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.rabbit.RabbitMessenger;
 import ga.justreddy.wiki.reggwars.support.bungeemode.spigot.messenger.redis.RedisMessenger;
+import ga.justreddy.wiki.reggwars.tasks.LeaderboardTask;
+import ga.justreddy.wiki.reggwars.tasks.PlayerSaveTask;
 import ga.justreddy.wiki.reggwars.utils.BungeeUtils;
 import ga.justreddy.wiki.reggwars.support.ApiHandler;
 import ga.justreddy.wiki.reggwars.listener.GameListener;
@@ -156,6 +158,7 @@ public final class REggWars extends JavaPlugin {
         }
 
         Bukkit.getPluginManager().registerEvents(new GameListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MainListener(), this);
 
         serverName = settingsConfig.getConfig().getString("bungee.server");
 
@@ -204,7 +207,11 @@ public final class REggWars extends JavaPlugin {
         }
 
         getCommand("eggwars").setExecutor(command = new BaseCommand(this));
-        Bukkit.getPluginManager().registerEvents(new MainListener(), this);
+
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new PlayerSaveTask(storage), 0, 20 * 300L);
+        int updateTime = settingsConfig.getConfig().getInt("modules.leaderboard.update-time");
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, new LeaderboardTask(), 0, 20L * updateTime);
+
 
     }
 
@@ -216,9 +223,6 @@ public final class REggWars extends JavaPlugin {
                 ILanguage language = player.getSettings().getLanguage();
                 String message = language.getString(Message.MESSAGES_SERVER_RESTARTED);
                 messenger.getSender().sendMessagePacket(player.getUniqueId(), message);
-/*
-                getSocketClient().getSender().sendMessagePacket(player.getUniqueId(), message);
-*/
                 BungeeUtils.getInstance().sendBackToServer(player);
             }
         });

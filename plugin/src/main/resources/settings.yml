@@ -5,6 +5,8 @@ debug: false
 modules:
   slimeworldmanager: false
   mode: MULTI_ARENA # MULTI_ARENA, BUNGEE, LOBBY
+  leaderboards:
+    update-time: 120 # In seconds
 
 game:
   respawn-protection: 5 # In seconds
