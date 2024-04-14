@@ -5,7 +5,12 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.commands.Command;
+import ga.justreddy.wiki.reggwars.manager.LeaderboardManager;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author JustReddy
@@ -57,6 +62,44 @@ public class AdminCommand extends Command {
     private void runSetSpawnCommand(IGamePlayer player) {
         REggWars.getInstance().setSpawnLocation(player.getPlayer().getLocation());
         player.sendMessage(Message.MESSAGES_SERVER_SPAWN_SET);
+    }
+
+    private void runLeaderboardCommand(IGamePlayer player, String[] args) {
+        if (args.length < 4) {
+            player.sendMessage(
+                    Message.MESSAGES_SERVER_INVALID_ARGUMENTS,
+                    new Replaceable("<usage>", "/eggwars admin leaderboard <add/remove> <id>")
+            );
+            return;
+        }
+
+        if (args[2].equalsIgnoreCase("add")) {
+
+            String leaderboardId = args[3];
+
+            if (!LeaderboardManager.getInstance().exists(leaderboardId)) {
+                player.sendMessage(
+                        Message.MESSAGES_SERVER_LEADERBOARD_DOES_NOT_EXIST,
+                        new Replaceable("<id>", leaderboardId)
+                );
+                Set<String> leaderboardIds = LeaderboardManager.getInstance().getLeaderboards().keySet();
+                List<String> list = new ArrayList<>();
+                leaderboardIds.forEach(id -> list.add("&7- &a" + id));
+                player.sendMessage(
+                        Message.MESSAGES_SERVER_LEADERBOARD_LIST,
+                        new Replaceable("<list>", String.join("\n", list))
+                );
+                return;
+            }
+
+            // TODO write to file and equip leaderboard to all players in lobby :)
+
+        } else if (args[2].equalsIgnoreCase("remove")) {
+            // TODO
+        }
+
+
+
     }
 
 }

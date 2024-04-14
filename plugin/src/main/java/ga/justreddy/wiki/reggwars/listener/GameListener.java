@@ -71,8 +71,7 @@ public class GameListener implements Listener {
 
         teamEgg.setEggGone(true);
         clickedBlock.setType(Material.AIR);
-        KillMessage def = KillMessageManager.getManager().getById(
-                gamePlayer.getCosmetics().getSelectedKillMessage());
+        KillMessage def = KillMessageManager.getManager().getById(0);
         def.sendEggBreakMessage(game, gamePlayer, teamEgg);
     }
 

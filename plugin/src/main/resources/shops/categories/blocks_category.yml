@@ -1,0 +1,231 @@
+title: "&bBlocks Shop"
+rows: 4 # 1 = 9, 2 = 18 etc etc
+
+items:
+  blocks:
+    id: "blocks"
+    item:
+      material: WHITE_WOOL
+      name: "&bBlocks"
+      lore:
+        - "&7Click to open the blocks shop!"
+    slot: 1
+    dummy: true
+    quick-buy: false
+    actions:
+      - "category:blocks"
+  weapons:
+    id: "weapons"
+    item:
+      material: IRON_SWORD
+      name: "&bWeapons"
+      lore:
+        - "&7Click to open the weapons shop!"
+    slot: 2
+    quick-buy: false
+    dummy: true
+    actions:
+      - "category:weapons"
+  armor:
+    id: "armor"
+    item:
+      material: IRON_CHESTPLATE
+      name: "&bArmor"
+      lore:
+        - "&7Click to open the armor shop!"
+    slot: 3
+    dummy: true
+    quick-buy: false
+    actions:
+      - "category:armor"
+  tools:
+    id: "tools"
+    item:
+      material: IRON_PICKAXE
+      name: "&bTools"
+      lore:
+        - "&7Click to open the tools shop!"
+    slot: 4
+    dummy: true
+    quick-buy: false
+    actions:
+      - "category:tools"
+  bows:
+    id: "bows"
+    item:
+      material: BOW
+      name: "&bBows"
+      lore:
+        - "&7Click to open the bows shop!"
+    slot: 5
+    dummy: true
+    quick-buy: false
+    actions:
+      - "category:bows"
+  potions:
+    id: "potions"
+    item:
+      material: POTION
+      name: "&bPotions"
+      lore:
+        - "&7Click to open the potions shop!"
+    slot: 6
+    dummy: true
+    quick-buy: false
+    actions:
+      - "category:potions"
+  utility:
+    id: "utility"
+    item:
+      material: CHEST
+      name: "&bUtility"
+      lore:
+        - "&7Click to open the utility shop!"
+    slot: 7
+    dummy: true
+    quick-buy: false
+    actions:
+      - "category:utility"
+  filler:
+    id: "filler"
+    item:
+      material: FILLER
+    slots: 9, 10, 11, 12, 13, 14, 15, 16, 17
+    dummy: true
+    quick-buy: false
+  wool:
+    id: "wool16" # This is the id of the item, it is used for the quickbuy feature
+    item:
+      material: WHITE_WOOL
+      name: "&bWool"
+      lore:
+        - "Cost: &f<price>"
+        - ""
+        - "&7A decent build material that"
+        - "&7changes it color based on your team"
+        - ""
+        - "&dSneak Click to add to Quick Buy"
+        - "&7Click to buy!"
+    slot: 19
+    amount: 16
+    price:
+      material: IRON_INGOT
+      amount: 4
+    color: true
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"
+  clay:
+    id: "clay16"
+    item:
+      material: WHITE_TERRACOTTA
+      name: "&bClay"
+      lore:
+        - "Cost: &f<price>"
+        - ""
+        - "&7A fine build material that"
+        - "&7changes it color based on your team"
+        - ""
+        - "&dSneak Click to add to Quick Buy"
+        - "&7Click to buy!"
+    slot: 20
+    amount: 16
+    price:
+      material: IRON_INGOT
+      amount: 4
+    color: true
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"
+  blast_proof_glass:
+    id: "blast_proof_glass4"
+    item:
+      material: WHITE_STAINED_GLASS
+      name: "&bBlast Proof Glass"
+      lore:
+        - "Cost: &f<price>"
+        - ""
+        - "&7A strong build material that"
+        - "&7protects your egg from explosions!"
+        - ""
+        - "&dSneak Click to add to Quick Buy"
+        - "&7Click to buy!"
+    slot: 21
+    amount: 4
+    price:
+      material: IRON_INGOT
+      amount: 12
+    color: true
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"
+  endstone:
+    id: "endstone12"
+    item:
+      material: END_STONE
+      name: "&bEndstone"
+      lore:
+        - "Cost: &f<price>"
+        - ""
+        - "&7A very strong build material that"
+        - "&7protects your egg from explosions!"
+        - ""
+        - "&dSneak Click to add to Quick Buy"
+        - "&7Click to buy!"
+    slot: 22
+    amount: 12
+    price:
+      material: IRON_INGOT
+      amount: 24
+    color: false
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"
+  wood:
+    id: "wood16"
+    item:
+      material: OAK_PLANKS
+      name: "&bOak Planks"
+      lore:
+        - "Cost: &6<price>"
+        - ""
+        - "&7A great choice for protection your bed!"
+        - ""
+        - "&dSneak Click to add to Quick Buy"
+        - "&7Click to buy!"
+    slot: 23
+    amount: 16
+    price:
+      material: GOLD_INGOT
+      amount: 4
+    color: false
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"
+  obsidian:
+    id: "obsidian4"
+    item:
+      material: OBSIDIAN
+      name: "&bObsidian"
+      lore:
+        - "Cost: &2<price>"
+        - ""
+        - "&7The best choice for protecting your bed!"
+        - ""
+        - "&dSneak Click to add to Quick Buy"
+        - "&7Click to buy!"
+    slot: 24
+    amount: 4
+    price:
+      material: EMERALD
+      amount: 4
+    color: false
+    dummy: false
+    quick-buy: true
+    actions:
+      - "give"

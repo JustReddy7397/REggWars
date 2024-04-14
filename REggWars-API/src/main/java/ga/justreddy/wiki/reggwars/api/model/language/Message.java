@@ -140,7 +140,20 @@ public enum Message {
     MESSAGES_ARENA_SHOP_ADDED("messages.arena.shop-added",
             "&aSuccessfully added a <type> shop!"),
     MESSAGES_ARENA_SHOP_INVALID_TYPE("messages.arena.invalid-shop-type",
-            "&cInvalid shop type!"),;
+            "&cInvalid shop type!"),
+    MESSAGES_SERVER_LEADERBOARD_DOES_NOT_EXIST("messages.server.invalid-leaderboard-id",
+            "&cLeaderboard with id &d<id> &cdoes not exist"
+            ),
+    MESSAGES_SERVER_LEADERBOARD_ADDED("messages.server.leaderboard-added",
+            "&aSuccessfully added leaderboard &d<id>"
+            ),
+    MESSAGES_SERVER_LEADERBOARD_REMOVED("messages.server.leaderboard-removed",
+            "&aSuccessfully removed leaderboard &d<id>"
+            ),
+    MESSAGES_SERVER_LEADERBOARD_LIST("messages.server.leaderboard-list",
+            "&dLeaderboards:",
+            "&a<list>"
+            );
 
 
     private final String path;

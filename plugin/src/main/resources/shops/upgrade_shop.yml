@@ -1,0 +1,4 @@
+# THIS SHOULD ALWAYS BE HERE, AND THE "type" HERE SHOULD NEVER BE CHANGED
+title: "&bUpgrade Shop"
+rows: 6 # 1 = 9, 2 = 18 etc etc
+type: UPGRADE # NORMAL, UPGRADE

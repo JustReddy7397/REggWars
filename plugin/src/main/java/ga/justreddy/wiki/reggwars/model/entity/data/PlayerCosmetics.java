@@ -62,7 +62,7 @@ public class PlayerCosmetics implements IPlayerCosmetics, ConfigurationSerializa
         this.killMessages.add(selectedKillMessage);
         this.deathCries.add(selectedDeathCry);
 
-        config = null; // Can be garbage collected since we dont need it anymore after
+        config = null; // Can be garbage collected since we don't need it anymore after
     }
 
     @Override

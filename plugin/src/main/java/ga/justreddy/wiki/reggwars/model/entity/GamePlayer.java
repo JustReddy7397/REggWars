@@ -13,6 +13,7 @@ import ga.justreddy.wiki.reggwars.api.model.language.ILanguage;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
+import ga.justreddy.wiki.reggwars.model.entity.data.PlayerCosmetics;
 import ga.justreddy.wiki.reggwars.model.entity.data.PlayerQuests;
 import ga.justreddy.wiki.reggwars.model.entity.data.PlayerQuickBuy;
 import ga.justreddy.wiki.reggwars.model.entity.data.PlayerSettings;
@@ -42,6 +43,7 @@ public class GamePlayer implements IGamePlayer {
     private IPlayerSettings settings;
     private IPlayerQuickBuy quickBuy;
     private IPlayerQuests quests;
+    private IPlayerCosmetics cosmetics;
 
     private ICombatLog combatLog;
 
@@ -52,6 +54,7 @@ public class GamePlayer implements IGamePlayer {
         this.settings = new PlayerSettings();
         this.quickBuy = new PlayerQuickBuy();
         this.quests = new PlayerQuests();
+        this.cosmetics = new PlayerCosmetics();
         this.combatLog = new CombatLog(this);
     }
 
@@ -173,6 +176,7 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public void teleport(Location location) {
+        if (location == null) return;
         player.teleport(location);
     }
 
@@ -193,12 +197,12 @@ public class GamePlayer implements IGamePlayer {
 
     @Override
     public IPlayerCosmetics getCosmetics() {
-        return null;
+        return cosmetics;
     }
 
     @Override
     public void setCosmetics(IPlayerCosmetics cosmetics) {
-
+        this.cosmetics = cosmetics;
     }
 
     @Override

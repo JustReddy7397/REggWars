@@ -163,31 +163,29 @@ public class v1_8_R3 implements Nms {
 
     @Override
     public void setTeamName(IGameTeam team) {
-        Map<UUID, List<FakeTeam>> TEAMS = FakeTeamManager.getPlayerTeams();
+
+        Map<UUID, List<FakeTeam>> teams = FakeTeamManager.getPlayerTeams();
+
         int priority = NumberUtil.getPriority(team);
+
+        Set<IGamePlayer> skip = new HashSet<>();
+
         FakeTeam fakeTeam = new FakeTeam(team.getTeam().getTag(), "", priority);
         for (IGamePlayer player : team.getAlivePlayers()) {
-            List<FakeTeam> teams = TEAMS.getOrDefault(player.getUniqueId(), new ArrayList<>());
-            if (!teams.isEmpty()) teams.clear();
-            teams.add(fakeTeam);
-            TEAMS.put(player.getUniqueId(), teams);
-            TEAMS.get(player.getUniqueId()).get(0).addMember(player.getName());
+            skip.add(player);
+            List<FakeTeam> t = teams.getOrDefault(player.getUniqueId(), new ArrayList<>());
+            if (!t.isEmpty()) t.clear();
+            fakeTeam.addMember(player.getName());
+            t.add(fakeTeam);
+            teams.put(player.getUniqueId(), t);
+            FakeTeamManager.sendTeam(player.getPlayer(), fakeTeam);
         }
-
 
         for (IGamePlayer player : team.getGame().getPlayers()) {
-            for (IGamePlayer players : team.getPlayers()) {
-                List<FakeTeam> teams = TEAMS.getOrDefault(players.getUniqueId(), new ArrayList<>());
-                FakeTeamManager.sendTeam(players.getPlayer(), teams.get(0));
-                if (players == player) continue;
-                FakeTeamManager.sendTeam(player.getPlayer(), teams.get(0));
-            }
+            if (skip.contains(player)) continue;
+            Player bukkitPlayer = player.getPlayer();
+            FakeTeamManager.sendTeam(bukkitPlayer, fakeTeam);
         }
-
-
-
-
-
     }
 
     @Override

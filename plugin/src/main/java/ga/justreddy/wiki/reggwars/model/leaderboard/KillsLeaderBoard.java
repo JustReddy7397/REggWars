@@ -13,8 +13,8 @@ import java.util.Map;
  */
 public class KillsLeaderBoard extends PerPlayerLeaderboard {
 
-    public KillsLeaderBoard(String id, Location location) {
-        super(id, location);
+    public KillsLeaderBoard(String id) {
+        super(id);
     }
 
     @Override

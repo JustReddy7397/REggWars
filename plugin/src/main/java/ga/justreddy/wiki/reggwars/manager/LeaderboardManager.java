@@ -61,6 +61,10 @@ public class LeaderboardManager {
         return leaderboards.get(id);
     }
 
+    public boolean exists(String id) {
+        return leaderboards.containsKey(id);
+    }
+
     public List<Leaderboard> getPlayerLeaderboards(IGamePlayer player) {
         return playerLeaderboards.getOrDefault(player, null);
     }
