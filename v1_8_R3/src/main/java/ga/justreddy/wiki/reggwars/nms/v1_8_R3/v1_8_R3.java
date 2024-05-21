@@ -1,6 +1,7 @@
 package ga.justreddy.wiki.reggwars.nms.v1_8_R3;
 
 import com.cryptomorin.xseries.XMaterial;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
@@ -20,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -262,5 +264,22 @@ public class v1_8_R3 implements Nms {
         }
     }
 
+    @Override
+    public ItemStack setNbt(ItemStack item, String key, String value) {
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.setString(key, value);
+        return nbtItem.getItem();
+    }
 
+    @Override
+    public boolean hasNbtData(ItemStack itemStack, String tag) {
+        NBTItem nbtItem = new NBTItem(itemStack);
+        return nbtItem.hasTag(tag);
+    }
+
+    @Override
+    public String getNbtData(ItemStack itemStack, String tag) {
+        NBTItem nbtItem = new NBTItem(itemStack);
+        return nbtItem.getString(tag);
+    }
 }

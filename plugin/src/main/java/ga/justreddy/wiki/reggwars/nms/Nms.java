@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -72,4 +73,9 @@ public interface Nms {
 
     void setBlastProofItems();
 
+    ItemStack setNbt(ItemStack item, String key, String value);
+
+    boolean hasNbtData(ItemStack itemStack, String customItem);
+
+    String getNbtData(ItemStack itemStack, String customItem);
 }

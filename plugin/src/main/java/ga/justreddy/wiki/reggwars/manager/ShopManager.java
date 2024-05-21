@@ -5,10 +5,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.*;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
 import ga.justreddy.wiki.reggwars.model.game.shop.Shop;
 import ga.justreddy.wiki.reggwars.model.game.shop.ShopCategory;
 import ga.justreddy.wiki.reggwars.model.game.shop.ShopGui;
 import ga.justreddy.wiki.reggwars.model.game.shop.ShopItem;
+import ga.justreddy.wiki.reggwars.model.game.test.CustomTestItem;
+import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -34,6 +37,7 @@ public class ShopManager {
     private final Map<String, IShop> shops;
     private final Map<String, IShopCategory> categories;
     private final Map<String, IShopItem> items;
+    private final Map<String, CustomShopItem> customShopItems;
     private final File shopFolder;
     private final File categoryFolder;
     private final XMaterial material;
@@ -42,7 +46,7 @@ public class ShopManager {
         manager = this;
         FileConfiguration configuration = REggWars.getInstance().getSettingsConfig().getConfig();
         this.material = XMaterial.matchXMaterial(configuration.getString("gui.filler")).orElse(XMaterial.BLACK_STAINED_GLASS_PANE);
-
+        this.customShopItems = new HashMap<>();
         this.shops = new HashMap<>();
         this.categories = new HashMap<>();
         this.items = new HashMap<>();
@@ -69,6 +73,7 @@ public class ShopManager {
     public void start() {
         loadShops();
         loadCategories();
+        registerCustomShopItem(new CustomTestItem());
         for (IShop shop : shops.values()) {
             ((Shop) shop).loadCategories();
         }
@@ -146,4 +151,15 @@ public class ShopManager {
          return items.getOrDefault(id, null);
     }
 
+    public void registerCustomShopItem(CustomShopItem item) {
+        if (customShopItems.containsKey(item.getId())) {
+            ChatUtil.sendConsole("&cCustom shop item with id " + item.getId() + " already exists!");
+            return;
+        }
+        customShopItems.put(item.getId(), item);
+    }
+
+    public CustomShopItem getCustomItemById(String customItem) {
+        return customShopItems.getOrDefault(customItem, null);
+    }
 }

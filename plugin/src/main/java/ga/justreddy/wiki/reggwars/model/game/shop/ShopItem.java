@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.model.game.shop;
 
+import com.avaje.ebeaninternal.server.query.LimitOffsetList;
 import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
@@ -7,11 +8,14 @@ import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopCategory;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopGui;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopItem;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShopPrice;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.model.entity.GamePlayer;
 import ga.justreddy.wiki.reggwars.model.gui.custom.guis.QuickBuyEditorGui;
+import ga.justreddy.wiki.reggwars.nms.Nms;
+import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
 import ga.justreddy.wiki.reggwars.utils.Util;
 import org.bukkit.Color;
@@ -41,6 +45,10 @@ public class ShopItem implements IShopItem {
     private final boolean canQuickBuy;
     private boolean dummy;
     private final List<String> actions;
+    private boolean customItem;
+    private CustomShopItem customShopItem;
+
+    private final Nms nms = REggWars.getInstance().getNms();
 
     public ShopItem(XMaterial material) {
         this.id = material.name() + UUID.randomUUID().toString().substring(0, 6);
@@ -50,6 +58,8 @@ public class ShopItem implements IShopItem {
         this.shouldColor = false;
         this.actions = new ArrayList<>();
         this.canQuickBuy = false;
+        this.customItem = false;
+        this.customShopItem = null;
     }
 
     public ShopItem(ConfigurationSection section, String id) {
@@ -71,6 +81,10 @@ public class ShopItem implements IShopItem {
         this.slots = new int[]{0};
         this.shouldColor = false;
         this.actions = new ArrayList<>();
+        if (section.contains("customItem")) {
+            this.customItem = true;
+            this.customShopItem = ShopManager.getManager().getCustomItemById(section.getString("customItem"));
+        }
     }
 
     public ShopItem(ConfigurationSection section) {
@@ -130,6 +144,10 @@ public class ShopItem implements IShopItem {
         this.shouldColor = section.getBoolean("color");
         this.actions = section.getStringList("actions");
         if (amount != 0) this.item.setAmount(amount);
+        if (section.contains("customItem")) {
+            this.customItem = true;
+            this.customShopItem = ShopManager.getManager().getCustomItemById(section.getString("customItem"));
+        }
     }
 
     @Override
@@ -179,6 +197,16 @@ public class ShopItem implements IShopItem {
     }
 
     @Override
+    public boolean isCustomItem() {
+        return customItem;
+    }
+
+    @Override
+    public CustomShopItem getCustomItem() {
+        return customShopItem;
+    }
+
+    @Override
     public void give(IShopGui gui, IGamePlayer player, boolean shift) {
 
         if (shift && canQuickBuy) {
@@ -211,19 +239,55 @@ public class ShopItem implements IShopItem {
                 final Player p = player.getPlayer();
                 if (p == null) return;
                 final PlayerInventory inventory = p.getInventory();
-                ItemBuilder builder = new ItemBuilder(new ItemStack(item.getType()));
-                builder.withAmount(item.getAmount());
-                if (item.getItemMeta().hasEnchants()) {
-                    builder.withEnchantments(item.getItemMeta().getEnchants());
+                ItemBuilder builder = null;
+                if (!isCustomItem()) {
+                    builder = new ItemBuilder(new ItemStack(item.getType()));
+                    if (item.getItemMeta().hasEnchants()) {
+                        builder.withEnchantments(item.getItemMeta().getEnchants());
+                    }
+                    if (shouldColor) {
+                        IGameTeam team = player.getTeam();
+                        Color color = team.getTeam().getColor();
+                        XMaterial woolMaterialByColor = Util.getWoolMaterialByColor(color);
+                        builder.withType(woolMaterialByColor.parseMaterial());
+                    }
+                    builder.withAmount(item.getAmount());
+                    takeMoney(player);
+                    inventory.addItem(builder.build());
+                } else {
+                    builder = new ItemBuilder(customShopItem.getToGive());
+                    builder.setNbtData("customItem", customShopItem.getId());
+                    builder.withAmount(item.getAmount());
+                    if (customShopItem.isUpgradable()) {
+                        ItemStack upgrade = customShopItem.nextUpgrade(player);
+                        ItemStack previousUpgrade = customShopItem.previousUpgrade(player);
+                        if (upgrade == null) {
+                            // TODO send message and cancel :)
+                            return;
+                        }
+                        builder.withAmount(upgrade.getAmount());
+                        builder.withName(upgrade.getItemMeta().getDisplayName());
+                        builder.withLore(upgrade.getItemMeta().getLore());
+
+                        for (int i = 0; i < inventory.getContents().length; i++) {
+                            ItemStack itemStack = inventory.getContents()[i];
+                            if (itemStack == null) continue;
+                            if (!nms.hasNbtData(itemStack, "customItem")) continue;
+                            if (!nms.getNbtData(itemStack, "customItem").equals(customShopItem.getId())) continue;
+                            if (previousUpgrade != null) {
+                                inventory.addItem(previousUpgrade);
+                            } else {
+                                inventory.removeItem(itemStack);
+                                inventory.setItem(i, upgrade);
+                            }
+                            break;
+                        }
+                        takeMoney(player);
+                    } else {
+                        takeMoney(player);
+                        inventory.addItem(builder.build());
+                    }
                 }
-                if (shouldColor) {
-                    IGameTeam team = player.getTeam();
-                    Color color = team.getTeam().getColor();
-                    XMaterial woolMaterialByColor = Util.getWoolMaterialByColor(color);
-                    builder.withType(woolMaterialByColor.parseMaterial());
-                }
-                takeMoney(player);
-                inventory.addItem(builder.build());
             }
 
         }

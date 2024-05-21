@@ -5,8 +5,10 @@ import com.cryptomorin.xseries.XItemStack;
 import com.cryptomorin.xseries.XMaterial;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.model.language.Replaceable;
+import ga.justreddy.wiki.reggwars.nms.Nms;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -37,7 +39,7 @@ import java.util.UUID;
  */
 public class ItemBuilder {
 
-    private final ItemStack stack;
+    private ItemStack stack;
     @Getter
     private boolean hasUsername;
     @Getter
@@ -424,4 +426,11 @@ public class ItemBuilder {
         }
         return this;
     }
+
+    public ItemBuilder setNbtData(String key, String value) {
+        Nms nms = REggWars.getInstance().getNms();
+        stack = nms.setNbt(stack, key, value);
+        return this;
+    }
+
 }

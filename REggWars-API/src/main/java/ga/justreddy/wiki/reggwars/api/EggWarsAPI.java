@@ -5,6 +5,7 @@ import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.VictoryDance;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
 import ga.justreddy.wiki.reggwars.api.model.leaderboard.Leaderboard;
 
 import java.io.FileReader;
@@ -60,6 +61,8 @@ public interface EggWarsAPI {
     void clearLeaderboards(IGamePlayer player);
 
     void addLeaderboard(IGamePlayer player, String id);
+
+    void registerCustomShopItem(CustomShopItem item);
 
     default String getVersion() {
         return "1.0.0";

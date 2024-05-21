@@ -6,10 +6,12 @@ import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.VictoryDance;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
 import ga.justreddy.wiki.reggwars.api.model.leaderboard.Leaderboard;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.LeaderboardManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
+import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
 
 import java.util.UUID;
@@ -64,5 +66,10 @@ public class ApiHandler implements EggWarsAPI {
     @Override
     public void addLeaderboard(IGamePlayer player, String id) {
         LeaderboardManager.getInstance().addPlayerLeaderboard(player, LeaderboardManager.getInstance().getLeaderboard(id));
+    }
+
+    @Override
+    public void registerCustomShopItem(CustomShopItem item) {
+        ShopManager.getManager().registerCustomShopItem(item);
     }
 }
