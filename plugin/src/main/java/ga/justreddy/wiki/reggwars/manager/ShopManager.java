@@ -50,6 +50,7 @@ public class ShopManager {
         this.shops = new HashMap<>();
         this.categories = new HashMap<>();
         this.items = new HashMap<>();
+        registerCustomShopItem(new CustomTestItem());
         this.shopFolder = new File(REggWars.getInstance().getDataFolder(), "shops");
         if (!shopFolder.exists()) shopFolder.mkdirs();
         this.categoryFolder = new File(REggWars.getInstance().getDataFolder() + "/shops", "categories");
@@ -73,7 +74,7 @@ public class ShopManager {
     public void start() {
         loadShops();
         loadCategories();
-        registerCustomShopItem(new CustomTestItem());
+
         for (IShop shop : shops.values()) {
             ((Shop) shop).loadCategories();
         }

@@ -39,5 +39,8 @@ public class CustomTestItem extends CustomShopItem {
 
     @Override
     public void onClick(IGamePlayer player, ClickAction action) {
+
+        player.sendLegacyMessage("Hello There! " + action.name());
+
     }
 }

@@ -29,7 +29,15 @@ public class LibraryManager {
         Library rabbit = create("com.rabbitmq", "amqp-client", "5.12.0", "RabbitMQ");
         Library xseries = create("com.github.cryptomorin", "XSeries", "9.4.0", "XSeries");
         Library redis = create("redis.clients", "jedis", "5.0.0", "Jedis");
-        libraryManager.loadLibraries(sqlite, mongo_driver, mongo_core, mongo_bson, rabbit, xseries, redis);
+        Library nbt_api = Library.builder()
+                .groupId("de.tr7zw")
+                .artifactId("item-nbt-api")
+                .version("2.12.4")
+                .loaderId("NBTAPI")
+                .repository("https://repo.codemc.io/repository/maven-public")
+                .relocate("ga.justreddy.wiki.reggwars.libs.nbtapi", "de.tr7zw")
+                .build();
+        libraryManager.loadLibraries(sqlite, mongo_driver, mongo_core, mongo_bson, rabbit, xseries, redis, nbt_api);
     }
 
     private Library create(String groupId, String artifactId, String version, String loaderId) {

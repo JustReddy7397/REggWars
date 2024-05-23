@@ -3,27 +3,27 @@ package ga.justreddy.wiki.reggwars.listener;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 import ga.justreddy.wiki.reggwars.REggWars;
-import ga.justreddy.wiki.reggwars.api.events.EggWarsEvent;
-import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillEffect;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.GameState;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
-import ga.justreddy.wiki.reggwars.api.model.game.IGameSign;
 import ga.justreddy.wiki.reggwars.api.model.game.generator.IGenerator;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.IShop;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.item.ClickAction;
+import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
 import ga.justreddy.wiki.reggwars.api.model.language.Message;
 import ga.justreddy.wiki.reggwars.manager.GameManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
+import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
+import ga.justreddy.wiki.reggwars.nms.Nms;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -31,19 +31,27 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
-import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 
 /**
  * @author JustReddy
  */
 public class GameListener implements Listener {
+
+    private final Nms nms;
+
+    public GameListener() {
+        this.nms = REggWars.getInstance().getNms();
+    }
 
     @EventHandler(ignoreCancelled = true)
     public void onDragonEggBreak(PlayerInteractEvent event) {
@@ -73,6 +81,40 @@ public class GameListener implements Listener {
         clickedBlock.setType(Material.AIR);
         KillMessage def = KillMessageManager.getManager().getById(0);
         def.sendEggBreakMessage(game, gamePlayer, teamEgg);
+    }
+
+    @EventHandler()
+    public void onCustomItemInteract(PlayerInteractEvent event) {
+        ItemStack heldItem = event.getItem();
+        if (heldItem == null) return;
+        final Player player = event.getPlayer();
+        boolean sneaking = player.isSneaking();
+        ClickAction clickAction;
+        switch (event.getAction()) {
+            case LEFT_CLICK_AIR:
+            case LEFT_CLICK_BLOCK:
+                clickAction = sneaking ? ClickAction.LEFT_SHIFT : ClickAction.LEFT;
+                break;
+            case RIGHT_CLICK_AIR:
+            case RIGHT_CLICK_BLOCK:
+                clickAction = sneaking ? ClickAction.RIGHT_SHIFT : ClickAction.RIGHT;
+                break;
+            default:
+                clickAction = ClickAction.LEFT;
+        }
+
+        IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(player.getUniqueId());
+        if (gamePlayer == null) return;
+        IGame game = gamePlayer.getGame();
+        if (game == null) return;
+        if (gamePlayer.isDead() || gamePlayer.isFakeDead()) return;
+        if (!game.isGameState(GameState.PLAYING)) return;
+
+        if (!nms.hasNbtData(heldItem, "customItem")) return;
+        String customItem = nms.getNbtData(heldItem, "customItem");
+        CustomShopItem customShopItem = ShopManager.getManager().getCustomItemById(customItem);
+        if (customShopItem == null) return;
+        customShopItem.onClick(gamePlayer, clickAction);
     }
 
     @EventHandler
