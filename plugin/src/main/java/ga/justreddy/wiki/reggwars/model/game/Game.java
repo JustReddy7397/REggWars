@@ -27,17 +27,19 @@ import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.KillMessageManager;
 import ga.justreddy.wiki.reggwars.model.game.generator.Generator;
+import ga.justreddy.wiki.reggwars.model.game.phase.GamePhaseManager;
+import ga.justreddy.wiki.reggwars.model.game.phase.GameWaitingPhase;
 import ga.justreddy.wiki.reggwars.model.game.team.GameTeam;
 import ga.justreddy.wiki.reggwars.model.game.team.TeamAssigner;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameEndTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.GameStartTimer;
-import ga.justreddy.wiki.reggwars.model.game.timer.GameTimer;
 import ga.justreddy.wiki.reggwars.model.game.timer.Timer;
 import ga.justreddy.wiki.reggwars.utils.BungeeUtils;
 import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import ga.justreddy.wiki.reggwars.utils.LocationUtils;
 import ga.justreddy.wiki.reggwars.utils.Util;
 import ga.justreddy.wiki.reggwars.utils.player.PlayerUtil;
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -53,6 +55,9 @@ import java.util.stream.Stream;
 /**
  * @author JustReddy
  */
+
+// @Getter used for the stuff we need that is outside the IGame class
+@Getter
 public class Game implements IGame {
 
     private final String name;
@@ -84,9 +89,9 @@ public class Game implements IGame {
     private int minPlayers;
     private int teamSize;
 
-    private Timer gameTimer;
     private Timer startTimer;
     private Timer endTimer;
+    private GamePhaseManager gamePhaseManager;
 
     private final ITeamAssigner teamAssigner = new TeamAssigner();
 
@@ -105,6 +110,7 @@ public class Game implements IGame {
         this.shops = new HashMap<>();
         this.actualPlayers = new ArrayList<>();
         this.server = REggWars.getInstance().getServerName();
+        this.gamePhaseManager = new GamePhaseManager(this);
     }
 
     @Override
@@ -234,6 +240,7 @@ public class Game implements IGame {
         protections.clear();
         shops.clear();
         actualPlayers.clear();
+        gamePhaseManager.setPhase(new GameWaitingPhase());
         this.displayName = config.getString("settings.displayName", name);
         this.minPlayers = config.getInt("settings.minPlayers");
         this.teamSize = config.getInt("settings.team-size");
@@ -284,142 +291,16 @@ public class Game implements IGame {
         high = LocationUtils.getLocation(config.getString("bounds.game.high"));
         low = LocationUtils.getLocation(config.getString("bounds.game.low"));
         gameCuboid = new Cuboid(high, low, false);
-        this.gameTimer = new GameTimer(0, REggWars.getInstance(), this);
-        this.startTimer = new GameStartTimer(60, REggWars.getInstance());
-        endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
+        this.startTimer = new GameStartTimer(20, REggWars.getInstance());
+        this.endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
         setGameState(GameState.WAITING); // TODO make it so if disabled, it wont enable again
         Util.updateGame(this);
     }
 
     @Override
     public void onCountDown() {
-        switch (state) {
-            case WAITING:
-                if (getPlayerCount() >= minPlayers) {
-                    if (startTimer.isStarted()) startTimer.stop();
-                    setGameState(GameState.STARTING);
-                    Util.updateGame(this);
-                    startTimer.start();
-                    return;
-                }
-                break;
-            // TODO
-            case STARTING:
-
-
-                if (getPlayerCount() == maxPlayers) {
-                    if (startTimer.isStarted()) startTimer.stop();
-                    startTimer = new GameStartTimer(10, REggWars.getInstance());
-                    startTimer.start();
-                    return;
-                }
-                if (getPlayerCount() < minPlayers) {
-                    setGameState(GameState.WAITING);
-                    Util.updateGame(this);
-                    gameTimer.stop();
-                    startTimer = new GameStartTimer(60, REggWars.getInstance());
-                    startTimer.stop();
-                    return;
-                }
-                if (startTimer.getTicksExceed() <= 0) {
-                    onGameStart();
-                    startTimer.stop();
-                    return;
-                }
-                break;
-            case PLAYING:
-/*                if (getAliveTeams().size() == 1) {
-                    onGameEnd(getAliveTeams().get(0));
-                } else if (getAliveTeams().isEmpty()) {
-                    onGameEnd(null);
-                }*/
-
-                generators.forEach(generator -> {
-                    generator.getGameSign().update();
-                });
-
-
-                break;
-            case ENDING:
-                if (endTimer.isStarted() && endTimer.getTicksExceed() <= 0) {
-                    // TODO :)
-                    onGameRestart();
-                }
-                break;
-        }
+        gamePhaseManager.getCurrentPhase().onTick(this);
     }
-
-    @Override
-    public void onGameStart() {
-        setGameState(GameState.PLAYING);
-        Util.updateGame(this);
-        if (!gameTimer.isStarted()) gameTimer.start();
-        teamAssigner.assignTeam(this);
-        Bukkit.getScheduler().runTaskLater(REggWars.getInstance(), () -> {
-            EggWarsGameStartEvent event = new EggWarsGameStartEvent(this);
-            event.call();
-            generators.forEach(IGenerator::start);
-            shops.forEach((location, shop) -> shop.spawn(location));
-            teams.forEach(team -> {
-                toSpawn(team);
-                if (team.getSize() == 0) {
-                    team.setEggGone(true);
-                    return;
-                }
-                team.getEggLocation().getBlock().setType(Material.DRAGON_EGG);
-                REggWars.getInstance().getNms().setTeamName(team);
-            });
-            if (lobbyLocation != null && lobbyCuboid != null) {
-                lobbyCuboid.clear();
-            }
-
-            for (IGamePlayer gamePlayer : getAlivePlayers()) {
-                Player player = gamePlayer.getPlayer();
-                player.setGameMode(org.bukkit.GameMode.SURVIVAL);
-                PlayerUtil.clearInventory(player);
-
-            }
-
-
-        }, 5);
-    }
-
-    @Override
-    public void onGameEnd(IGameTeam winner) {
-        generators.forEach(IGenerator::destroy);
-        endTimer.start();
-        setGameState(GameState.ENDING);
-        for (IGamePlayer player : actualPlayers) {
-            player.getQuests().update(player, QuestType.PLAY_GAMES);
-        }
-        Util.updateGame(this);
-        sendLegacyMessage("Thanks for playing bitches");
-    }
-
-    @Override
-    public void onGameRestart() {
-        setGameState(GameState.RESTARTING);
-        if (world != null) {
-            world.getPlayers().forEach(player -> {
-                if (Core.MODE == ServerMode.BUNGEE) {
-                    BungeeUtils.getInstance().sendBackToServer(
-                            PlayerManager.getManager().getGamePlayer(player.getUniqueId())
-                    );
-                    return;
-                } else if (Core.MODE == ServerMode.MULTI_ARENA) {
-                    player.teleport(Bukkit.getWorld("world").getSpawnLocation());
-                    // TODO
-                    return;
-
-                }
-            });
-        }
-        Util.updateGame(this);
-        System.out.println("RESTARTING WORLD");
-        adapter.onRestart(this);
-
-    }
-
 
     @Override
     public void onGamePlayerJoin(IGamePlayer gamePlayer) {
@@ -807,11 +688,16 @@ public class Game implements IGame {
     }
 
     @Override
+    public void goToNextPhase() {
+        gamePhaseManager.nextPhase();
+    }
+
+    @Override
     public World getWorld() {
         return world;
     }
 
-    private void toSpawn(IGameTeam team) {
+    public void toSpawn(IGameTeam team) {
         team.getAlivePlayers().forEach(player -> player.teleport(team.getSpawnLocation()));
     }
 

@@ -64,12 +64,6 @@ public interface IGame {
 
     void onCountDown();
 
-    void onGameStart();
-
-    void onGameEnd(IGameTeam winner);
-
-    void onGameRestart();
-
     void onGamePlayerJoin(IGamePlayer gamePlayer);
 
     void onGamePlayerQuit(IGamePlayer gamePlayer, boolean silent, boolean local);
@@ -129,6 +123,8 @@ public interface IGame {
     boolean hasRespawnProtection(IGamePlayer gamePlayer);
 
     void removeRespawnProtection(IGamePlayer gamePlayer);
+
+    void goToNextPhase();
 
     World getWorld();
 

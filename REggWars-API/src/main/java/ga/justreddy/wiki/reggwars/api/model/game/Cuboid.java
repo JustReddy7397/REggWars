@@ -39,6 +39,7 @@ public class Cuboid implements Region {
     }
 
 
+    // TODO OVERHAUL TO USE WITH WORLDEDIT
     public void clear() {
         for (int x = x1; x < x2; x++) {
             for (int y = y1; y < y2; y++) {

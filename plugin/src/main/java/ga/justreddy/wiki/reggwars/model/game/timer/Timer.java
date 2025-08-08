@@ -19,13 +19,15 @@ public abstract class Timer implements Runnable {
     private final REggWars plugin;
     protected boolean started;
 
-
     /**
-     * Proper method to use to start the timer is start()
+     * The Proper method to use to start the timer is start()
      */
 
     @Override
     public void run() {
+        if (!isStarted()) {
+            throw new IllegalStateException("Timer is not started. Use start() method to start the timer.");
+        }
         if (ticksExceed == 0) {
             onEnd();
             stop();

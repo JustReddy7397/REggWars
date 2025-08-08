@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 /**
  * @author JustReddy
  */
-public class GeneratorTimer extends Timer{
+public class GeneratorTimer extends Timer {
 
     public GeneratorTimer(int seconds, REggWars plugin) {
         super(seconds, plugin);
