@@ -16,12 +16,19 @@ import ga.justreddy.wiki.reggwars.model.gui.custom.Gui;
 import ga.justreddy.wiki.reggwars.model.gui.editable.InventoryMenu;
 import ga.justreddy.wiki.reggwars.packets.FakeTeamManager;
 import ga.justreddy.wiki.reggwars.utils.BungeeUtils;
+import ga.justreddy.wiki.reggwars.utils.ChatUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.InventoryHolder;
@@ -193,6 +200,23 @@ public class MainListener implements Listener {
                 game.onGamePlayerJoinSpectator(gamePlayer, true);
                 break;
         }
+    }
+
+    @EventHandler
+    public void onSignClick(PlayerInteractEvent event) {
+        if (event.getClickedBlock() == null) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        final Block block = event.getClickedBlock();
+        final BlockState state = block.getState();
+        if (!(state instanceof Sign)) return;
+        final Sign sign = (Sign) state;
+        final String[] lines = sign.getLines();
+        if (!lines[0].equalsIgnoreCase(ChatUtil.format("&7[&dREggWars&7]"))) return;
+        final IGame game = GameManager.getManager().getGameByName(lines[1].replace(" ", ""));
+        if (game == null) return;
+        final IGamePlayer gamePlayer = PlayerManager.getManager().getGamePlayer(event.getPlayer().getUniqueId());
+        game.onGamePlayerJoin(gamePlayer);
+        // TODO better :)
     }
 
 

@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars;
 
+import com.cryptomorin.xseries.XMaterial;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.api.loaders.SlimeLoader;
 import ga.justreddy.wiki.reggwars.api.EggWarsProvider;
@@ -63,10 +64,12 @@ public final class REggWars extends JavaPlugin {
     private Nms nms;
     private ISchematic schematic;
 
+
     private Storage storage;
 
     private Config generatorsConfig;
     private Config settingsConfig;
+    private Config signsConfig;
 
     private BaseCommand command;
 
@@ -240,8 +243,10 @@ public final class REggWars extends JavaPlugin {
     private boolean loadConfig() {
         settingsConfig = new Config("settings.yml");
         generatorsConfig = new Config("generators.yml");
+        signsConfig = new Config("signs.yml");
         ConfigManager.getManager().register(settingsConfig);
         ConfigManager.getManager().register(generatorsConfig);
+        ConfigManager.getManager().register(signsConfig);
         return true;
     }
 
@@ -255,6 +260,7 @@ public final class REggWars extends JavaPlugin {
         GameManager.getManager().start();
         DanceManager.getManager().start();
         KillMessageManager.getManager().start();
+        GameSignManager.getInstance().start();
     }
 
     private static String getVersion(Server server) {
