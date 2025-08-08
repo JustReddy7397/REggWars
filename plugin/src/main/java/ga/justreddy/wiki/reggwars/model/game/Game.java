@@ -285,7 +285,7 @@ public class Game implements IGame {
         low = LocationUtils.getLocation(config.getString("bounds.game.low"));
         gameCuboid = new Cuboid(high, low, false);
         this.gameTimer = new GameTimer(0, REggWars.getInstance(), this);
-        this.startTimer = new GameStartTimer(10, REggWars.getInstance());
+        this.startTimer = new GameStartTimer(60, REggWars.getInstance());
         endTimer = new GameEndTimer(5, REggWars.getInstance()); // TODO make choose-able time
         setGameState(GameState.WAITING); // TODO make it so if disabled, it wont enable again
         Util.updateGame(this);
@@ -294,12 +294,30 @@ public class Game implements IGame {
     @Override
     public void onCountDown() {
         switch (state) {
+            case WAITING:
+                if (getPlayerCount() >= minPlayers) {
+                    if (startTimer.isStarted()) startTimer.stop();
+                    setGameState(GameState.STARTING);
+                    Util.updateGame(this);
+                    startTimer.start();
+                    return;
+                }
+                break;
             // TODO
             case STARTING:
+
+
+                if (getPlayerCount() == maxPlayers) {
+                    if (startTimer.isStarted()) startTimer.stop();
+                    startTimer = new GameStartTimer(10, REggWars.getInstance());
+                    startTimer.start();
+                    return;
+                }
                 if (getPlayerCount() < minPlayers) {
                     setGameState(GameState.WAITING);
                     Util.updateGame(this);
                     gameTimer.stop();
+                    startTimer = new GameStartTimer(60, REggWars.getInstance());
                     startTimer.stop();
                     return;
                 }
@@ -406,6 +424,8 @@ public class Game implements IGame {
     @Override
     public void onGamePlayerJoin(IGamePlayer gamePlayer) {
 
+        System.out.println("Executor");
+
         EggWarsGameJoinEvent event = new EggWarsGameJoinEvent(this, gamePlayer);
         event.call();
         Player p = gamePlayer.getPlayer();
@@ -427,29 +447,18 @@ public class Game implements IGame {
         PlayerUtil.refresh(gamePlayer.getPlayer());
 
         // TODO set possibly their rank
-
-        REggWars.getInstance().getServer().getScheduler().runTaskLater(REggWars.getInstance(), () -> {
-            EggWarsBoard.getManager().removeScoreboard(gamePlayer);
-            PlayerUtil.clearInventory(gamePlayer.getPlayer());
-            //HotBarManager.getManager().giveItems(player.getPlayer(), HotBarType.GAME);
-            for (Player player1 : world.getPlayers()) {
-                player1.showPlayer(gamePlayer.getPlayer());
-                gamePlayer.getPlayer().showPlayer(player1);
-            }
-            // TODO create scoreboard
-            EggWarsBoard.getManager().setGameBoard(gamePlayer);
-        }, 10L);
-
-
-        if (players.size() > minPlayers && isGameState(GameState.WAITING)) {
-            setGameState(GameState.STARTING);
-            if (!gameTimer.isStarted()) gameTimer.start();
-            startTimer.start();
+        EggWarsBoard.getManager().removeScoreboard(gamePlayer);
+        PlayerUtil.clearInventory(gamePlayer.getPlayer());
+        //HotBarManager.getManager().giveItems(player.getPlayer(), HotBarType.GAME);
+        for (Player player1 : world.getPlayers()) {
+            player1.showPlayer(gamePlayer.getPlayer());
+            gamePlayer.getPlayer().showPlayer(player1);
         }
-
+        // TODO create scoreboard
+        EggWarsBoard.getManager().setGameBoard(gamePlayer);
+        System.out.println("Board set!");
 
         Util.updateGame(this);
-
     }
 
     @Override

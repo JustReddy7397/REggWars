@@ -1,5 +1,6 @@
 package ga.justreddy.wiki.reggwars.support;
 
+import ga.justreddy.wiki.reggwars.REggWars;
 import ga.justreddy.wiki.reggwars.api.EggWarsAPI;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillEffect;
 import ga.justreddy.wiki.reggwars.api.model.cosmetics.KillMessage;
@@ -13,6 +14,7 @@ import ga.justreddy.wiki.reggwars.manager.LeaderboardManager;
 import ga.justreddy.wiki.reggwars.manager.PlayerManager;
 import ga.justreddy.wiki.reggwars.manager.ShopManager;
 import ga.justreddy.wiki.reggwars.manager.cosmetic.DanceManager;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -59,7 +61,7 @@ public class ApiHandler implements EggWarsAPI {
     @Override
     public void clearLeaderboards(IGamePlayer player) {
         LeaderboardManager.getInstance().getPlayerLeaderboards(player)
-                        .forEach(Leaderboard::destroy);
+                .forEach(Leaderboard::destroy);
         LeaderboardManager.getInstance().getPlayerLeaderboards().remove(player);
     }
 
@@ -71,5 +73,10 @@ public class ApiHandler implements EggWarsAPI {
     @Override
     public void registerCustomShopItem(CustomShopItem item) {
         ShopManager.getManager().registerCustomShopItem(item);
+    }
+
+    @Override
+    public boolean hasNbtData(ItemStack itemStack, String key) {
+        return REggWars.getInstance().getNms().hasNbtData(itemStack, key);
     }
 }

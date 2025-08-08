@@ -4,6 +4,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 
 /**
+ * This enum represents a team in the game.
+ * It provides methods to manage the team's information.
+ * It also provides a method to get a team by its identifier.
+ *
  * @author JustReddy
  */
 public enum Team {

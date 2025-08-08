@@ -91,7 +91,7 @@ items:
     item:
       material: STONE_SWORD
       name: "&bStone Sword"
-      lore: 
+      lore:
         - "Cost: &f<price>"
         - ""
         - "A decent sword for beginners!"

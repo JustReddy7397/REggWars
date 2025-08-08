@@ -1,20 +1,24 @@
-package ga.justreddy.wiki.reggwars.model.game.test;
+package ga.justreddy.wiki.reggwars.model.game.items;
 
+import com.cryptomorin.xseries.XMaterial;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.item.ClickAction;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.LinkedList;
 
 /**
  * @author JustReddy
  */
-public class CustomTestItem extends CustomShopItem {
+public class SheerItem extends CustomShopItem {
 
-    public CustomTestItem() {
-        super("test", new ItemStack(Material.APPLE));
+    /**
+     * Constructs a new CustomShopItem with the given id and starter item.
+     *
+     * @param id          the unique identifier for this item
+     * @param starterItem the initial item stack for this item
+     */
+    public SheerItem() {
+        super("sheer", new ItemStack(XMaterial.SHEARS.parseMaterial()));
     }
 
     @Override
@@ -24,13 +28,12 @@ public class CustomTestItem extends CustomShopItem {
 
     @Override
     public boolean isPersistent() {
-        return false;
+        return true;
     }
-
 
     @Override
     public void onDeath(IGamePlayer player) {
-        // Nothing :(
+
     }
 
     @Override
@@ -40,8 +43,6 @@ public class CustomTestItem extends CustomShopItem {
 
     @Override
     public void onClick(IGamePlayer player, ClickAction action) {
-
-        player.sendLegacyMessage("Hello There! " + action.name());
 
     }
 }

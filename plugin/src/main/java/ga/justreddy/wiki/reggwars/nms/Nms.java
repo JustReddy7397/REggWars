@@ -5,6 +5,7 @@ import eu.decentsoftware.holograms.api.holograms.Hologram;
 import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.team.IGameTeam;
+import ga.justreddy.wiki.reggwars.utils.ItemBuilder;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -78,4 +79,6 @@ public interface Nms {
     boolean hasNbtData(ItemStack itemStack, String customItem);
 
     String getNbtData(ItemStack itemStack, String customItem);
+
+    ItemStack setUnbreakable(ItemStack stack);
 }

@@ -433,4 +433,10 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder setUnbreakable() {
+        Nms nms = REggWars.getInstance().getNms();
+        stack = nms.setUnbreakable(stack);
+        return this;
+    }
+
 }

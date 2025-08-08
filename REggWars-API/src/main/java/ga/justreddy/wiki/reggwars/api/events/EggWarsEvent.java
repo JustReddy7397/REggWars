@@ -5,6 +5,8 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 /**
+ * This class represents an event.
+ *
  * @author JustReddy
  */
 public abstract class EggWarsEvent extends Event {

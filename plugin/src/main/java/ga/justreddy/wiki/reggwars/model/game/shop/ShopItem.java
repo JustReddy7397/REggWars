@@ -160,11 +160,14 @@ public class ShopItem implements IShopItem {
         return item;
     }
 
+    public void setItem(ItemStack item) {
+        this.item = item;
+    }
+
     @Override
     public IShopPrice getPrice() {
         return price;
     }
-
 
     @Override
     public int getAmount() {
@@ -255,7 +258,7 @@ public class ShopItem implements IShopItem {
                     takeMoney(player);
                     inventory.addItem(builder.build());
                 } else {
-                    builder = new ItemBuilder(customShopItem.getToGive());
+                    builder = new ItemBuilder(customShopItem.getStarterItem());
                     builder.setNbtData("customItem", customShopItem.getId());
                     builder.withAmount(item.getAmount());
                     if (customShopItem.isUpgradable()) {
@@ -283,6 +286,7 @@ public class ShopItem implements IShopItem {
                             break;
                         }
                         takeMoney(player);
+
                     } else {
                         takeMoney(player);
                         inventory.addItem(builder.build());

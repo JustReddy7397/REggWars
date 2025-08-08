@@ -7,6 +7,7 @@ import ga.justreddy.wiki.reggwars.api.model.entity.IGamePlayer;
 import ga.justreddy.wiki.reggwars.api.model.game.IGame;
 import ga.justreddy.wiki.reggwars.api.model.game.shop.item.CustomShopItem;
 import ga.justreddy.wiki.reggwars.api.model.leaderboard.Leaderboard;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.FileReader;
 import java.util.UUID;
@@ -63,6 +64,8 @@ public interface EggWarsAPI {
     void addLeaderboard(IGamePlayer player, String id);
 
     void registerCustomShopItem(CustomShopItem item);
+
+    boolean hasNbtData(ItemStack itemStack, String key);
 
     default String getVersion() {
         return "1.0.0";

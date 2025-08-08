@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -281,5 +282,13 @@ public class v1_8_R3 implements Nms {
     public String getNbtData(ItemStack itemStack, String tag) {
         NBTItem nbtItem = new NBTItem(itemStack);
         return nbtItem.getString(tag);
+    }
+
+    @Override
+    public ItemStack setUnbreakable(ItemStack stack) {
+        ItemMeta meta = stack.getItemMeta();
+        meta.spigot().setUnbreakable(true);
+        stack.setItemMeta(meta);
+        return stack;
     }
 }

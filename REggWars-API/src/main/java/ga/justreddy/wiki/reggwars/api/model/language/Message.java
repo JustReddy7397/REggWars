@@ -7,6 +7,8 @@ package ga.justreddy.wiki.reggwars.api.model.language;
 public enum Message {
 
     // Scoreboard
+    SETTINGS_ID("settings.id", "en"),
+    SETTINGS_DISPLAYNAME("settings.displayname", "English"),
     SCOREBOARD_DATE_FORMAT("scoreboard.date-format",
             "dd/MM/yyyy"),
     SCOREBOARD_YOU_TEXT("scoreboard.you",
